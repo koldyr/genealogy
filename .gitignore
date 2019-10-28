@@ -20,4 +20,4 @@ hs_err_pid*
 *.iml
 *.ged
 .idea
-out
+build

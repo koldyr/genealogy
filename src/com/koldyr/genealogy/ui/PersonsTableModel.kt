@@ -18,7 +18,7 @@ class PersonsTableModel(private val persons: List<Person>): AbstractTableModel()
     }
 
     override fun getColumnCount(): Int {
-        return 9
+        return columnNames.size
     }
 
     override fun getColumnName(column: Int): String {
@@ -37,14 +37,14 @@ class PersonsTableModel(private val persons: List<Person>): AbstractTableModel()
         val person = persons.get(rowIndex)
         return when (columnIndex) {
             0 -> { person.id }
-            1 -> { if (person.name == null) "-" else person.name }
-            2 -> { if (person.sex == null) "-" else person.sex!!.name }
-            3 -> { if (person.birth == null) "-" else person.birth }
-            4 -> { if (person.death == null) "-" else person.death }
-            5 -> { if (person.place == null) "-" else person.place }
-            6 -> { if (person.occupation == null) "-" else person.occupation }
-            7 -> { if (person.note == null) "-" else person.note }
-            8 -> { if (person.familyId == null) "-" else person.familyId }
+            1 -> { person.name }
+            2 -> { person.sex }
+            3 -> { person.birth }
+            4 -> { person.death }
+            5 -> { person.place }
+            6 -> { person.occupation }
+            7 -> { person.note }
+            8 -> { person.familyId }
             else -> { "N/A" }
         }
     }

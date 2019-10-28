@@ -14,6 +14,17 @@ data class Person(
         var place: String? = null,
         var occupation: String? = null,
         var note: String? = null,
-        var sex: Sex? = null,
+        var sex: Sex = Sex.MALE,
         var familyId: Int? = null
-)
+) {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Person) return false
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id
+    }
+}
