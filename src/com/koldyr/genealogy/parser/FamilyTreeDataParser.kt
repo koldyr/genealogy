@@ -1,10 +1,7 @@
 package com.koldyr.genealogy.parser
 
 import com.koldyr.genealogy.model.*
-import java.io.BufferedReader
 import java.io.File
-import java.io.FileInputStream
-import java.io.InputStreamReader
 import java.nio.charset.Charset
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -23,99 +20,101 @@ class FamilyTreeDataParser {
 
     fun parse(fileName: String): Set<Family> {
         val charset = Charset.forName("windows-1251")
-        val inputStreamReader = InputStreamReader(FileInputStream(File(fileName)), charset)
-        val reader = BufferedReader(inputStreamReader)
+        val bufferedReader = File(fileName).bufferedReader(charset)
 
         val families: MutableSet<Family> = mutableSetOf()
         val persons: MutableMap<Int, Person> = mutableMapOf()
-        var person: Person? = null
-        var family: Family? = null
-        var event: LifeEvent? = null
 
-        var line: String? = reader.readLine()
-        while (line != null) {
-            if (line.endsWith(PERSON)) {
-                val personId: Int = getPersonId(line)
-                person = Person(personId)
-                persons.put(personId, person)
-            } else if (line.contains(NAME)) {
-                if (person != null) {
-                    person.name = parseFullName(line)
-                }
-            } else if (line.contains(SEX)) {
-                if (person != null) {
-                    person.sex = parseSex(line)
-                }
-            } else if (line.contains(OCCUPATION)) {
-                if (person != null) {
-                    person.occupation = parseGeneric(line, OCCUPATION)
-                }
-            } else if (line.contains(RESIDENCE)) {
-                if (person != null) {
-                    person.place = parseGeneric(line, RESIDENCE)
-                }
-            } else if (line.contains(NOTE)) {
-                if (person != null) {
-                    person.note = parseGeneric(line, NOTE)
-                } else if (family != null) {
-                    family.note = parseGeneric(line, NOTE)
-                }
-            } else if (line.contains(CONTINUE)) {
-                if (person != null) {
-                    person.note = person.note + '\n' + parseGeneric(line, CONTINUE)
-                }
-            } else if (line.contains(FAMC)) {
-                if (person != null) {
+        bufferedReader.use { reader ->
+            var person: Person? = null
+            var family: Family? = null
+            var event: LifeEvent? = null
+
+            var line: String? = reader.readLine()
+            while (line != null) {
+                if (line.endsWith(PERSON)) {
+                    val personId: Int = getPersonId(line)
+                    person = Person(personId)
+                    persons.put(personId, person)
+                } else if (line.contains(NAME)) {
+                    if (person != null) {
+                        person.name = parseFullName(line)
+                    }
+                } else if (line.contains(SEX)) {
+                    if (person != null) {
+                        person.sex = parseSex(line)
+                    }
+                } else if (line.contains(OCCUPATION)) {
+                    if (person != null) {
+                        person.occupation = parseGeneric(line, OCCUPATION)
+                    }
+                } else if (line.contains(RESIDENCE)) {
+                    if (person != null) {
+                        person.place = parseGeneric(line, RESIDENCE)
+                    }
+                } else if (line.contains(NOTE)) {
+                    if (person != null) {
+                        person.note = parseGeneric(line, NOTE)
+                    } else if (family != null) {
+                        family.note = parseGeneric(line, NOTE)
+                    }
+                } else if (line.contains(CONTINUE)) {
+                    if (person != null) {
+                        person.note = person.note + '\n' + parseGeneric(line, CONTINUE)
+                    }
+                } else if (line.contains(FAMC)) {
+                    if (person != null) {
+                        val familyId = parseFamilyId(line)
+                        handleFamily(familyId, person, families)
+                    }
+                } else if (line.endsWith(FAMILY)) {
+                    person = null
                     val familyId = parseFamilyId(line)
-                    handleFamily(familyId, person, families)
-                }
-            } else if (line.endsWith(FAMILY)) {
-                person = null
-                val familyId = parseFamilyId(line)
-                family = families.stream().filter { it.id == familyId }.findFirst().orElseGet { Family(familyId) }
-            } else if (line.contains(HUSBAND)) {
-                if (family != null) {
-                    val personId = getPersonId(line)
-                    family.husband = persons.get(personId)
-                }
-            } else if (line.contains(WIFE)) {
-                if (family != null) {
-                    val personId = getPersonId(line)
-                    family.wife = persons.get(personId)
-                }
-            } else if (line.contains(CHILD)) {
-                if (family != null) {
-                    val personId = getPersonId(line)
-                    val child = persons.get(personId)
-                    if (child != null) {
-                        family.children.add(child)
+                    family = families.stream().filter { it.id == familyId }.findFirst().orElseGet { Family(familyId) }
+                } else if (line.contains(HUSBAND)) {
+                    if (family != null) {
+                        val personId = getPersonId(line)
+                        family.husband = persons.get(personId)
+                    }
+                } else if (line.contains(WIFE)) {
+                    if (family != null) {
+                        val personId = getPersonId(line)
+                        family.wife = persons.get(personId)
+                    }
+                } else if (line.contains(CHILD)) {
+                    if (family != null) {
+                        val personId = getPersonId(line)
+                        val child = persons.get(personId)
+                        if (child != null) {
+                            family.children.add(child)
+                        }
+                    }
+                } else if (line.endsWith(BIRTH)) {
+                    if (person != null) {
+                        event = LifeEvent()
+                        person.birth = event
+                    }
+                } else if (line.endsWith(DEATH)) {
+                    if (person != null) {
+                        event = LifeEvent()
+                        person.death = event
+                    }
+                } else if (line.endsWith(MARRIAGE)) {
+                    if (family != null) {
+                        event = LifeEvent()
+                        family.marriage = event
+                    }
+                } else if (line.contains(DATE)) {
+                    if (event != null) {
+                        event.date = parseDate(line)
+                    }
+                } else if (line.contains(PLACE)) {
+                    if (event != null) {
+                        event.place = parseGeneric(line, PLACE)
                     }
                 }
-            } else if (line.endsWith(BIRTH)) {
-                if (person != null) {
-                    event = LifeEvent()
-                    person.birth = event
-                }
-            } else if (line.endsWith(DEATH)) {
-                if (person != null) {
-                    event = LifeEvent()
-                    person.death = event
-                }
-            } else if (line.endsWith(MARRIAGE)) {
-                if (family != null) {
-                    event = LifeEvent()
-                    family.marriage = event
-                }
-            } else if (line.contains(DATE)) {
-                if (event != null) {
-                    event.date = parseDate(line)
-                }
-            } else if (line.contains(PLACE)) {
-                if (event != null) {
-                    event.place = parseGeneric(line, PLACE)
-                }
+                line = reader.readLine()
             }
-            line = reader.readLine()
         }
 
         return families
