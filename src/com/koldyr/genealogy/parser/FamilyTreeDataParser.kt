@@ -18,7 +18,7 @@ class FamilyTreeDataParser {
     private val personIdPattern = Pattern.compile("@(\\d+)@")
     private val familyIdPattern = Pattern.compile("@\\w(\\d+)@")
 
-    fun parse(fileName: String): Set<Family> {
+    fun parse(fileName: String): Collection<Person> {
         val charset = Charset.forName("windows-1251")
         val bufferedReader = File(fileName).bufferedReader(charset)
 
@@ -117,7 +117,7 @@ class FamilyTreeDataParser {
             }
         }
 
-        return families
+        return persons.values
     }
 
     private fun handleFamily(familyId: Int, person: Person, families: MutableSet<Family>) {

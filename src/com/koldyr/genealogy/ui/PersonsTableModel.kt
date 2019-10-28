@@ -13,6 +13,10 @@ class PersonsTableModel(private val persons: List<Person>): AbstractTableModel()
 
     private val columnNames = listOf("Id", "Name", "Sex", "Birth", "Death", "Place", "Occupation", "Note", "Family Id")
 
+    fun getPerson(index: Int): Person {
+        return persons[index]
+    }
+
     override fun getRowCount(): Int {
         return persons.size
     }
