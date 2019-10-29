@@ -6,22 +6,31 @@ import com.koldyr.genealogy.model.PersonNames
 import com.koldyr.genealogy.parser.FamilyTreeDataParser
 import java.awt.Dimension
 import java.awt.event.ActionEvent
+import java.awt.event.ActionListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.*
-import javax.swing.JOptionPane.INFORMATION_MESSAGE
-import javax.swing.JOptionPane.showMessageDialog
+import javax.swing.JDialog
+import javax.swing.JFileChooser
+import javax.swing.JFrame
+import javax.swing.JMenu
+import javax.swing.JMenuBar
+import javax.swing.JMenuItem
+import javax.swing.JOptionPane
+import javax.swing.JPopupMenu
+import javax.swing.JScrollPane
+import javax.swing.JTable
 import javax.swing.filechooser.FileNameExtensionFilter
 
 /**
  * Description of class GenealogyApp
  * @created: 2019-10-27
  */
-class GenealogyApp : JFrame {
+class GenealogyApp : JFrame, ActionListener {
 
-    private var persons: Collection<Person>
     private val tableModel: PersonsTableModel
     private val tblPersons: JTable
+
+    private var persons: Collection<Person>
     private var fileName: String?
 
     constructor(persons: Collection<Person>, fileName: String?) : super("Genealogy: ${fileName ?: ""} ") {
@@ -33,26 +42,15 @@ class GenealogyApp : JFrame {
 //                .flatMap { stream: Stream<Person?> -> stream }
 //                .filter { it != null }
 //                .collect(Collectors.toSet())
-//
-//        persons = persons.toSortedSet(Comparator { p1, p2 -> p1!!.id.compareTo(p2!!.id) })
 
-        tableModel = PersonsTableModel(persons.toList().sortedBy { it.id  })
-        tblPersons = JTable(tableModel)
-        tblPersons.setDefaultRenderer(PersonNames::class.java, NamesRenderer())
-        tblPersons.setDefaultRenderer(LifeEvent::class.java, EventsRenderer())
-        tblPersons.addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(e: MouseEvent) {
-                if (e.button == MouseEvent.BUTTON1 && e.clickCount == 2) {
-                    val person = tableModel.getPerson(tblPersons.selectedRow)
-                    val editPersonDialog: JDialog = EditPersonDialog(this@GenealogyApp, person)
-                    editPersonDialog.isVisible = true
-                }
-            }
-        })
+        val personPopUp = createPersonPopUp()
+        createMenu()
 
+        tableModel = PersonsTableModel()
+        tblPersons = createTable(personPopUp)
         contentPane.add(JScrollPane(tblPersons))
 
-        createMenu()
+        tableModel.setPersons(persons)
 
         val frameSize = Dimension(1000, 800)
         preferredSize.size = frameSize
@@ -62,42 +60,120 @@ class GenealogyApp : JFrame {
         setLocationRelativeTo(null)
     }
 
+    private fun createTable(personPopUp: JPopupMenu): JTable {
+        val tblPersons = JTable(tableModel)
+        tblPersons.setDefaultRenderer(PersonNames::class.java, NamesRenderer())
+        tblPersons.setDefaultRenderer(LifeEvent::class.java, EventsRenderer())
+        tblPersons.addMouseListener(object : MouseAdapter() {
+            override fun mousePressed(e: MouseEvent) {
+                if (e.isPopupTrigger) {
+                    personPopUp.location = e.locationOnScreen
+                    personPopUp.isVisible = true
+                }
+            }
+
+            override fun mouseReleased(e: MouseEvent) {
+                if (e.isPopupTrigger) {
+                    personPopUp.location = e.locationOnScreen
+                    personPopUp.isVisible = true
+                }
+            }
+
+            override fun mouseClicked(e: MouseEvent) {
+                if (e.button == MouseEvent.BUTTON1 && e.clickCount == 2) {
+                    editPerson()
+                }
+            }
+        })
+        return tblPersons
+    }
+
+    private fun createPersonPopUp(): JPopupMenu {
+        val personPopUp = JPopupMenu()
+
+        val jmiAdd = JMenuItem("Add")
+        jmiAdd.addActionListener(this)
+        personPopUp.add(jmiAdd)
+
+        val jmiEdit = JMenuItem("Edit")
+        jmiEdit.addActionListener(this)
+        personPopUp.add(jmiEdit)
+
+        val jmiDelete = JMenuItem("Delete")
+        jmiDelete.addActionListener(this)
+        personPopUp.add(jmiDelete)
+
+        return personPopUp
+    }
+
     private fun createMenu() {
-        val actionOpen = object: AbstractAction("Open") {
-            override fun actionPerformed(e: ActionEvent) {
-                openFile()
-            }
-        }
-
-        val actionSave = object: AbstractAction("Save") {
-            override fun actionPerformed(e: ActionEvent) {
-                saveFile()
-            }
-        }
-
-        val actionExit = object: AbstractAction("Exit") {
-            override fun actionPerformed(e: ActionEvent) {
-                this@GenealogyApp.dispose()
-            }
-        }
-
-        val actionAbout = object: AbstractAction("About") {
-            override fun actionPerformed(e: ActionEvent) {
-                showMessageDialog(this@GenealogyApp, "Genealogy v1.0.0", "About", INFORMATION_MESSAGE)
-            }
-        }
-
         val mnuFile = JMenu("File")
-        mnuFile.add(actionOpen)
-        mnuFile.add(actionSave)
-        mnuFile.add(actionExit)
+
+        val jmiOpen = JMenuItem("Open")
+        jmiOpen.addActionListener(this)
+        mnuFile.add(jmiOpen)
+
+        val jmiSave = JMenuItem("Save")
+        jmiSave.addActionListener(this)
+        mnuFile.add(jmiSave)
+
+        val jmiExit = JMenuItem("Exit")
+        jmiExit.addActionListener(this)
+        mnuFile.add(jmiExit)
+
+        val mnuEdit = JMenu("Edit")
+
+        val jmiAdd = JMenuItem("Add")
+        jmiAdd.addActionListener(this)
+        mnuEdit.add(jmiAdd)
+
+        val jmiEdit = JMenuItem("Edit")
+        jmiEdit.addActionListener(this)
+        mnuEdit.add(jmiEdit)
+
+        val jmiDelete = JMenuItem("Delete")
+        jmiDelete.addActionListener(this)
+        mnuEdit.add(jmiDelete)
 
         val mnuHelp = JMenu("Help")
-        mnuHelp.add(actionAbout)
+
+        val jmiAbout = JMenuItem("About")
+        jmiAbout.addActionListener(this)
+        mnuHelp.add(jmiAbout)
 
         rootPane.jMenuBar = JMenuBar()
         rootPane.jMenuBar.add(mnuFile)
+        rootPane.jMenuBar.add(mnuEdit)
         rootPane.jMenuBar.add(mnuHelp)
+    }
+
+    override fun actionPerformed(e: ActionEvent) {
+        when (e.actionCommand) {
+            "Open" -> openFile()
+            "Save" -> saveFile()
+            "Exit" -> this.dispose()
+            "Edit" -> editPerson()
+            "Delete" -> deletePerson()
+            "Add" -> addPerson()
+            "About" -> showAbout()
+            else -> println(e.actionCommand)
+        }
+    }
+
+    private fun editPerson() {
+        if (tblPersons.selectedRow > -1) {
+            val person = tableModel.getPerson(tblPersons.selectedRow)
+            val editPersonDialog: JDialog = EditPersonDialog(this@GenealogyApp, person)
+            editPersonDialog.isVisible = true
+        }
+    }
+
+    private fun deletePerson() {
+        tableModel.removePerson(tblPersons.selectedRow)
+    }
+
+    private fun addPerson() {
+
     }
 
     private fun openFile() {
@@ -125,5 +201,9 @@ class GenealogyApp : JFrame {
         if (fileChooser.selectedFile != null) {
             println("path: ${fileChooser.selectedFile}")
         }
+    }
+
+    private fun showAbout() {
+        JOptionPane.showMessageDialog(this@GenealogyApp, "Genealogy v1.0.0", "About", JOptionPane.INFORMATION_MESSAGE)
     }
 }
