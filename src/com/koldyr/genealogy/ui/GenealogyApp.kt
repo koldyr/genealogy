@@ -9,16 +9,7 @@ import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.JDialog
-import javax.swing.JFileChooser
-import javax.swing.JFrame
-import javax.swing.JMenu
-import javax.swing.JMenuBar
-import javax.swing.JMenuItem
-import javax.swing.JOptionPane
-import javax.swing.JPopupMenu
-import javax.swing.JScrollPane
-import javax.swing.JTable
+import javax.swing.*
 import javax.swing.filechooser.FileNameExtensionFilter
 
 /**
@@ -151,7 +142,7 @@ class GenealogyApp : JFrame, ActionListener {
         when (e.actionCommand) {
             "Open" -> openFile()
             "Save" -> saveFile()
-            "Exit" -> this.dispose()
+            "Exit" -> dispose()
             "Edit" -> editPerson()
             "Delete" -> deletePerson()
             "Add" -> addPerson()
@@ -169,7 +160,9 @@ class GenealogyApp : JFrame, ActionListener {
     }
 
     private fun deletePerson() {
-        tableModel.removePerson(tblPersons.selectedRow)
+        if (tblPersons.selectedRow > -1) {
+            tableModel.removePerson(tblPersons.selectedRow)
+        }
     }
 
     private fun addPerson() {

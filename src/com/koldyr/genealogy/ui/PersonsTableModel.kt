@@ -20,6 +20,10 @@ class PersonsTableModel : AbstractTableModel() {
         fireTableDataChanged()
     }
 
+    fun getPersons(): Collection<Person> {
+        return persons
+    }
+
     fun getPerson(index: Int): Person {
         return persons[index]
     }
@@ -44,51 +48,25 @@ class PersonsTableModel : AbstractTableModel() {
 
     override fun getColumnClass(columnIndex: Int): Class<*> {
         return when (columnIndex) {
-            1 -> {
-                PersonNames::class.java
-            }
-            3, 4 -> {
-                LifeEvent::class.java
-            }
-            else -> {
-                super.getColumnClass(columnIndex)
-            }
+            1 -> PersonNames::class.java
+            3, 4 -> LifeEvent::class.java
+            else -> super.getColumnClass(columnIndex)
         }
     }
 
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {
         val person = persons.get(rowIndex)
         return when (columnIndex) {
-            0 -> {
-                person.id
-            }
-            1 -> {
-                person.name
-            }
-            2 -> {
-                person.sex
-            }
-            3 -> {
-                person.birth
-            }
-            4 -> {
-                person.death
-            }
-            5 -> {
-                person.place
-            }
-            6 -> {
-                person.occupation
-            }
-            7 -> {
-                person.note
-            }
-            8 -> {
-                person.familyId
-            }
-            else -> {
-                "N/A"
-            }
+            0 -> person.id
+            1 -> person.name
+            2 -> person.sex
+            3 -> person.birth
+            4 -> person.death
+            5 -> person.place
+            6 -> person.occupation
+            7 -> person.note
+            8 -> person.familyId
+            else -> "N/A"
         }
     }
 }
