@@ -10,11 +10,19 @@ object Main {
     @Throws(IOException::class)
     @JvmStatic
     fun main(args: Array<String>) {
-        val parser = FamilyTreeDataParser()
-        val persons: Collection<Person> = parser.parse(args[0])
-        println("persons = ${persons}")
+        val fileName = if (args.isEmpty()) null else args[0]
 
-        val appWindow = GenealogyApp(persons)
+        val persons: Collection<Person>
+
+        if (fileName == null) {
+            persons = listOf()
+        } else {
+            val parser = FamilyTreeDataParser()
+            persons = parser.parse(fileName)
+            println("persons = ${persons}")
+        }
+
+        val appWindow = GenealogyApp(persons, fileName)
         appWindow.isVisible = true
     }
 }

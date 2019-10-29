@@ -9,9 +9,14 @@ import javax.swing.table.AbstractTableModel
  * Description of class PersonsTableModel
  * @created: 2019-10-27
  */
-class PersonsTableModel(private val persons: List<Person>): AbstractTableModel() {
+class PersonsTableModel(private var persons: List<Person>): AbstractTableModel() {
 
     private val columnNames = listOf("Id", "Name", "Sex", "Birth", "Death", "Place", "Occupation", "Note", "Family Id")
+
+    fun setPersons(persons: Collection<Person>) {
+        this.persons = persons.toList().sortedBy { it.id }
+        fireTableDataChanged()
+    }
 
     fun getPerson(index: Int): Person {
         return persons[index]
