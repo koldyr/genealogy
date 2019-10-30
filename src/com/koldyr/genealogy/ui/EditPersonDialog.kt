@@ -4,11 +4,28 @@ import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
 import com.koldyr.genealogy.model.Sex
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.FlowLayout
+import java.awt.Frame
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
+import java.awt.Insets
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import javax.swing.*
+import javax.swing.AbstractAction
+import javax.swing.Action
+import javax.swing.JButton
+import javax.swing.JComboBox
+import javax.swing.JComponent
+import javax.swing.JDialog
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.JTextArea
+import javax.swing.JTextField
+import javax.swing.KeyStroke
 import javax.swing.border.EmptyBorder
 
 
@@ -16,26 +33,49 @@ import javax.swing.border.EmptyBorder
  * Description of class EditPersonDialog
  * @created: 2019-10-27
  */
-class EditPersonDialog(owner: Frame?, private var person: Person) : JDialog(owner, "Edit Person", true) {
-    init {
+class EditPersonDialog : JDialog {
+    private var person: Person
+    private var modalResult: Boolean = false
+
+    private val txtName: JTextField
+    private val txtMiddle: JTextField
+    private val txtLast: JTextField
+    private val txtMaiden: JTextField
+    private val cmbSex: JComboBox<Sex>
+    private val txtBirth: JTextField
+    private val txtBirthPlace: JTextField
+    private val txtDeath: JTextField
+    private val txtDeathPlace: JTextField
+    private val txtPlace: JTextField
+    private val txtOccupation: JTextField
+    private val txtNote: JTextArea
+
+    constructor(owner: Frame?, person: Person) : super(owner, "Edit Person", true) {
+        this.person = person
+
         val lblId = JLabel("Id:")
         val txtId = JTextField(person.id.toString())
         txtId.isEditable = false
 
-        val name: PersonNames = person.name!!
-        val lblName = JLabel("Name:")
-        val txtName = JTextField(name.name)
-        val txtMiddle = JTextField(name.middle)
-        val txtLast = JTextField(name.last)
-        val txtMaiden = JTextField(name.maiden)
+        val name: PersonNames = person.name ?: PersonNames("", "", "", "")
+        val lblName = JLabel("Name/Middle:")
+        txtName = JTextField(name.name)
+        txtMiddle = JTextField(name.middle)
+
+        val lblLast = JLabel("Last/Maiden:")
+        txtLast = JTextField(name.last)
+        txtMaiden = JTextField(name.maiden)
 
         val lblSex = JLabel("Sex:")
-        val cmbSex = JComboBox(Sex.values())
-        cmbSex.selectedItem = person.sex
+        cmbSex = JComboBox(Sex.values())
+        cmbSex.addActionListener {
+            txtMaiden.isVisible = cmbSex.selectedItem == Sex.FEMALE
+        }
 
         val lblBirth = JLabel("Birth:")
-        val txtBirth = JTextField()
-        val txtBirthPlace = JTextField()
+        txtBirth = JTextField()
+        txtBirthPlace = JTextField()
+
         if (person.birth != null) {
             val birth: LifeEvent = person.birth!!
             if (birth.date != null) {
@@ -45,8 +85,8 @@ class EditPersonDialog(owner: Frame?, private var person: Person) : JDialog(owne
         }
 
         val lblDeath = JLabel("Death:")
-        val txtDeath = JTextField()
-        val txtDeathPlace = JTextField()
+        txtDeath = JTextField()
+        txtDeathPlace = JTextField()
 
         if (person.death != null) {
             val death: LifeEvent = person.death!!
@@ -57,75 +97,124 @@ class EditPersonDialog(owner: Frame?, private var person: Person) : JDialog(owne
         }
 
         val lblPlace = JLabel("Place:")
-        val txtPlace = JTextField(person.place)
+        txtPlace = JTextField(person.place)
 
         val lblOccupation = JLabel("Occupation:")
-        val txtOccupation = JTextField(person.occupation)
+        txtOccupation = JTextField(person.occupation)
 
         val lblNote = JLabel("Note:")
-        val txtNote = JTextArea(person.note, 3, 20)
+        txtNote = JTextArea(person.note, 4, 20)
 
         rootPane.border = EmptyBorder(10, 10, 10, 10)
 
+        var rowIndex = 0
         val pnlContent = JPanel(GridBagLayout())
-        pnlContent.add(lblId, GridBagConstraints(0, 0, 2, 1, 0.0, 0.0,
+        pnlContent.add(lblId, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtId, GridBagConstraints(1, 0, 1, 1, 1.0, 0.0,
+        pnlContent.add(txtId, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
-        pnlContent.add(lblName, GridBagConstraints(0, 1, 2, 1, 0.0, 0.0,
+        rowIndex++
+        pnlContent.add(lblName, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtName, GridBagConstraints(1, 1, 1, 1, 0.5, 0.0,
+        pnlContent.add(txtName, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
-        pnlContent.add(txtMiddle, GridBagConstraints(2, 1, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
-        if (person.sex == Sex.FEMALE) {
-            pnlContent.add(txtMaiden, GridBagConstraints(3, 1, 1, 1, 0.5, 0.0,
-                    GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
-        }
+        pnlContent.add(txtMiddle, GridBagConstraints(2, rowIndex, 1, 1, 0.5, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 5, 0), 0, 0))
 
-        pnlContent.add(lblSex, GridBagConstraints(0, 2, 1, 1, 0.0, 0.0,
+        rowIndex++
+        pnlContent.add(lblLast, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(cmbSex, GridBagConstraints(1, 2, 2, 1, 1.0, 0.0,
+        pnlContent.add(txtLast, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+        pnlContent.add(txtMaiden, GridBagConstraints(2, rowIndex, 1, 1, 0.5, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 5, 0), 0, 0))
+
+        rowIndex++
+        pnlContent.add(lblSex, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+        pnlContent.add(cmbSex, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 0), 0, 0))
 
-        pnlContent.add(lblBirth, GridBagConstraints(0, 3, 1, 1, 0.0, 0.0,
+        rowIndex++
+        pnlContent.add(lblBirth, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtBirth, GridBagConstraints(1, 3, 1, 1, 0.5, 0.0,
+        pnlContent.add(txtBirth, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
-        pnlContent.add(txtBirthPlace, GridBagConstraints(2, 3, 1, 1, 0.5, 0.0,
+        pnlContent.add(txtBirthPlace, GridBagConstraints(2, rowIndex, 1, 1, 0.5, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 5, 0), 0, 0))
+
+        rowIndex++
+        pnlContent.add(lblDeath, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+        pnlContent.add(txtDeath, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+        pnlContent.add(txtDeathPlace, GridBagConstraints(2, rowIndex, 1, 1, 0.5, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 5, 0), 0, 0))
+
+        rowIndex++
+        pnlContent.add(lblPlace, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+        pnlContent.add(txtPlace, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
-        pnlContent.add(lblDeath, GridBagConstraints(0, 4, 1, 1, 0.0, 0.0,
+        rowIndex++
+        pnlContent.add(lblOccupation, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtDeath, GridBagConstraints(1, 4, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
-        pnlContent.add(txtDeathPlace, GridBagConstraints(2, 4, 1, 1, 0.5, 0.0,
+        pnlContent.add(txtOccupation, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
-        pnlContent.add(lblPlace, GridBagConstraints(0, 5, 1, 1, 0.0, 0.0,
+        rowIndex++
+        pnlContent.add(lblNote, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtPlace, GridBagConstraints(1, 5, 2, 1, 1.0, 0.0,
+        pnlContent.add(JScrollPane(txtNote), GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
-        pnlContent.add(lblOccupation, GridBagConstraints(0, 6, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtOccupation, GridBagConstraints(1, 6, 2, 1, 1.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+        cmbSex.selectedItem = person.sex
+        val pnlButtons = createButtonsPanel()
 
-        pnlContent.add(lblNote, GridBagConstraints(0, 7, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(JScrollPane(txtNote), GridBagConstraints(1, 7, 2, 1, 1.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+        contentPane.add(pnlContent)
+        contentPane.add(pnlButtons, BorderLayout.SOUTH)
 
+        pack()
+        setLocationRelativeTo(null)
+    }
+
+    fun getPerson(): Person {
+        val name: String = txtName.text
+        val middle: String? = if (txtMiddle.text.trim().isEmpty()) null else txtMiddle.text
+        val last: String? = if (txtLast.text.trim().isEmpty()) null else txtLast.text
+        val maiden: String? = if (txtMaiden.text.trim().isEmpty()) null else txtMaiden.text
+        person.name = PersonNames(name, middle, last, maiden)
+
+        val birthDate: LocalDate? = if (txtBirth.text.trim().isEmpty()) null else LocalDate.parse(txtBirth.text, DateTimeFormatter.ISO_LOCAL_DATE)
+        val birthPlace: String? = if (txtBirthPlace.text.trim().isEmpty()) null else txtBirthPlace.text
+        person.birth = LifeEvent(birthDate, birthPlace)
+
+        val deathDate: LocalDate? = if (txtDeath.text.trim().isEmpty()) null else LocalDate.parse(txtDeath.text, DateTimeFormatter.ISO_LOCAL_DATE)
+        val deathPlace: String? = if (txtDeathPlace.text.trim().isEmpty()) null else txtDeathPlace.text
+        person.death = LifeEvent(deathDate, deathPlace)
+
+        person.sex = cmbSex.selectedItem as Sex
+        person.place = txtPlace.text
+        person.occupation = txtOccupation.text
+        person.note = txtNote.text
+
+        return person
+    }
+
+    fun getModalResult(): Boolean {
+        return modalResult
+    }
+
+    private fun createButtonsPanel(): JPanel {
         val okAction = object : AbstractAction("Ok") {
             init {
                 putValue(Action.MNEMONIC_KEY, KeyEvent.VK_ENTER)
             }
 
             override fun actionPerformed(evt: ActionEvent) {
-                save()
-                close()
+                close(true)
             }
         }
 
@@ -139,7 +228,7 @@ class EditPersonDialog(owner: Frame?, private var person: Person) : JDialog(owne
             }
 
             override fun actionPerformed(evt: ActionEvent) {
-                close()
+                close(false)
             }
         }
 
@@ -150,25 +239,13 @@ class EditPersonDialog(owner: Frame?, private var person: Person) : JDialog(owne
         val pnlButtons = JPanel(FlowLayout(FlowLayout.TRAILING))
         pnlButtons.add(btnOk)
         pnlButtons.add(btnCancel)
-
-        contentPane.add(pnlContent)
-        contentPane.add(pnlButtons, BorderLayout.SOUTH)
-
         rootPane.defaultButton = btnOk
 
-        pack()
-        setLocationRelativeTo(null)
+        return pnlButtons
     }
 
-    fun getPerson(): Person? {
-        return person
-    }
-
-    private fun save() {
-
-    }
-
-    private fun close() {
+    private fun close(value: Boolean) {
+        modalResult = value
         isVisible = false
     }
 }

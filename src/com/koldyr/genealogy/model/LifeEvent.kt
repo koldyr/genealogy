@@ -6,7 +6,7 @@ import java.time.LocalDate
  * Description of class LifeEvent
  * @created: 2019-10-26
  */
-class LifeEvent {
-    var date: LocalDate? = null
-    var place: String? = null
-}
+data class LifeEvent(
+        var date: LocalDate? = null,
+        var place: String? = null
+)

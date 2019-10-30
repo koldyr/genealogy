@@ -9,7 +9,15 @@ import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.*
+import javax.swing.JFileChooser
+import javax.swing.JFrame
+import javax.swing.JMenu
+import javax.swing.JMenuBar
+import javax.swing.JMenuItem
+import javax.swing.JOptionPane
+import javax.swing.JPopupMenu
+import javax.swing.JScrollPane
+import javax.swing.JTable
 import javax.swing.filechooser.FileNameExtensionFilter
 
 /**
@@ -52,7 +60,7 @@ class GenealogyApp : JFrame, ActionListener {
     }
 
     private fun createTable(personPopUp: JPopupMenu): JTable {
-        val tblPersons = JTable(tableModel)
+        val tblPersons = JTable(tableModel, null)
         tblPersons.setDefaultRenderer(PersonNames::class.java, NamesRenderer())
         tblPersons.setDefaultRenderer(LifeEvent::class.java, EventsRenderer())
         tblPersons.addMouseListener(object : MouseAdapter() {
@@ -154,8 +162,31 @@ class GenealogyApp : JFrame, ActionListener {
     private fun editPerson() {
         if (tblPersons.selectedRow > -1) {
             val person = tableModel.getPerson(tblPersons.selectedRow)
-            val editPersonDialog: JDialog = EditPersonDialog(this@GenealogyApp, person)
+
+            var toEdit = person.copy()
+            val editPersonDialog = EditPersonDialog(this@GenealogyApp, toEdit)
             editPersonDialog.isVisible = true
+
+            if (editPersonDialog.getModalResult()) {
+                toEdit = editPersonDialog.getPerson()
+                tableModel.updatePerson(toEdit)
+            }
+        }
+    }
+
+    private fun addPerson() {
+        val index = persons.stream()
+                .map { it.id }
+                .max { id1, id2 -> id1.compareTo(id2) }
+                .get() + 1
+        var person = Person(index)
+
+        val editPersonDialog = EditPersonDialog(this@GenealogyApp, person)
+        editPersonDialog.isVisible = true
+
+        if (editPersonDialog.getModalResult()) {
+            person = editPersonDialog.getPerson()
+            tableModel.addPerson(person)
         }
     }
 
@@ -163,10 +194,6 @@ class GenealogyApp : JFrame, ActionListener {
         if (tblPersons.selectedRow > -1) {
             tableModel.removePerson(tblPersons.selectedRow)
         }
-    }
-
-    private fun addPerson() {
-
     }
 
     private fun openFile() {

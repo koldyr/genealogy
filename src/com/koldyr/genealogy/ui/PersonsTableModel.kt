@@ -34,6 +34,22 @@ class PersonsTableModel : AbstractTableModel() {
         return person
     }
 
+    fun addPerson(person: Person) {
+        persons.add(person)
+        fireTableRowsInserted(persons.size, persons.size)
+    }
+
+    fun updatePerson(person: Person) {
+        for ((index, p) in persons.withIndex()) {
+            if (p.id == person.id) {
+                persons.removeAt(index)
+                persons.add(index, person)
+                fireTableCellUpdated(index, index)
+                return
+            }
+        }
+    }
+
     override fun getRowCount(): Int {
         return persons.size
     }
