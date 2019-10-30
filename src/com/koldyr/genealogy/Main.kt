@@ -19,7 +19,7 @@ object Main {
         } else {
             val parser = FamilyTreeDataParser()
             persons = parser.parse(fileName)
-            println("persons = ${persons}")
+            println("persons = $persons")
         }
 
         val appWindow = GenealogyApp(persons, fileName)

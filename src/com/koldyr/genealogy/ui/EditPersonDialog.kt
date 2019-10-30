@@ -28,7 +28,6 @@ import javax.swing.JTextField
 import javax.swing.KeyStroke
 import javax.swing.border.EmptyBorder
 
-
 /**
  * Description of class EditPersonDialog
  * @created: 2019-10-27
@@ -78,9 +77,7 @@ class EditPersonDialog : JDialog {
 
         if (person.birth != null) {
             val birth: LifeEvent = person.birth!!
-            if (birth.date != null) {
-                txtBirth.text = birth.date!!.format(DateTimeFormatter.ISO_LOCAL_DATE)
-            }
+            txtBirth.text = birth.date?.format(DateTimeFormatter.ISO_LOCAL_DATE)
             txtBirthPlace.text = birth.place
         }
 
@@ -90,9 +87,7 @@ class EditPersonDialog : JDialog {
 
         if (person.death != null) {
             val death: LifeEvent = person.death!!
-            if (death.date != null) {
-                txtDeath.text = death.date!!.format(DateTimeFormatter.ISO_LOCAL_DATE)
-            }
+            txtDeath.text = death.date?.format(DateTimeFormatter.ISO_LOCAL_DATE)
             txtDeathPlace.text = death.place
         }
 
@@ -111,7 +106,7 @@ class EditPersonDialog : JDialog {
         val pnlContent = JPanel(GridBagLayout())
         pnlContent.add(lblId, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtId, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
+        pnlContent.add(txtId, GridBagConstraints(1, rowIndex, 1, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
         rowIndex++
@@ -213,9 +208,7 @@ class EditPersonDialog : JDialog {
                 putValue(Action.MNEMONIC_KEY, KeyEvent.VK_ENTER)
             }
 
-            override fun actionPerformed(evt: ActionEvent) {
-                close(true)
-            }
+            override fun actionPerformed(evt: ActionEvent) = close(true)
         }
 
         val btnOk = JButton(okAction)
@@ -227,9 +220,7 @@ class EditPersonDialog : JDialog {
                 putValue(Action.MNEMONIC_KEY, KeyEvent.VK_ESCAPE)
             }
 
-            override fun actionPerformed(evt: ActionEvent) {
-                close(false)
-            }
+            override fun actionPerformed(evt: ActionEvent) = close(false)
         }
 
         val btnCancel = JButton(cancelAction)
