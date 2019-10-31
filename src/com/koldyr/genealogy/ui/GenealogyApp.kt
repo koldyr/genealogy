@@ -236,18 +236,18 @@ class GenealogyApp : JFrame, ActionListener {
             val persons = tableModel.getPersons()
             val filter = fileChooser.fileFilter as FileNameExtensionFilter
             val extension = filter.extensions[0]
-            val file = handleExportFile(fileChooser.selectedFile, filter)
+            val file = handleExportFile(fileChooser.selectedFile, extension)
 
             val exporter = ExporterFactory.create(extension)
             exporter.export(file, persons)
         }
     }
 
-    private fun handleExportFile(file: File, filter: FileNameExtensionFilter): File {
+    private fun handleExportFile(file: File, ext: String): File {
         val fileName = file.name
-        val ext = fileName.indexOf('.')
-        if (ext < 0) {
-            return File(file.parentFile, fileName + '.' + filter.extensions[0])
+        val index = fileName.indexOf('.')
+        if (index < 0) {
+            return File(file.parentFile, "$fileName.$ext")
         }
 
         return file
