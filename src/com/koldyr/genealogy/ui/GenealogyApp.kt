@@ -1,19 +1,16 @@
 package com.koldyr.genealogy.ui
 
+import com.koldyr.genealogy.export.ExporterFactory
+import com.koldyr.genealogy.importer.ImporterFactory
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
-import com.koldyr.genealogy.model.Persons
-import com.koldyr.genealogy.parser.FamilyTreeDataParser
 import java.awt.Dimension
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
-import java.nio.file.Files
-import java.time.format.DateTimeFormatter
-import java.util.*
 import javax.swing.JFileChooser
 import javax.swing.JFrame
 import javax.swing.JMenu
@@ -26,9 +23,6 @@ import javax.swing.JScrollPane
 import javax.swing.JTable
 import javax.swing.border.EmptyBorder
 import javax.swing.filechooser.FileNameExtensionFilter
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.JAXBException
-import javax.xml.bind.Marshaller.*
 
 /**
  * Description of class GenealogyApp
@@ -173,14 +167,14 @@ class GenealogyApp : JFrame, ActionListener {
     private fun editPerson() {
         if (tblPersons.selectedRow > -1) {
             val person = tableModel.getPerson(tblPersons.selectedRow)
+            val toEdit = clonePerson(person)
 
-            var toEdit = clonePerson(person)
             val editPersonDialog = EditPersonDialog(this@GenealogyApp, toEdit)
             editPersonDialog.isVisible = true
 
             if (editPersonDialog.getModalResult()) {
-                toEdit = editPersonDialog.getPerson()
-                tableModel.updatePerson(toEdit)
+                val changed = editPersonDialog.getPerson()
+                tableModel.updatePerson(changed)
             }
         }
     }
@@ -208,16 +202,23 @@ class GenealogyApp : JFrame, ActionListener {
     }
 
     private fun openFile() {
-        val fileChooser = JFileChooser()
+        val startDir = System.getProperty("user.dir")
+        val fileChooser = JFileChooser(startDir)
+        fileChooser.isAcceptAllFileFilterUsed = false
         fileChooser.addChoosableFileFilter(FileNameExtensionFilter("AgelongTree genealogy file", "ged"))
+        fileChooser.addChoosableFileFilter(FileNameExtensionFilter("XML genealogy file", "xml"))
+        fileChooser.addChoosableFileFilter(FileNameExtensionFilter("CSV genealogy file", "csv"))
+        fileChooser.addChoosableFileFilter(FileNameExtensionFilter("JSON genealogy file", "json"))
         fileChooser.showOpenDialog(this)
 
         if (fileChooser.selectedFile != null) {
-            fileName = fileChooser.selectedFile.absolutePath
-            val persons = FamilyTreeDataParser().parse(fileName!!)
+            val file = fileChooser.selectedFile
+
+            val importer = ImporterFactory.create(file)
+            val persons = importer.import(file)
             tableModel.setPersons(persons)
 
-            title = "Genealogy: $fileName"
+            title = "Genealogy: ${file.absolutePath}"
         }
     }
 
@@ -232,80 +233,24 @@ class GenealogyApp : JFrame, ActionListener {
         fileChooser.showSaveDialog(this)
 
         if (fileChooser.selectedFile != null) {
-            val filter: FileNameExtensionFilter = fileChooser.fileFilter as FileNameExtensionFilter
-            val extension: String = filter.extensions[0]
-            when (extension) {
-                "xml" -> saveXML(fileChooser.selectedFile)
-                "json" -> saveJSON(fileChooser.selectedFile)
-                "ged" -> saveGED(fileChooser.selectedFile)
-                else -> saveCSV(fileChooser.selectedFile)
-            }
-            println("Completed")
+            val persons = tableModel.getPersons()
+            val filter = fileChooser.fileFilter as FileNameExtensionFilter
+            val extension = filter.extensions[0]
+            val file = handleExportFile(fileChooser.selectedFile, filter)
+
+            val exporter = ExporterFactory.create(extension)
+            exporter.export(file, persons)
         }
     }
 
-    private fun saveXML(file: File) {
-        try {
-            val jaxbContext = JAXBContext.newInstance(Persons::class.java)
-            val jaxbMarshaller = jaxbContext.createMarshaller()
-            jaxbMarshaller.setProperty(JAXB_FORMATTED_OUTPUT, java.lang.Boolean.TRUE)
-
-            val stream = Files.newOutputStream(file.toPath())
-            stream.buffered().bufferedWriter(Charsets.UTF_8).use { writer ->
-                val persons = tableModel.getPersons()
-                jaxbMarshaller.marshal(Persons(persons), writer)
-            }
-        } catch (e: JAXBException) {
-            e.printStackTrace()
+    private fun handleExportFile(file: File, filter: FileNameExtensionFilter): File {
+        val fileName = file.name
+        val ext = fileName.indexOf('.')
+        if (ext < 0) {
+            return File(file.parentFile, fileName + '.' + filter.extensions[0])
         }
-    }
 
-    private fun saveJSON(file: File) {
-        TODO("not implemented")
-    }
-
-    private fun saveGED(file: File) {
-        TODO("not implemented")
-    }
-
-    private fun saveCSV(file: File) {
-        try {
-            val stream = Files.newOutputStream(file.toPath())
-            stream.buffered().bufferedWriter(Charsets.UTF_8).use { writer ->
-                tableModel.getPersons().forEach {
-                    val line = StringJoiner(",", "", "\n")
-                    line.add(it.id.toString())
-
-                    if (it.name == null) {
-                        line.add("")
-                    } else {
-                        line.add(it.name!!.name + '|' + it.name!!.middle + '|' + it.name!!.last + '|' + it.name!!.maiden)
-                    }
-
-                    if (it.birth == null) {
-                        line.add("")
-                    } else {
-                        line.add(it.birth!!.date?.format(DateTimeFormatter.ISO_LOCAL_DATE) + '|' + it.birth!!.place)
-                    }
-                    if (it.death == null) {
-                        line.add("")
-                    } else {
-                        line.add(it.death!!.date?.format(DateTimeFormatter.ISO_LOCAL_DATE) + '|' + it.death!!.place)
-                    }
-
-                    line.add(it.sex.name)
-                    line.add(it.place ?: "")
-                    line.add(it.occupation ?: "")
-                    line.add(it.note ?: "")
-                    line.add(it.familyId?.toString() ?: "")
-
-                    writer.write(line.toString())
-                }
-
-            }
-        } catch (e: JAXBException) {
-            e.printStackTrace()
-        }
+        return file
     }
 
     private fun showAbout() {

@@ -1,6 +1,10 @@
-package com.koldyr.genealogy.parser
+package com.koldyr.genealogy.importer
 
-import com.koldyr.genealogy.model.*
+import com.koldyr.genealogy.model.Family
+import com.koldyr.genealogy.model.LifeEvent
+import com.koldyr.genealogy.model.Person
+import com.koldyr.genealogy.model.PersonNames
+import com.koldyr.genealogy.model.Sex
 import java.io.File
 import java.nio.charset.Charset
 import java.time.LocalDate
@@ -8,19 +12,40 @@ import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 import kotlin.math.max
 
+const val PERSON = "INDI";
+const val NAME = "NAME";
+const val SEX = "SEX";
+const val BIRTH = "BIRT";
+const val DEATH = "DEAT";
+const val DATE = "DATE";
+const val PLACE = "PLAC";
+const val RESIDENCE = "RESI";
+const val OCCUPATION = "OCCU";
+const val NOTE = "NOTE";
+const val CONTINUE = "CONT";
+const val FAMC = "FAMC";
+const val FAMILY = "FAM";
+const val MARRIAGE = "MARR";
+const val HUSBAND = "HUSB";
+const val WIFE = "WIFE";
+const val CHILD = "CHIL";
+const val ABOUT = "ABT";
+const val AFTER = "AFT";
+const val BEFORE = "BEF";
+
 /**
- * Description of class FamilyTreeDataParser
- *
- * @created: 2019-10-26
+ * Description of class GEDImporter
+ * @created: 2019.10.31
  */
-class FamilyTreeDataParser {
+class GEDImporter: Importer {
+
     private val datePattern = DateTimeFormatter.ofPattern("yyyy MMM d")
     private val personIdPattern = Pattern.compile("@(\\d+)@")
     private val familyIdPattern = Pattern.compile("@\\w(\\d+)@")
 
-    fun parse(fileName: String): Collection<Person> {
+    override fun import(file: File): Collection<Person> {
         val charset = Charset.forName("windows-1251")
-        val bufferedReader = File(fileName).bufferedReader(charset)
+        val bufferedReader = file.bufferedReader(charset)
 
         val families: MutableSet<Family> = mutableSetOf()
         val persons: MutableMap<Int, Person> = mutableMapOf()
