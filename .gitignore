@@ -17,6 +17,7 @@
 hs_err_pid*
 
 #private
+target
 *.iml
 *.ged
 .idea
