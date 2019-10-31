@@ -8,6 +8,7 @@ import javax.xml.bind.annotation.XmlAccessorType
  * @created: 2019-10-26
  */
 @XmlAccessorType(XmlAccessType.FIELD)
+@Suppress("unused")
 data class PersonNames(var name: String) {
     var middle: String? = null
     var last: String? = null
