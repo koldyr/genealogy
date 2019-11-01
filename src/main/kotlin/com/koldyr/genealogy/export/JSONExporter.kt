@@ -2,8 +2,7 @@ package com.koldyr.genealogy.export
 
 import com.fasterxml.jackson.annotation.JsonInclude.*
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.databind.util.StdDateFormat
+import com.fasterxml.jackson.databind.SerializationFeature.*
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.koldyr.genealogy.model.Person
 import java.io.File
@@ -24,11 +23,10 @@ class JSONExporter: Exporter {
 
     private fun mapper(): ObjectMapper {
         val mapper = ObjectMapper()
-        mapper.serializationConfig.with(SerializationFeature.INDENT_OUTPUT)
-        mapper.serializationConfig.without(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS)
+        mapper.serializationConfig.with(INDENT_OUTPUT)
         mapper.setSerializationInclusion(Include.NON_NULL)
+        mapper.disable(WRITE_DATES_AS_TIMESTAMPS)
         mapper.registerModule(JavaTimeModule())
-        mapper.dateFormat = StdDateFormat()
         return mapper
     }
 }
