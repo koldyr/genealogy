@@ -14,16 +14,17 @@ import javax.xml.bind.annotation.XmlType
 @JsonPropertyOrder("id", "name", "sex", "birth", "death", "place", "occupation", "note", "familyId")
 @XmlType(propOrder = ["id", "name", "sex", "birth", "death", "place", "occupation", "note", "familyId"])
 @XmlAccessorType(XmlAccessType.FIELD)
-data class Person(@XmlAttribute var id: Int) {
-
-    var name: PersonNames? = null
-    var birth: LifeEvent? = null
-    var death: LifeEvent? = null
-    var place: String? = null
-    var occupation: String? = null
-    var note: String? = null
-    @XmlAttribute var sex: Sex = Sex.MALE
-    @XmlAttribute var familyId: Int? = null
+data class Person(
+        @XmlAttribute var id: Int,
+        var name: PersonNames? = null,
+        var birth: LifeEvent? = null,
+        var death: LifeEvent? = null,
+        var place: String? = null,
+        var occupation: String? = null,
+        var note: String? = null,
+        @XmlAttribute var sex: Sex = Sex.MALE,
+        @XmlAttribute var familyId: Int? = null
+) {
 
     constructor() : this(-1)
 

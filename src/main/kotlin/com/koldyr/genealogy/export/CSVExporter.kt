@@ -10,12 +10,15 @@ import java.io.File
 import java.nio.file.Files
 import java.time.format.DateTimeFormatter
 import java.util.*
+import java.util.regex.Pattern
 
 /**
  * Description of class CSVExporter
  * @created: 2019.10.31
  */
 class CSVExporter : Exporter {
+
+    private val pattern = Pattern.compile("\\n")
 
     override fun export(file: File, persons: Collection<Person>) {
         val stream = Files.newOutputStream(file.toPath())
@@ -36,7 +39,7 @@ class CSVExporter : Exporter {
         line.add(it.sex.name)
         line.add(escapeCsv(it.place ?: EMPTY))
         line.add(escapeCsv(it.occupation ?: EMPTY))
-        line.add(escapeCsv(it.note ?: EMPTY))
+        line.add(prepareNote(it.note))
         line.add(escapeCsv(it.familyId?.toString() ?: EMPTY))
 
         writer.write(line.toString())
@@ -68,5 +71,13 @@ class CSVExporter : Exporter {
         value.append('|')
         value.append(escapeCsv(event.place ?: EMPTY))
         return value.toString()
+    }
+
+    private fun prepareNote(note: String?): String? {
+        if (isEmpty(note)) {
+            return EMPTY
+        }
+        val matcher = pattern.matcher(note!!)
+        return escapeCsv(matcher.replaceAll("\\\\n"))
     }
 }
