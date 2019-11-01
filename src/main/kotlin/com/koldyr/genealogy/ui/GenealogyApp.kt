@@ -240,6 +240,8 @@ class GenealogyApp : JFrame, ActionListener {
 
             val exporter = ExporterFactory.create(extension)
             exporter.export(file, persons)
+
+            println("Export completed")
         }
     }
 

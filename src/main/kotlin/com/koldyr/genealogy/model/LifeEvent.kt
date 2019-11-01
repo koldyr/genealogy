@@ -1,5 +1,9 @@
 package com.koldyr.genealogy.model
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.koldyr.genealogy.importer.LocalDateAdapter
 import java.time.LocalDate
 import javax.xml.bind.annotation.XmlAccessType
@@ -13,6 +17,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter
 @XmlAccessorType(XmlAccessType.FIELD)
 data class LifeEvent(
         @XmlJavaTypeAdapter(type = LocalDate::class, value = LocalDateAdapter::class)
+        @JsonSerialize(using = LocalDateSerializer::class)
+        @JsonDeserialize(using = LocalDateDeserializer::class)
         var date: LocalDate? = null,
         var place: String? = null
 ) {
