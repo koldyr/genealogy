@@ -12,14 +12,18 @@ import javax.xml.bind.Marshaller
  * @created: 2019.10.31
  */
 class XMLExporter: Exporter {
-    override fun export(file: File, persons: Collection<Person>) {
-        val jaxbContext = JAXBContext.newInstance(Persons::class.java)
-        val jaxbMarshaller = jaxbContext.createMarshaller()
-        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, java.lang.Boolean.TRUE)
 
+    override fun export(file: File, persons: Collection<Person>) {
         val stream = Files.newOutputStream(file.toPath())
         stream.bufferedWriter(Charsets.UTF_8).use { writer ->
-            jaxbMarshaller.marshal(Persons(persons), writer)
+            marshaller().marshal(Persons(persons), writer)
         }
+    }
+
+    private fun marshaller(): Marshaller {
+        val jaxbContext = JAXBContext.newInstance(Persons::class.java)
+        val jaxbMarshaller = jaxbContext.createMarshaller()
+        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
+        return jaxbMarshaller
     }
 }

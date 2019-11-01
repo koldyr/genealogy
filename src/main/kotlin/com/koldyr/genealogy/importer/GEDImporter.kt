@@ -12,26 +12,26 @@ import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 import kotlin.math.max
 
-const val PERSON = "INDI";
-const val NAME = "NAME";
-const val SEX = "SEX";
-const val BIRTH = "BIRT";
-const val DEATH = "DEAT";
-const val DATE = "DATE";
-const val PLACE = "PLAC";
-const val RESIDENCE = "RESI";
-const val OCCUPATION = "OCCU";
-const val NOTE = "NOTE";
-const val CONTINUE = "CONT";
-const val FAMC = "FAMC";
-const val FAMILY = "FAM";
-const val MARRIAGE = "MARR";
-const val HUSBAND = "HUSB";
-const val WIFE = "WIFE";
-const val CHILD = "CHIL";
-const val ABOUT = "ABT";
-const val AFTER = "AFT";
-const val BEFORE = "BEF";
+const val PERSON = "INDI"
+const val NAME = "NAME"
+const val SEX = "SEX"
+const val BIRTH = "BIRT"
+const val DEATH = "DEAT"
+const val DATE = "DATE"
+const val PLACE = "PLAC"
+const val RESIDENCE = "RESI"
+const val OCCUPATION = "OCCU"
+const val NOTE = "NOTE"
+const val CONTINUE = "CONT"
+const val FAMC = "FAMC"
+const val FAMILY = "FAM"
+const val MARRIAGE = "MARR"
+const val HUSBAND = "HUSB"
+const val WIFE = "WIFE"
+const val CHILD = "CHIL"
+const val ABOUT = "ABT"
+const val AFTER = "AFT"
+const val BEFORE = "BEF"
 
 /**
  * Description of class GEDImporter
@@ -44,13 +44,11 @@ class GEDImporter: Importer {
     private val familyIdPattern = Pattern.compile("@\\w(\\d+)@")
 
     override fun import(file: File): Collection<Person> {
-        val charset = Charset.forName("windows-1251")
-        val bufferedReader = file.bufferedReader(charset)
-
         val families: MutableSet<Family> = mutableSetOf()
         val persons: MutableMap<Int, Person> = mutableMapOf()
 
-        bufferedReader.use { reader ->
+        val charset = Charset.forName("windows-1251")
+        file.bufferedReader(charset).use { reader ->
             var person: Person? = null
             var family: Family? = null
             var event: LifeEvent? = null
@@ -60,7 +58,7 @@ class GEDImporter: Importer {
                 if (line.endsWith(PERSON)) {
                     val personId: Int = getPersonId(line)
                     person = Person(personId)
-                    persons.put(personId, person)
+                    persons[personId] = person
                 } else if (line.contains(NAME)) {
                     if (person != null) {
                         person.name = parseFullName(line)
@@ -99,17 +97,17 @@ class GEDImporter: Importer {
                 } else if (line.contains(HUSBAND)) {
                     if (family != null) {
                         val personId = getPersonId(line)
-                        family.husband = persons.get(personId)
+                        family.husband = persons[personId]
                     }
                 } else if (line.contains(WIFE)) {
                     if (family != null) {
                         val personId = getPersonId(line)
-                        family.wife = persons.get(personId)
+                        family.wife = persons[personId]
                     }
                 } else if (line.contains(CHILD)) {
                     if (family != null) {
                         val personId = getPersonId(line)
-                        val child = persons.get(personId)
+                        val child = persons[personId]
                         if (child != null) {
                             family.children.add(child)
                         }
@@ -180,7 +178,7 @@ class GEDImporter: Importer {
 
         if (value.contains('/')) {
             val start = value.indexOf('/')
-            val end = value.indexOf('/', start + 1);
+            val end = value.indexOf('/', start + 1)
 
             fullName = value.substring(0, max(0, start - 1))
             val lastValue = value.substring(start + 1, end)
@@ -194,7 +192,7 @@ class GEDImporter: Importer {
             }
         }
         val items = fullName.split(" ")
-        val name = items[0];
+        val name = items[0]
         val middle = if (items.size == 2) items[1] else null
         return PersonNames(name, middle, lastName, maidenName)
     }
@@ -205,7 +203,7 @@ class GEDImporter: Importer {
             val id = matcher.group(1)
             return Integer.parseInt(id)
         }
-        return -1;
+        return -1
     }
 
     private fun parseFamilyId(value: String): Int {
@@ -214,20 +212,20 @@ class GEDImporter: Importer {
             val id = matcher.group(1)
             return Integer.parseInt(id)
         }
-        return -1;
+        return -1
     }
 
     private fun parseDate(value: String): LocalDate {
-        var dateValue = parseGeneric(value, DATE);
+        var dateValue = parseGeneric(value, DATE)
 
         if (dateValue.contains(ABOUT)) {
-            dateValue = parseGeneric(dateValue, ABOUT);
+            dateValue = parseGeneric(dateValue, ABOUT)
         }
         if (dateValue.contains(AFTER)) {
-            dateValue = parseGeneric(dateValue, AFTER);
+            dateValue = parseGeneric(dateValue, AFTER)
         }
         if (dateValue.contains(BEFORE)) {
-            dateValue = parseGeneric(dateValue, BEFORE);
+            dateValue = parseGeneric(dateValue, BEFORE)
         }
 
         val year: String

@@ -3,16 +3,19 @@ package com.koldyr.genealogy.export
 import com.koldyr.genealogy.model.Person
 import java.io.File
 import java.nio.file.Files
+import javax.swing.JFrame
+import javax.swing.JOptionPane
 
 /**
- * Description of class JSONExporter
+ * Description of class GEDExporter
  * @created: 2019.10.31
  */
 class GEDExporter: Exporter {
+
     override fun export(file: File, persons: Collection<Person>) {
         val stream = Files.newOutputStream(file.toPath())
         stream.bufferedWriter(Charsets.UTF_8).use { writer ->
-            TODO("not implemented")
+            JOptionPane.showMessageDialog(JFrame.getFrames()[0], "Not implemented")
         }
     }
 }

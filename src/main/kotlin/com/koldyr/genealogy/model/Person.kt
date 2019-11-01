@@ -1,14 +1,18 @@
 package com.koldyr.genealogy.model
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import javax.xml.bind.annotation.XmlAccessType
 import javax.xml.bind.annotation.XmlAccessorType
 import javax.xml.bind.annotation.XmlAttribute
+import javax.xml.bind.annotation.XmlType
 
 /**
  * Description of class Person
  *
  * @created: 2019-10-25
  */
+@JsonPropertyOrder("id", "name", "sex", "birth", "death", "place", "occupation", "note", "familyId")
+@XmlType(propOrder = ["id", "name", "sex", "birth", "death", "place", "occupation", "note", "familyId"])
 @XmlAccessorType(XmlAccessType.FIELD)
 data class Person(@XmlAttribute var id: Int) {
 

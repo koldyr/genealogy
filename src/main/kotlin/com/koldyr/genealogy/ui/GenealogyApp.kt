@@ -5,6 +5,7 @@ import com.koldyr.genealogy.importer.ImporterFactory
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
+import org.apache.commons.lang3.StringUtils.*
 import java.awt.Dimension
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
@@ -18,7 +19,6 @@ import javax.swing.JMenuBar
 import javax.swing.JMenuItem
 import javax.swing.JOptionPane
 import javax.swing.JPanel
-import javax.swing.JPopupMenu
 import javax.swing.JScrollPane
 import javax.swing.JTable
 import javax.swing.border.EmptyBorder
@@ -33,10 +33,10 @@ class GenealogyApp : JFrame, ActionListener {
     private val tableModel: PersonsTableModel
     private val tblPersons: JTable
 
-    private var fileName: String?
+    private var file: File? = null
 
     constructor(persons: Collection<Person>, fileName: String?) : super("Genealogy: ${fileName ?: ""} ") {
-        this.fileName = fileName
+        this.file = fileName?.let { File(it) }
 
 //        var persons: Set<Person?> = families.stream()
 //                .map { family: Family -> Stream.concat(Stream.of(family.husband, family.wife), family.children.stream()) }
@@ -44,11 +44,10 @@ class GenealogyApp : JFrame, ActionListener {
 //                .filter { it != null }
 //                .collect(Collectors.toSet())
 
-        val personPopUp = createPersonPopUp()
         createMenu()
 
         tableModel = PersonsTableModel()
-        tblPersons = createTable(personPopUp)
+        tblPersons = createTable()
 
         val pnlContent = contentPane as JPanel
         pnlContent.border = EmptyBorder(5, 5, 5, 5)
@@ -64,24 +63,11 @@ class GenealogyApp : JFrame, ActionListener {
         setLocationRelativeTo(null)
     }
 
-    private fun createTable(personPopUp: JPopupMenu): JTable {
+    private fun createTable(): JTable {
         val tblPersons = JTable(tableModel, null)
         tblPersons.setDefaultRenderer(PersonNames::class.java, NamesRenderer())
         tblPersons.setDefaultRenderer(LifeEvent::class.java, EventsRenderer())
         tblPersons.addMouseListener(object : MouseAdapter() {
-            override fun mousePressed(e: MouseEvent) {
-                if (e.isPopupTrigger) {
-                    personPopUp.location = e.locationOnScreen
-                    personPopUp.isVisible = true
-                }
-            }
-
-            override fun mouseReleased(e: MouseEvent) {
-                if (e.isPopupTrigger) {
-                    personPopUp.location = e.locationOnScreen
-                    personPopUp.isVisible = true
-                }
-            }
 
             override fun mouseClicked(e: MouseEvent) {
                 if (e.button == MouseEvent.BUTTON1 && e.clickCount == 2) {
@@ -90,24 +76,6 @@ class GenealogyApp : JFrame, ActionListener {
             }
         })
         return tblPersons
-    }
-
-    private fun createPersonPopUp(): JPopupMenu {
-        val personPopUp = JPopupMenu()
-
-        val jmiAdd = JMenuItem("Add")
-        jmiAdd.addActionListener(this)
-        personPopUp.add(jmiAdd)
-
-        val jmiEdit = JMenuItem("Edit")
-        jmiEdit.addActionListener(this)
-        personPopUp.add(jmiEdit)
-
-        val jmiDelete = JMenuItem("Delete")
-        jmiDelete.addActionListener(this)
-        personPopUp.add(jmiDelete)
-
-        return personPopUp
     }
 
     private fun createMenu() {
@@ -120,6 +88,10 @@ class GenealogyApp : JFrame, ActionListener {
         val jmiSave = JMenuItem("Save")
         jmiSave.addActionListener(this)
         mnuFile.add(jmiSave)
+
+        val jmiExport = JMenuItem("Export")
+        jmiExport.addActionListener(this)
+        mnuFile.add(jmiExport)
 
         val jmiExit = JMenuItem("Exit")
         jmiExit.addActionListener(this)
@@ -155,6 +127,7 @@ class GenealogyApp : JFrame, ActionListener {
         when (e.actionCommand) {
             "Open" -> openFile()
             "Save" -> saveFile()
+            "Export" -> exportFile()
             "Exit" -> dispose()
             "Edit" -> editPerson()
             "Delete" -> deletePerson()
@@ -181,8 +154,8 @@ class GenealogyApp : JFrame, ActionListener {
 
     private fun addPerson() {
         val index = tableModel.getPersons().stream()
-                .map { it.id }
-                .max { id1, id2 -> id1.compareTo(id2) }
+                .map(Person::id)
+                .max(Integer::compare)
                 .get() + 1
         var person = Person(index)
 
@@ -212,17 +185,31 @@ class GenealogyApp : JFrame, ActionListener {
         fileChooser.showOpenDialog(this)
 
         if (fileChooser.selectedFile != null) {
-            val file = fileChooser.selectedFile
+            val fileToOpen: File = fileChooser.selectedFile
 
-            val importer = ImporterFactory.create(file)
-            val persons = importer.import(file)
+            val importer = ImporterFactory.create(fileToOpen)
+            val persons = importer.import(fileToOpen)
             tableModel.setPersons(persons)
 
-            title = "Genealogy: ${file.absolutePath}"
+            title = "Genealogy: ${fileToOpen.absolutePath}"
+            file = fileToOpen
         }
     }
 
+
     private fun saveFile() {
+        if (file != null) {
+            val fileToSave = file!!
+            val extension = fileToSave.extension
+
+            val exporter = ExporterFactory.create(extension)
+            exporter.export(fileToSave, tableModel.getPersons())
+
+            JOptionPane.showMessageDialog(this, "Saved to ${fileToSave.name}")
+        }
+    }
+
+    private fun exportFile() {
         val startDir = System.getProperty("user.dir")
         val fileChooser = JFileChooser(startDir)
         fileChooser.isAcceptAllFileFilterUsed = false
@@ -233,6 +220,13 @@ class GenealogyApp : JFrame, ActionListener {
         fileChooser.showSaveDialog(this)
 
         if (fileChooser.selectedFile != null) {
+            if (fileChooser.selectedFile.exists()) {
+                val replace = JOptionPane.showConfirmDialog(this, "Replace existing file", "File exists", JOptionPane.YES_NO_OPTION)
+                if (replace == JOptionPane.NO_OPTION) {
+                    return
+                }
+            }
+
             val persons = tableModel.getPersons()
             val filter = fileChooser.fileFilter as FileNameExtensionFilter
             val extension = filter.extensions[0]
@@ -241,14 +235,14 @@ class GenealogyApp : JFrame, ActionListener {
             val exporter = ExporterFactory.create(extension)
             exporter.export(file, persons)
 
-            println("Export completed")
+            JOptionPane.showMessageDialog(this, "Exported to ${file.name}")
         }
     }
 
     private fun handleExportFile(file: File, ext: String): File {
-        val fileName = file.name
-        val index = fileName.indexOf('.')
-        if (index < 0) {
+        val fileExt = file.extension
+        if (isEmpty(fileExt)) {
+            val fileName = file.name
             return File(file.parentFile, "$fileName.$ext")
         }
 
