@@ -24,7 +24,7 @@ class JSONExporter: Exporter {
     private fun mapper(): ObjectMapper {
         val mapper = ObjectMapper()
         mapper.serializationConfig.with(INDENT_OUTPUT)
-        mapper.setSerializationInclusion(Include.NON_NULL)
+        mapper.setSerializationInclusion(Include.NON_EMPTY)
         mapper.disable(WRITE_DATES_AS_TIMESTAMPS)
         mapper.registerModule(JavaTimeModule())
         return mapper

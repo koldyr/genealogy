@@ -4,6 +4,7 @@ import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
 import com.koldyr.genealogy.model.Sex
+import org.apache.commons.lang3.StringUtils.*
 import java.awt.BorderLayout
 import java.awt.FlowLayout
 import java.awt.Frame
@@ -177,23 +178,23 @@ class EditPersonDialog : JDialog {
 
     fun getPerson(): Person {
         val name: String = txtName.text
-        val middle: String? = if (txtMiddle.text.trim().isEmpty()) null else txtMiddle.text
-        val last: String? = if (txtLast.text.trim().isEmpty()) null else txtLast.text
-        val maiden: String? = if (txtMaiden.text.trim().isEmpty()) null else txtMaiden.text
+        val middle: String? = defaultIfEmpty(txtMiddle.text, null)
+        val last: String? = defaultIfEmpty(txtLast.text, null)
+        val maiden: String? = defaultIfEmpty(txtMaiden.text, null)
         person.name = PersonNames(name, middle, last, maiden)
 
         val birthDate: LocalDate? = if (txtBirth.text.trim().isEmpty()) null else LocalDate.parse(txtBirth.text, DateTimeFormatter.ISO_LOCAL_DATE)
-        val birthPlace: String? = if (txtBirthPlace.text.trim().isEmpty()) null else txtBirthPlace.text
+        val birthPlace: String? = defaultIfEmpty(txtBirthPlace.text, null)
         person.birth = LifeEvent(birthDate, birthPlace)
 
         val deathDate: LocalDate? = if (txtDeath.text.trim().isEmpty()) null else LocalDate.parse(txtDeath.text, DateTimeFormatter.ISO_LOCAL_DATE)
-        val deathPlace: String? = if (txtDeathPlace.text.trim().isEmpty()) null else txtDeathPlace.text
+        val deathPlace: String? = defaultIfEmpty(txtDeathPlace.text, null)
         person.death = LifeEvent(deathDate, deathPlace)
 
         person.sex = cmbSex.selectedItem as Sex
-        person.place = txtPlace.text
-        person.occupation = txtOccupation.text
-        person.note = txtNote.text
+        person.place = defaultIfEmpty(txtPlace.text, null)
+        person.occupation = defaultIfEmpty(txtOccupation.text, null)
+        person.note = defaultIfEmpty(txtNote.text, null)
 
         return person
     }

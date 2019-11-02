@@ -14,11 +14,11 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter
  * Description of class LifeEvent
  * @created: 2019-10-26
  */
-@XmlJavaTypeAdapter(type = LocalDate::class, value = LocalDateAdapter::class)
 @XmlAccessorType(XmlAccessType.FIELD)
 data class LifeEvent(
         @JsonSerialize(using = LocalDateSerializer::class)
         @JsonDeserialize(using = LocalDateDeserializer::class)
+        @XmlJavaTypeAdapter(value = LocalDateAdapter::class)
         var date: LocalDate? = null,
         var place: String? = null
 ) {

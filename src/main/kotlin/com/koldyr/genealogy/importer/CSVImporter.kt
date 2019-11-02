@@ -5,8 +5,8 @@ import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
 import com.koldyr.genealogy.model.Sex
 import org.apache.commons.lang3.StringUtils.*
+import java.io.BufferedReader
 import java.io.File
-import java.nio.charset.Charset
 import java.nio.file.Files
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -18,20 +18,23 @@ class CSVImporter : Importer {
 
     override fun import(file: File): Collection<Person> {
         val stream = Files.newInputStream(file.toPath())
-        val charset = Charset.forName("windows-1251")
-        return stream.bufferedReader(charset).use { reader ->
-            val persons: MutableCollection<Person> = mutableListOf()
-
-            var line: String? = reader.readLine()
-            while (line != null) {
-                val person: Person = readPerson(line)
-                persons.add(person)
-
-                line = reader.readLine()
-            }
-
-            return persons
+        return stream.bufferedReader(Charsets.UTF_8).use {
+            reader -> parse(reader)
         }
+    }
+
+    private fun parse(reader: BufferedReader): Collection<Person> {
+        val persons: MutableCollection<Person> = mutableListOf()
+
+        var line: String? = reader.readLine()
+        while (line != null) {
+            val person: Person = readPerson(line)
+            persons.add(person)
+
+            line = reader.readLine()
+        }
+
+        return persons
     }
 
     private fun readPerson(line: String): Person {
@@ -88,9 +91,9 @@ class CSVImporter : Importer {
         for ((index, name) in values.withIndex()) {
             when (index) {
                 0 -> names.name = name
-                1 -> names.middle = name
-                2 -> names.last = name
-                3 -> names.maiden = name
+                1 -> names.middle = defaultIfEmpty(name, null)
+                2 -> names.last = defaultIfEmpty(name, null)
+                3 -> names.maiden = defaultIfEmpty(name, null)
             }
         }
         return names
@@ -123,7 +126,7 @@ class CSVImporter : Importer {
             isEmpty(value) -> null
             else -> {
                 val matcher = pattern.matcher(value)
-                matcher.replaceAll("\n")
+                matcher.replaceAll('\n'.toString())
             }
         }
     }

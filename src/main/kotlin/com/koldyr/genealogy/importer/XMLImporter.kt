@@ -11,15 +11,14 @@ class XMLImporter : Importer {
 
     override fun import(file: File): Collection<Person> {
         val stream = Files.newInputStream(file.toPath())
-        return stream.bufferedReader(Charsets.UTF_8).use { reader ->
-            val persons: Persons = unmarshaller().unmarshal(reader) as Persons
-            return persons.persons
+        val persons1 = stream.bufferedReader(Charsets.UTF_8).use {
+            reader -> unmarshaller().unmarshal(reader) as Persons
         }
+        return persons1.persons
     }
 
     private fun unmarshaller(): Unmarshaller {
         val jaxbContext = JAXBContext.newInstance(Persons::class.java)
-        val jaxbUnMarshaller = jaxbContext.createUnmarshaller()
-        return jaxbUnMarshaller
+        return jaxbContext.createUnmarshaller()
     }
 }

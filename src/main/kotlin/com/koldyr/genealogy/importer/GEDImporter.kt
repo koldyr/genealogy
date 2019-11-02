@@ -144,9 +144,8 @@ class GEDImporter: Importer {
     }
 
     private fun handleFamily(familyId: Int, person: Person, families: MutableSet<Family>) {
-        val oFamily = families.stream().filter { it.id == familyId }.findFirst()
-
-        if (!oFamily.isPresent) {
+        val noFamily = families.stream().noneMatch{ it.id == familyId }
+        if (noFamily) {
             families.add(Family(familyId))
         }
 
