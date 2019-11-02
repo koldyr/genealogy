@@ -5,7 +5,9 @@ import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
 import com.koldyr.genealogy.model.Sex
 import org.apache.commons.lang3.StringUtils.*
+import org.jdatepicker.JDatePicker
 import java.awt.BorderLayout
+import java.awt.Dimension
 import java.awt.FlowLayout
 import java.awt.Frame
 import java.awt.GridBagConstraints
@@ -14,7 +16,6 @@ import java.awt.Insets
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JButton
@@ -42,9 +43,9 @@ class EditPersonDialog : JDialog {
     private val txtLast: JTextField
     private val txtMaiden: JTextField
     private val cmbSex: JComboBox<Sex>
-    private val txtBirth: JTextField
+    private val birthModel: LocalDateModel
     private val txtBirthPlace: JTextField
-    private val txtDeath: JTextField
+    private val deathModel: LocalDateModel
     private val txtDeathPlace: JTextField
     private val txtPlace: JTextField
     private val txtOccupation: JTextField
@@ -61,6 +62,7 @@ class EditPersonDialog : JDialog {
         val lblName = JLabel("Name/Middle:")
         txtName = JTextField(name.name)
         txtMiddle = JTextField(name.middle)
+        txtMiddle.preferredSize = Dimension(200, 20)
 
         val lblLast = JLabel("Last/Maiden:")
         txtLast = JTextField(name.last)
@@ -73,22 +75,25 @@ class EditPersonDialog : JDialog {
         }
 
         val lblBirth = JLabel("Birth:")
-        txtBirth = JTextField()
+
+        birthModel = LocalDateModel()
+        val dpBirth = JDatePicker(birthModel, "yyyy MMM dd")
         txtBirthPlace = JTextField()
 
         if (person.birth != null) {
             val birth: LifeEvent = person.birth!!
-            txtBirth.text = birth.date?.format(DateTimeFormatter.ISO_LOCAL_DATE)
+            birthModel.value = birth.date
             txtBirthPlace.text = birth.place
         }
 
         val lblDeath = JLabel("Death:")
-        txtDeath = JTextField()
+        deathModel = LocalDateModel()
+        val dpDeath = JDatePicker(deathModel, "yyyy MMM dd")
         txtDeathPlace = JTextField()
 
         if (person.death != null) {
             val death: LifeEvent = person.death!!
-            txtDeath.text = death.date?.format(DateTimeFormatter.ISO_LOCAL_DATE)
+            deathModel.value = death.date
             txtDeathPlace.text = death.place
         }
 
@@ -135,7 +140,7 @@ class EditPersonDialog : JDialog {
         rowIndex++
         pnlContent.add(lblBirth, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtBirth, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
+        pnlContent.add(dpBirth, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
         pnlContent.add(txtBirthPlace, GridBagConstraints(2, rowIndex, 1, 1, 0.5, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 5, 0), 0, 0))
@@ -143,7 +148,7 @@ class EditPersonDialog : JDialog {
         rowIndex++
         pnlContent.add(lblDeath, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtDeath, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
+        pnlContent.add(dpDeath, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
         pnlContent.add(txtDeathPlace, GridBagConstraints(2, rowIndex, 1, 1, 0.5, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 5, 0), 0, 0))
@@ -183,11 +188,11 @@ class EditPersonDialog : JDialog {
         val maiden: String? = defaultIfEmpty(txtMaiden.text, null)
         person.name = PersonNames(name, middle, last, maiden)
 
-        val birthDate: LocalDate? = if (txtBirth.text.trim().isEmpty()) null else LocalDate.parse(txtBirth.text, DateTimeFormatter.ISO_LOCAL_DATE)
+        val birthDate: LocalDate? = birthModel.value
         val birthPlace: String? = defaultIfEmpty(txtBirthPlace.text, null)
         person.birth = LifeEvent(birthDate, birthPlace)
 
-        val deathDate: LocalDate? = if (txtDeath.text.trim().isEmpty()) null else LocalDate.parse(txtDeath.text, DateTimeFormatter.ISO_LOCAL_DATE)
+        val deathDate: LocalDate? = deathModel.value
         val deathPlace: String? = defaultIfEmpty(txtDeathPlace.text, null)
         person.death = LifeEvent(deathDate, deathPlace)
 
