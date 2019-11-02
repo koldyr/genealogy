@@ -250,7 +250,7 @@ class GenealogyApp : JFrame, ActionListener {
     }
 
     private fun showAbout() {
-        JOptionPane.showMessageDialog(this@GenealogyApp, "Genealogy v1.0.0", "About", JOptionPane.INFORMATION_MESSAGE)
+        JOptionPane.showMessageDialog(this, "Genealogy v1.0.0", "About", JOptionPane.INFORMATION_MESSAGE)
     }
 
     private fun clonePerson(person: Person): Person {

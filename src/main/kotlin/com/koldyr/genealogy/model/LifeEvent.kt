@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 data class LifeEvent(
-        @JsonSerialize(using = LocalDateSerializer::class)
-        @JsonDeserialize(using = LocalDateDeserializer::class)
-        @XmlJavaTypeAdapter(value = LocalDateAdapter::class)
+        @field:JsonSerialize(using = LocalDateSerializer::class)
+        @field:JsonDeserialize(using = LocalDateDeserializer::class)
+        @field:XmlJavaTypeAdapter(value = LocalDateAdapter::class)
         var date: LocalDate? = null,
         var place: String? = null
 ) {
