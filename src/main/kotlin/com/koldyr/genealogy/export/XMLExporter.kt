@@ -1,29 +1,34 @@
 package com.koldyr.genealogy.export
 
-import com.koldyr.genealogy.model.Person
-import com.koldyr.genealogy.model.Persons
+import com.fasterxml.jackson.annotation.JsonInclude.Include.*
+import com.fasterxml.jackson.databind.SerializationFeature.*
+import com.fasterxml.jackson.dataformat.xml.XmlMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.koldyr.genealogy.model.Clan
 import java.io.File
 import java.nio.file.Files
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.Marshaller
 
 /**
  * Description of class XMLExporter
  * @created: 2019.10.31
  */
-class XMLExporter: Exporter {
+class XMLExporter : Exporter {
 
-    override fun export(file: File, persons: Collection<Person>) {
+    override fun export(file: File, clan: Clan) {
         val stream = Files.newOutputStream(file.toPath())
         stream.bufferedWriter(Charsets.UTF_8).use { writer ->
-            marshaller().marshal(Persons(persons), writer)
+            mapper().writeValue(writer, clan)
         }
     }
 
-    private fun marshaller(): Marshaller {
-        val jaxbContext = JAXBContext.newInstance(Persons::class.java)
-        val jaxbMarshaller = jaxbContext.createMarshaller()
-        jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true)
-        return jaxbMarshaller
+    private fun mapper(): XmlMapper {
+        val mapper = XmlMapper()
+        mapper.registerModule(JavaTimeModule())
+        mapper.registerModule(KotlinModule())
+        mapper.setSerializationInclusion(NON_EMPTY)
+        mapper.enable(INDENT_OUTPUT)
+        mapper.disable(WRITE_DATES_AS_TIMESTAMPS)
+        return mapper
     }
 }

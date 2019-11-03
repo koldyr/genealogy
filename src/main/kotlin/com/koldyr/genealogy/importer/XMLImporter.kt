@@ -1,24 +1,29 @@
 package com.koldyr.genealogy.importer
 
-import com.koldyr.genealogy.model.Person
-import com.koldyr.genealogy.model.Persons
+import com.fasterxml.jackson.databind.DeserializationFeature.*
+import com.fasterxml.jackson.dataformat.xml.XmlMapper
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.koldyr.genealogy.model.Clan
 import java.io.File
 import java.nio.file.Files
-import javax.xml.bind.JAXBContext
-import javax.xml.bind.Unmarshaller
 
 class XMLImporter : Importer {
 
-    override fun import(file: File): Collection<Person> {
+    override fun import(file: File): Clan {
         val stream = Files.newInputStream(file.toPath())
-        val persons1 = stream.bufferedReader(Charsets.UTF_8).use {
-            reader -> unmarshaller().unmarshal(reader) as Persons
+        val clan: Clan = stream.bufferedReader(Charsets.UTF_8).use {
+            reader -> mapper().readValue(reader, Clan::class.java)
         }
-        return persons1.persons
+        return clan
     }
 
-    private fun unmarshaller(): Unmarshaller {
-        val jaxbContext = JAXBContext.newInstance(Persons::class.java)
-        return jaxbContext.createUnmarshaller()
+    private fun mapper(): XmlMapper {
+        val mapper = XmlMapper()
+        mapper.registerModule(JavaTimeModule())
+        mapper.registerModule(KotlinModule())
+        mapper.enable(ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+        mapper.disable(FAIL_ON_UNKNOWN_PROPERTIES)
+        return mapper
     }
 }

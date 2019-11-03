@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.importer
 
+import com.koldyr.genealogy.model.Clan
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Person
@@ -43,7 +44,7 @@ class GEDImporter: Importer {
     private val personIdPattern = Pattern.compile("@(\\d+)@")
     private val familyIdPattern = Pattern.compile("@\\w(\\d+)@")
 
-    override fun import(file: File): Collection<Person> {
+    override fun import(file: File): Clan {
         val families: MutableSet<Family> = mutableSetOf()
         val persons: MutableMap<Int, Person> = mutableMapOf()
 
@@ -140,7 +141,7 @@ class GEDImporter: Importer {
             }
         }
 
-        return persons.values
+        return Clan(persons.values)
     }
 
     private fun handleFamily(familyId: Int, person: Person, families: MutableSet<Family>) {

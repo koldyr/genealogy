@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.export
 
+import com.koldyr.genealogy.model.Clan
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
@@ -20,10 +21,10 @@ class CSVExporter : Exporter {
 
     private val pattern = Pattern.compile("\\n")
 
-    override fun export(file: File, persons: Collection<Person>) {
+    override fun export(file: File, clan: Clan) {
         val stream = Files.newOutputStream(file.toPath())
         stream.bufferedWriter(Charsets.UTF_8).use { writer ->
-            persons.forEach {
+            clan.persons.forEach {
                 person -> writePerson(writer, person)
             }
         }

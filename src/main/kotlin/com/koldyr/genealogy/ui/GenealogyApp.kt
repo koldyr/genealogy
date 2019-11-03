@@ -2,6 +2,7 @@ package com.koldyr.genealogy.ui
 
 import com.koldyr.genealogy.export.ExporterFactory
 import com.koldyr.genealogy.importer.ImporterFactory
+import com.koldyr.genealogy.model.Clan
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
@@ -33,9 +34,11 @@ class GenealogyApp : JFrame, ActionListener {
     private val tableModel: PersonsTableModel
     private val tblPersons: JTable
 
+    private var clan: Clan
     private var file: File? = null
 
-    constructor(persons: Collection<Person>, fileName: String?) : super("Genealogy: ${fileName ?: ""} ") {
+    constructor(clan: Clan, fileName: String?) : super("Genealogy: ${fileName ?: ""} ") {
+        this.clan = clan
         this.file = fileName?.let { File(it) }
 
 //        var persons: Set<Person?> = families.stream()
@@ -53,7 +56,7 @@ class GenealogyApp : JFrame, ActionListener {
         pnlContent.border = EmptyBorder(5, 5, 5, 5)
         pnlContent.add(JScrollPane(tblPersons))
 
-        tableModel.setPersons(persons)
+        tableModel.setPersons(clan.persons)
 
         val frameSize = Dimension(1000, 800)
         preferredSize.size = frameSize
@@ -188,8 +191,8 @@ class GenealogyApp : JFrame, ActionListener {
             val fileToOpen: File = fileChooser.selectedFile
 
             val importer = ImporterFactory.create(fileToOpen)
-            val persons = importer.import(fileToOpen)
-            tableModel.setPersons(persons)
+            clan = importer.import(fileToOpen)
+            tableModel.setPersons(clan.persons)
 
             title = "Genealogy: ${fileToOpen.absolutePath}"
             file = fileToOpen
@@ -203,7 +206,8 @@ class GenealogyApp : JFrame, ActionListener {
             val extension = fileToSave.extension
 
             val exporter = ExporterFactory.create(extension)
-            exporter.export(fileToSave, tableModel.getPersons())
+            clan.persons = tableModel.getPersons()
+            exporter.export(fileToSave, clan)
 
             JOptionPane.showMessageDialog(this, "Saved to ${fileToSave.name}")
         }
@@ -233,7 +237,8 @@ class GenealogyApp : JFrame, ActionListener {
             val file = handleExportFile(fileChooser.selectedFile, extension)
 
             val exporter = ExporterFactory.create(extension)
-            exporter.export(file, persons)
+            clan.persons = persons
+            exporter.export(file, clan)
 
             JOptionPane.showMessageDialog(this, "Exported to ${file.name}")
         }

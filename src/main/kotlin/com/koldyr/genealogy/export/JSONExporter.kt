@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature.*
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.koldyr.genealogy.model.Person
+import com.fasterxml.jackson.module.kotlin.KotlinModule
+import com.koldyr.genealogy.model.Clan
 import java.io.File
 import java.nio.file.Files
 
@@ -14,19 +15,20 @@ import java.nio.file.Files
  */
 class JSONExporter: Exporter {
 
-    override fun export(file: File, persons: Collection<Person>) {
+    override fun export(file: File, clan: Clan) {
         val stream = Files.newOutputStream(file.toPath())
         stream.bufferedWriter(Charsets.UTF_8).use { writer ->
-            mapper().writeValue(writer, persons)
+            mapper().writeValue(writer, clan)
         }
     }
 
     private fun mapper(): ObjectMapper {
         val mapper = ObjectMapper()
-        mapper.serializationConfig.with(INDENT_OUTPUT)
-        mapper.setSerializationInclusion(Include.NON_EMPTY)
-        mapper.disable(WRITE_DATES_AS_TIMESTAMPS)
         mapper.registerModule(JavaTimeModule())
+        mapper.registerModule(KotlinModule())
+        mapper.setSerializationInclusion(Include.NON_EMPTY)
+        mapper.enable(INDENT_OUTPUT)
+        mapper.disable(WRITE_DATES_AS_TIMESTAMPS)
         return mapper
     }
 }

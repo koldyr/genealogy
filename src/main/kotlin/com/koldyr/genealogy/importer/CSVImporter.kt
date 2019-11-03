@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.importer
 
+import com.koldyr.genealogy.model.Clan
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
@@ -16,11 +17,12 @@ class CSVImporter : Importer {
 
     private val pattern = Pattern.compile("\\\\n")
 
-    override fun import(file: File): Collection<Person> {
+    override fun import(file: File): Clan {
         val stream = Files.newInputStream(file.toPath())
-        return stream.bufferedReader(Charsets.UTF_8).use {
-            reader -> parse(reader)
+        val persons = stream.bufferedReader(Charsets.UTF_8).use { reader ->
+            parse(reader)
         }
+        return Clan(persons)
     }
 
     private fun parse(reader: BufferedReader): Collection<Person> {
@@ -40,7 +42,7 @@ class CSVImporter : Importer {
     private fun readPerson(line: String): Person {
         val values = splitValues(line)
 
-        val person = Person()
+        val person = Person(-1)
         for ((index, value) in values.withIndex()) {
             when (index) {
                 0 -> person.id = Integer.parseInt(value)
