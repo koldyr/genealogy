@@ -2,8 +2,8 @@ package com.koldyr.genealogy.ui
 
 import com.koldyr.genealogy.export.ExporterFactory
 import com.koldyr.genealogy.importer.ImporterFactory
-import com.koldyr.genealogy.model.Clan
 import com.koldyr.genealogy.model.LifeEvent
+import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
 import org.apache.commons.lang3.StringUtils.*
@@ -34,11 +34,11 @@ class GenealogyApp : JFrame, ActionListener {
     private val tableModel: PersonsTableModel
     private val tblPersons: JTable
 
-    private var clan: Clan
+    private var lineage: Lineage
     private var file: File? = null
 
-    constructor(clan: Clan, fileName: String?) : super("Genealogy: ${fileName ?: ""} ") {
-        this.clan = clan
+    constructor(lineage: Lineage, fileName: String?) : super("Genealogy: ${fileName ?: ""} ") {
+        this.lineage = lineage
         this.file = fileName?.let { File(it) }
 
 //        var persons: Set<Person?> = families.stream()
@@ -56,7 +56,7 @@ class GenealogyApp : JFrame, ActionListener {
         pnlContent.border = EmptyBorder(5, 5, 5, 5)
         pnlContent.add(JScrollPane(tblPersons))
 
-        tableModel.setPersons(clan.persons)
+        tableModel.setPersons(lineage.persons)
 
         val frameSize = Dimension(1000, 800)
         preferredSize.size = frameSize
@@ -191,8 +191,8 @@ class GenealogyApp : JFrame, ActionListener {
             val fileToOpen: File = fileChooser.selectedFile
 
             val importer = ImporterFactory.create(fileToOpen)
-            clan = importer.import(fileToOpen)
-            tableModel.setPersons(clan.persons)
+            lineage = importer.import(fileToOpen)
+            tableModel.setPersons(lineage.persons)
 
             title = "Genealogy: ${fileToOpen.absolutePath}"
             file = fileToOpen
@@ -206,8 +206,8 @@ class GenealogyApp : JFrame, ActionListener {
             val extension = fileToSave.extension
 
             val exporter = ExporterFactory.create(extension)
-            clan.persons = tableModel.getPersons()
-            exporter.export(fileToSave, clan)
+            lineage.persons = tableModel.getPersons()
+            exporter.export(fileToSave, lineage)
 
             JOptionPane.showMessageDialog(this, "Saved to ${fileToSave.name}")
         }
@@ -237,8 +237,8 @@ class GenealogyApp : JFrame, ActionListener {
             val file = handleExportFile(fileChooser.selectedFile, extension)
 
             val exporter = ExporterFactory.create(extension)
-            clan.persons = persons
-            exporter.export(file, clan)
+            lineage.persons = persons
+            exporter.export(file, lineage)
 
             JOptionPane.showMessageDialog(this, "Exported to ${file.name}")
         }

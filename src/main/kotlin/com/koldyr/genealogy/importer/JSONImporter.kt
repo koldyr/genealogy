@@ -4,16 +4,16 @@ import com.fasterxml.jackson.databind.DeserializationFeature.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.koldyr.genealogy.model.Clan
+import com.koldyr.genealogy.model.Lineage
 import java.io.File
 import java.nio.file.Files
 
 class JSONImporter : Importer {
 
-    override fun import(file: File): Clan {
+    override fun import(file: File): Lineage {
         val stream = Files.newInputStream(file.toPath())
         return stream.bufferedReader(Charsets.UTF_8).use {
-            reader -> mapper().readValue(reader, Clan::class.java)
+            reader -> mapper().readValue(reader, Lineage::class.java)
         }
     }
 

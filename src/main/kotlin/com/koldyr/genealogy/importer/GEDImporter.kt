@@ -1,8 +1,8 @@
 package com.koldyr.genealogy.importer
 
-import com.koldyr.genealogy.model.Clan
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.LifeEvent
+import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
 import com.koldyr.genealogy.model.Sex
@@ -14,6 +14,7 @@ import java.util.regex.Pattern
 import kotlin.math.max
 
 const val PERSON = "INDI"
+const val CHAR_ENCODING = "CHAR"
 const val NAME = "NAME"
 const val SEX = "SEX"
 const val BIRTH = "BIRT"
@@ -44,11 +45,12 @@ class GEDImporter: Importer {
     private val personIdPattern = Pattern.compile("@(\\d+)@")
     private val familyIdPattern = Pattern.compile("@\\w(\\d+)@")
 
-    override fun import(file: File): Clan {
+    override fun import(file: File): Lineage {
         val families: MutableSet<Family> = mutableSetOf()
         val persons: MutableMap<Int, Person> = mutableMapOf()
 
-        val charset = Charset.forName("windows-1251")
+        val charset = getEncoding(file)
+
         file.bufferedReader(charset).use { reader ->
             var person: Person? = null
             var family: Family? = null
@@ -141,7 +143,21 @@ class GEDImporter: Importer {
             }
         }
 
-        return Clan(persons.values)
+        return Lineage(persons.values, families)
+    }
+
+    private fun getEncoding(file: File): Charset {
+        val charset = Charsets.UTF_8
+        file.bufferedReader(charset).use { reader ->
+            var line: String? = reader.readLine()
+            while (line != null) {
+                if (line.contains(CHAR_ENCODING)) {
+                    return Charset.forName(parseGeneric(line, CHAR_ENCODING))
+                }
+                line = reader.readLine()
+            }
+        }
+        return charset
     }
 
     private fun handleFamily(familyId: Int, person: Person, families: MutableSet<Family>) {

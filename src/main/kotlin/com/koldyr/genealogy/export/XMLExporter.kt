@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.SerializationFeature.*
 import com.fasterxml.jackson.dataformat.xml.XmlMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
-import com.koldyr.genealogy.model.Clan
+import com.koldyr.genealogy.model.Lineage
 import java.io.File
 import java.nio.file.Files
 
@@ -15,10 +15,10 @@ import java.nio.file.Files
  */
 class XMLExporter : Exporter {
 
-    override fun export(file: File, clan: Clan) {
+    override fun export(file: File, lineage: Lineage) {
         val stream = Files.newOutputStream(file.toPath())
         stream.bufferedWriter(Charsets.UTF_8).use { writer ->
-            mapper().writeValue(writer, clan)
+            mapper().writeValue(writer, lineage)
         }
     }
 

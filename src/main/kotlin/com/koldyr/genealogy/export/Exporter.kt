@@ -1,6 +1,6 @@
 package com.koldyr.genealogy.export
 
-import com.koldyr.genealogy.model.Clan
+import com.koldyr.genealogy.model.Lineage
 import java.io.File
 
 /**
@@ -8,5 +8,5 @@ import java.io.File
  * @created: 2019.10.31
  */
 interface Exporter {
-    fun export(file: File, clan: Clan)
+    fun export(file: File, lineage: Lineage)
 }
