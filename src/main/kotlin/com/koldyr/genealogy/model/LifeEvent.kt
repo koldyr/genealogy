@@ -15,5 +15,5 @@ data class LifeEvent(
         @JsonDeserialize(using = LocalDateDeserializer::class)
         var date: LocalDate? = null,
         var place: String? = null,
-        var prefix: String? = null
+        var prefix: EventPrefix? = null
 )

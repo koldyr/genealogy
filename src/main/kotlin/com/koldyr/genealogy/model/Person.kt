@@ -1,6 +1,7 @@
 package com.koldyr.genealogy.model
 
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlCData
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 
 /**
@@ -16,7 +17,7 @@ data class Person(
         var death: LifeEvent? = null,
         var place: String? = null,
         var occupation: String? = null,
-        var note: String? = null,
+        @JacksonXmlCData var note: String? = null,
         @JacksonXmlProperty(isAttribute = true) var sex: Sex = Sex.MALE,
         @JacksonXmlProperty(isAttribute = true) var familyId: Int? = null
 ) {

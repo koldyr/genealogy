@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.importer
 
+import com.koldyr.genealogy.model.EventPrefix
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Lineage
@@ -132,7 +133,9 @@ class GEDImporter: Importer {
                     }
                 } else if (line.contains(DATE)) {
                     if (event != null) {
-                        event.date = parseDate(line)
+                        val parsed = parseDate(line)
+                        event.date = parsed.first
+                        event.prefix = parsed.second
                     }
                 } else if (line.contains(PLACE)) {
                     if (event != null) {
@@ -231,17 +234,23 @@ class GEDImporter: Importer {
         return -1
     }
 
-    private fun parseDate(value: String): LocalDate {
+    private fun parseDate(value: String): Pair<LocalDate, EventPrefix?> {
         var dateValue = parseGeneric(value, DATE)
 
-        if (dateValue.contains(ABOUT)) {
-            dateValue = parseGeneric(dateValue, ABOUT)
-        }
-        if (dateValue.contains(AFTER)) {
-            dateValue = parseGeneric(dateValue, AFTER)
-        }
-        if (dateValue.contains(BEFORE)) {
-            dateValue = parseGeneric(dateValue, BEFORE)
+        val prefix: EventPrefix? = when {
+            dateValue.contains(BEFORE) -> {
+                dateValue = parseGeneric(dateValue, BEFORE)
+                EventPrefix.Before
+            }
+            dateValue.contains(ABOUT) -> {
+                dateValue = parseGeneric(dateValue, ABOUT)
+                EventPrefix.About
+            }
+            dateValue.contains(AFTER) -> {
+                dateValue = parseGeneric(dateValue, AFTER)
+                EventPrefix.After
+            }
+            else -> null
         }
 
         val year: String
@@ -272,7 +281,8 @@ class GEDImporter: Importer {
             }
         }
 
-        return LocalDate.parse("$year $month $day", datePattern)
+        val date = LocalDate.parse("$year $month $day", datePattern)
+        return Pair(date, prefix)
     }
 
     private fun parseMonth(month: String): String {

@@ -12,7 +12,7 @@ class XMLImporter : Importer {
 
     override fun import(file: File): Lineage {
         val stream = Files.newInputStream(file.toPath())
-        val lineage: Lineage = stream.bufferedReader(Charsets.UTF_8).use {
+        val lineage = stream.bufferedReader(Charsets.UTF_8).use {
             reader -> mapper().readValue(reader, Lineage::class.java)
         }
         return lineage
