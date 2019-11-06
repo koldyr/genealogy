@@ -145,7 +145,7 @@ class GenealogyApp : JFrame, ActionListener {
             val person = tableModel.getPerson(tblPersons.selectedRow)
             val toEdit = clonePerson(person)
 
-            val editPersonDialog = EditPersonDialog(this, toEdit)
+            val editPersonDialog = EditPersonDialog(this, lineage, toEdit)
             editPersonDialog.isVisible = true
 
             if (editPersonDialog.getModalResult()) {
@@ -162,7 +162,7 @@ class GenealogyApp : JFrame, ActionListener {
                 .get() + 1
         var person = Person(index)
 
-        val editPersonDialog = EditPersonDialog(this, person)
+        val editPersonDialog = EditPersonDialog(this, lineage, person)
         editPersonDialog.isVisible = true
 
         if (editPersonDialog.getModalResult()) {

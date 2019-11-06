@@ -1,6 +1,8 @@
 package com.koldyr.genealogy.ui
 
+import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.LifeEvent
+import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
 import com.koldyr.genealogy.model.Sex
@@ -35,6 +37,7 @@ import javax.swing.border.EmptyBorder
  * @created: 2019-10-27
  */
 class EditPersonDialog : JDialog {
+    private val lineage: Lineage
     private var person: Person
     private var modalResult: Boolean = false
 
@@ -50,8 +53,10 @@ class EditPersonDialog : JDialog {
     private val txtPlace: JTextField
     private val txtOccupation: JTextField
     private val txtNote: JTextArea
+    private val cmbFamily: JComboBox<Family>
 
-    constructor(owner: Frame?, person: Person) : super(owner, "Edit Person", true) {
+    constructor(owner: Frame?, lineage: Lineage, person: Person) : super(owner, "Edit Person", true) {
+        this.lineage = lineage
         this.person = person
 
         val lblId = JLabel("Id:")
@@ -105,6 +110,11 @@ class EditPersonDialog : JDialog {
 
         val lblNote = JLabel("Note:")
         txtNote = JTextArea(person.note, 4, 20)
+
+        val lblFamily = JLabel("Family:")
+        cmbFamily = JComboBox(lineage.families.toTypedArray())
+        cmbFamily.renderer = FamilyRenderer(lineage)
+        cmbFamily.selectedItem = lineage.findFamily(person.familyId)
 
         rootPane.border = EmptyBorder(10, 10, 10, 10)
 
@@ -169,6 +179,12 @@ class EditPersonDialog : JDialog {
         pnlContent.add(lblNote, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
         pnlContent.add(JScrollPane(txtNote), GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+
+        rowIndex++
+        pnlContent.add(lblFamily, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+        pnlContent.add(cmbFamily, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
         cmbSex.selectedItem = person.sex
