@@ -26,8 +26,8 @@ class FamilyRenderer(val lineage: Lineage) : DefaultListCellRenderer() {
         if (family == null) {
             return ""
         }
-        val person = family.husband ?: family.wife
+        val person = family.husband ?: family.wife ?: return ""
 
-        return if (person == null) "" else person.name?.last ?: ""
+        return person.name?.last ?: ""
     }
 }

@@ -7,7 +7,6 @@ import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
 import com.koldyr.genealogy.model.Sex
 import org.apache.commons.lang3.StringUtils.*
-import org.jdatepicker.JDatePicker
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.FlowLayout
@@ -17,14 +16,15 @@ import java.awt.GridBagLayout
 import java.awt.Insets
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
-import java.time.LocalDate
 import javax.swing.AbstractAction
 import javax.swing.Action
+import javax.swing.DefaultListModel
 import javax.swing.JButton
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JDialog
 import javax.swing.JLabel
+import javax.swing.JList
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
@@ -46,10 +46,7 @@ class EditPersonDialog : JDialog {
     private val txtLast: JTextField
     private val txtMaiden: JTextField
     private val cmbSex: JComboBox<Sex>
-    private val birthModel: LocalDateModel
-    private val txtBirthPlace: JTextField
-    private val deathModel: LocalDateModel
-    private val txtDeathPlace: JTextField
+    private val lstEvents: JList<LifeEvent>
     private val txtPlace: JTextField
     private val txtOccupation: JTextField
     private val txtNote: JTextArea
@@ -79,28 +76,10 @@ class EditPersonDialog : JDialog {
             txtMaiden.isVisible = cmbSex.selectedItem == Sex.FEMALE
         }
 
-        val lblBirth = JLabel("Birth:")
-
-        birthModel = LocalDateModel()
-        val dpBirth = JDatePicker(birthModel, "yyyy MMM dd")
-        txtBirthPlace = JTextField()
-
-        if (person.birth != null) {
-            val birth: LifeEvent = person.birth!!
-            birthModel.value = birth.date
-            txtBirthPlace.text = birth.place
-        }
-
-        val lblDeath = JLabel("Death:")
-        deathModel = LocalDateModel()
-        val dpDeath = JDatePicker(deathModel, "yyyy MMM dd")
-        txtDeathPlace = JTextField()
-
-        if (person.death != null) {
-            val death: LifeEvent = person.death!!
-            deathModel.value = death.date
-            txtDeathPlace.text = death.place
-        }
+        val lblEvents = JLabel("Events:")
+        val eventsModel = DefaultListModel<LifeEvent>()
+        eventsModel.addAll(person.events)
+        lstEvents = JList(eventsModel)
 
         val lblPlace = JLabel("Place:")
         txtPlace = JTextField(person.place)
@@ -148,20 +127,10 @@ class EditPersonDialog : JDialog {
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 0), 0, 0))
 
         rowIndex++
-        pnlContent.add(lblBirth, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(dpBirth, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
-        pnlContent.add(txtBirthPlace, GridBagConstraints(2, rowIndex, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 5, 0), 0, 0))
-
-        rowIndex++
-        pnlContent.add(lblDeath, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(dpDeath, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
-        pnlContent.add(txtDeathPlace, GridBagConstraints(2, rowIndex, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 5, 0), 0, 0))
+        pnlContent.add(lblEvents, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
+                GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+        pnlContent.add(JScrollPane(lstEvents), GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.BOTH, Insets(0, 0, 5, 0), 0, 0))
 
         rowIndex++
         pnlContent.add(lblPlace, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
@@ -177,7 +146,7 @@ class EditPersonDialog : JDialog {
 
         rowIndex++
         pnlContent.add(lblNote, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+                GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
         pnlContent.add(JScrollPane(txtNote), GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
@@ -203,15 +172,6 @@ class EditPersonDialog : JDialog {
         val last: String? = defaultIfEmpty(txtLast.text, null)
         val maiden: String? = defaultIfEmpty(txtMaiden.text, null)
         person.name = PersonNames(name, middle, last, maiden)
-
-        val birthDate: LocalDate? = birthModel.value
-        val birthPlace: String? = defaultIfEmpty(txtBirthPlace.text, null)
-        person.birth = LifeEvent(birthDate, birthPlace)
-
-        val deathDate: LocalDate? = deathModel.value
-        val deathPlace: String? = defaultIfEmpty(txtDeathPlace.text, null)
-        person.death = LifeEvent(deathDate, deathPlace)
-
         person.sex = cmbSex.selectedItem as Sex
         person.place = defaultIfEmpty(txtPlace.text, null)
         person.occupation = defaultIfEmpty(txtOccupation.text, null)

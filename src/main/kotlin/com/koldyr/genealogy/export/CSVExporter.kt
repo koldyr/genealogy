@@ -35,8 +35,8 @@ class CSVExporter : Exporter {
 
         line.add(it.id.toString())
         line.add(personNamesToCSV(it.name))
-        line.add(liveEventToCSV(it.birth))
-        line.add(liveEventToCSV(it.death))
+        line.add(liveEventToCSV(it.getBirth()))
+        line.add(liveEventToCSV(it.getDeath()))
         line.add(it.sex.name)
         line.add(escapeCsv(it.place ?: EMPTY))
         line.add(escapeCsv(it.occupation ?: EMPTY))

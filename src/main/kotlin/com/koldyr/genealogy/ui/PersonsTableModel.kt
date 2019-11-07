@@ -20,7 +20,7 @@ class PersonsTableModel : AbstractTableModel() {
         fireTableDataChanged()
     }
 
-    fun getPersons(): Collection<Person> {
+    fun getAll(): Collection<Person> {
         return persons
     }
 
@@ -28,18 +28,18 @@ class PersonsTableModel : AbstractTableModel() {
         return persons[index]
     }
 
-    fun removePerson(index: Int): Person {
+    fun remove(index: Int): Person {
         val person = persons.removeAt(index)
         fireTableRowsDeleted(index, index)
         return person
     }
 
-    fun addPerson(person: Person) {
+    fun add(person: Person) {
         persons.add(person)
         fireTableRowsInserted(persons.size, persons.size)
     }
 
-    fun updatePerson(person: Person) {
+    fun update(person: Person) {
         for ((index, p) in persons.withIndex()) {
             if (p.id == person.id) {
                 persons.removeAt(index)
@@ -76,8 +76,8 @@ class PersonsTableModel : AbstractTableModel() {
             0 -> person.id
             1 -> person.name
             2 -> person.sex
-            3 -> person.birth
-            4 -> person.death
+            3 -> person.getBirth()
+            4 -> person.getDeath()
             5 -> person.place
             6 -> person.occupation
             7 -> person.note

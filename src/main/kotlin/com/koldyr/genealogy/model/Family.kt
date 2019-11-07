@@ -10,8 +10,8 @@ import com.koldyr.genealogy.handlers.PersonIdSerializer
  * Description of class Family
  * @created: 2019-10-25
  */
-class Family(@field:JacksonXmlProperty(isAttribute = true) var id: Int) {
-    var marriage: LifeEvent? = null
+data class Family(@field:JacksonXmlProperty(isAttribute = true) var id: Int) {
+    val events: MutableSet<LifeEvent> = mutableSetOf()
 
     @field:JacksonXmlProperty(isAttribute = true)
     @JsonSerialize(using = PersonIdSerializer::class)

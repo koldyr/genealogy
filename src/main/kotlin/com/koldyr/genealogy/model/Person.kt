@@ -13,8 +13,7 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 data class Person(
         @JacksonXmlProperty(isAttribute = true) var id: Int,
         var name: PersonNames? = null,
-        var birth: LifeEvent? = null,
-        var death: LifeEvent? = null,
+        var events: MutableSet<LifeEvent> = mutableSetOf(),
         var place: String? = null,
         var occupation: String? = null,
         @JacksonXmlCData var note: String? = null,
@@ -31,5 +30,19 @@ data class Person(
 
     override fun hashCode(): Int {
         return id
+    }
+
+    fun getBirth(): LifeEvent? {
+        return events.stream()
+                .filter { it.type == EventType.Birth }
+                .findFirst()
+                .orElse(null)
+    }
+
+    fun getDeath(): LifeEvent? {
+        return events.stream()
+                .filter { it.type == EventType.Death }
+                .findFirst()
+                .orElse(null)
     }
 }
