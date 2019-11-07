@@ -5,5 +5,5 @@ package com.koldyr.genealogy.model
  * @created: 2019-11-06
  */
 enum class EventPrefix {
-    Before, About, After
+    None, Before, About, After
 }

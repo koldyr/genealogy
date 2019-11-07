@@ -16,15 +16,18 @@ import java.awt.GridBagLayout
 import java.awt.Insets
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.AbstractAction
 import javax.swing.Action
-import javax.swing.DefaultListModel
+import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JDialog
 import javax.swing.JLabel
 import javax.swing.JList
+import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
@@ -46,6 +49,7 @@ class EditPersonDialog : JDialog {
     private val txtLast: JTextField
     private val txtMaiden: JTextField
     private val cmbSex: JComboBox<Sex>
+    private val eventsModel: LifeEventListModel
     private val lstEvents: JList<LifeEvent>
     private val txtPlace: JTextField
     private val txtOccupation: JTextField
@@ -77,9 +81,29 @@ class EditPersonDialog : JDialog {
         }
 
         val lblEvents = JLabel("Events:")
-        val eventsModel = DefaultListModel<LifeEvent>()
-        eventsModel.addAll(person.events)
+        eventsModel = LifeEventListModel(person.events.map { it.copy() }.toMutableList())
         lstEvents = JList(eventsModel)
+        lstEvents.cellRenderer = LifeEventRenderer()
+        lstEvents.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                if (e.button == MouseEvent.BUTTON1 && e.clickCount == 2) {
+                    editEvent(lstEvents.selectedValue as LifeEvent)
+                }
+            }
+        })
+
+        val addAction = object : AbstractAction("+") {
+            override fun actionPerformed(e: ActionEvent) = editEvent(null)
+        }
+        val removeAction = object : AbstractAction("-") {
+            override fun actionPerformed(e: ActionEvent) = removeEvent()
+        }
+
+        val pnlEventButtons = JPanel()
+        val boxLayout = BoxLayout(pnlEventButtons, BoxLayout.Y_AXIS)
+        pnlEventButtons.layout = boxLayout
+        pnlEventButtons.add(JButton(addAction))
+        pnlEventButtons.add(JButton(removeAction))
 
         val lblPlace = JLabel("Place:")
         txtPlace = JTextField(person.place)
@@ -129,8 +153,10 @@ class EditPersonDialog : JDialog {
         rowIndex++
         pnlContent.add(lblEvents, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(JScrollPane(lstEvents), GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
+        pnlContent.add(JScrollPane(lstEvents), GridBagConstraints(1, rowIndex, 1, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.BOTH, Insets(0, 0, 5, 0), 0, 0))
+        pnlContent.add(pnlEventButtons, GridBagConstraints(2, rowIndex, 1, 1, 1.0, 0.0,
+                GridBagConstraints.NORTHWEST, GridBagConstraints.VERTICAL, Insets(0, 0, 5, 0), 0, 0))
 
         rowIndex++
         pnlContent.add(lblPlace, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
@@ -172,6 +198,7 @@ class EditPersonDialog : JDialog {
         val last: String? = defaultIfEmpty(txtLast.text, null)
         val maiden: String? = defaultIfEmpty(txtMaiden.text, null)
         person.name = PersonNames(name, middle, last, maiden)
+        person.events = eventsModel.events.toMutableSet()
         person.sex = cmbSex.selectedItem as Sex
         person.place = defaultIfEmpty(txtPlace.text, null)
         person.occupation = defaultIfEmpty(txtOccupation.text, null)
@@ -220,5 +247,24 @@ class EditPersonDialog : JDialog {
     private fun close(value: Boolean) {
         modalResult = value
         isVisible = false
+    }
+
+    private fun editEvent(event: LifeEvent?) {
+        val eventEditPanel = LifeEventEditPanel(event)
+        val result = JOptionPane.showConfirmDialog(this, eventEditPanel, "Edit event", JOptionPane.OK_CANCEL_OPTION)
+
+        if (result == JOptionPane.OK_OPTION) {
+            val newEvent = eventEditPanel.getEvent()
+
+            if (event == null) {
+                eventsModel.add(newEvent)
+            }
+        }
+    }
+
+    private fun removeEvent() {
+        if (lstEvents.selectedValue != null) {
+            eventsModel.remove(lstEvents.selectedValue)
+        }
     }
 }
