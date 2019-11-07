@@ -6,7 +6,7 @@ package com.koldyr.genealogy.model
  */
 data class PersonNames(
         var name: String,
-        var middle: String?,
-        var last: String?,
-        var maiden: String?
+        var middle: String? = null,
+        var last: String? = null,
+        var maiden: String? = null
 )
