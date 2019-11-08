@@ -70,7 +70,7 @@ class LifeEventEditPanel: JPanel {
         if (this.event == null) {
             val type = cmbType.selectedItem as EventType
             val prefix = getPrefix()
-            return LifeEvent(type, dateModel.value, txtPlace.text, prefix)
+            return LifeEvent(type, prefix, dateModel.value, txtPlace.text)
         }
 
         val changed: LifeEvent = this.event!!

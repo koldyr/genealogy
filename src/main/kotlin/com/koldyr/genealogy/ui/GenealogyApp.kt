@@ -50,7 +50,7 @@ class GenealogyApp : JFrame, ActionListener {
         pnlContent.border = EmptyBorder(5, 5, 5, 5)
         pnlContent.add(JScrollPane(tblPersons))
 
-        personsModel.setPersons(lineage.persons)
+        personsModel.setPersons(lineage.person)
 
         val frameSize = Dimension(1000, 800)
         preferredSize.size = frameSize
@@ -186,7 +186,7 @@ class GenealogyApp : JFrame, ActionListener {
 
             val importer = ImporterFactory.create(fileToOpen)
             lineage = importer.import(fileToOpen)
-            personsModel.setPersons(lineage.persons)
+            personsModel.setPersons(lineage.person)
 
             title = "Genealogy: ${fileToOpen.absolutePath}"
             file = fileToOpen
@@ -200,7 +200,7 @@ class GenealogyApp : JFrame, ActionListener {
             val extension = fileToSave.extension
 
             val exporter = ExporterFactory.create(extension)
-            lineage.persons = personsModel.getAll()
+            lineage.person = personsModel.getAll()
             exporter.export(fileToSave, lineage)
 
             JOptionPane.showMessageDialog(this, "Saved to ${fileToSave.name}")
@@ -231,7 +231,7 @@ class GenealogyApp : JFrame, ActionListener {
             val file = handleExportFile(fileChooser.selectedFile, extension)
 
             val exporter = ExporterFactory.create(extension)
-            lineage.persons = persons
+            lineage.person = persons
             exporter.export(file, lineage)
 
             JOptionPane.showMessageDialog(this, "Exported to ${file.name}")
@@ -255,7 +255,7 @@ class GenealogyApp : JFrame, ActionListener {
     private fun clonePerson(person: Person): Person {
         val copy = person.copy()
         copy.name = person.name?.copy()
-        copy.events = person.events.toMutableSet()
+        copy.event = person.event.map { it.copy() }.toMutableSet()
         return copy
     }
 }

@@ -44,7 +44,7 @@ class PersonsTableModel : AbstractTableModel() {
             if (p.id == person.id) {
                 persons.removeAt(index)
                 persons.add(index, person)
-                fireTableCellUpdated(index, index)
+                fireTableRowsUpdated(index, index)
                 return
             }
         }

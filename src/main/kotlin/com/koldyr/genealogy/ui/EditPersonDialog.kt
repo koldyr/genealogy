@@ -81,7 +81,7 @@ class EditPersonDialog : JDialog {
         }
 
         val lblEvents = JLabel("Events:")
-        eventsModel = LifeEventListModel(person.events.map { it.copy() }.toMutableList())
+        eventsModel = LifeEventListModel(person.event.toMutableList())
         lstEvents = JList(eventsModel)
         lstEvents.cellRenderer = LifeEventRenderer()
         lstEvents.addMouseListener(object : MouseAdapter() {
@@ -92,18 +92,22 @@ class EditPersonDialog : JDialog {
             }
         })
 
-        val addAction = object : AbstractAction("+") {
+        val btnAdd = JButton(object : AbstractAction("+") {
             override fun actionPerformed(e: ActionEvent) = editEvent(null)
-        }
-        val removeAction = object : AbstractAction("-") {
+        })
+        btnAdd.margin = Insets(2, 3, 2, 3)
+
+        val btnRemove = JButton(object : AbstractAction("-") {
             override fun actionPerformed(e: ActionEvent) = removeEvent()
-        }
+        })
+        btnRemove.margin = Insets(2, 5, 2, 4)
 
         val pnlEventButtons = JPanel()
         val boxLayout = BoxLayout(pnlEventButtons, BoxLayout.Y_AXIS)
         pnlEventButtons.layout = boxLayout
-        pnlEventButtons.add(JButton(addAction))
-        pnlEventButtons.add(JButton(removeAction))
+
+        pnlEventButtons.add(btnAdd)
+        pnlEventButtons.add(btnRemove)
 
         val lblPlace = JLabel("Place:")
         txtPlace = JTextField(person.place)
@@ -115,7 +119,7 @@ class EditPersonDialog : JDialog {
         txtNote = JTextArea(person.note, 4, 20)
 
         val lblFamily = JLabel("Family:")
-        cmbFamily = JComboBox(lineage.families.toTypedArray())
+        cmbFamily = JComboBox(lineage.family.toTypedArray())
         cmbFamily.renderer = FamilyRenderer(lineage)
         cmbFamily.selectedItem = lineage.findFamily(person.familyId)
 
@@ -125,13 +129,13 @@ class EditPersonDialog : JDialog {
         val pnlContent = JPanel(GridBagLayout())
         pnlContent.add(lblId, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtId, GridBagConstraints(1, rowIndex, 1, 1, 1.0, 0.0,
+        pnlContent.add(txtId, GridBagConstraints(1, rowIndex, 3, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
         rowIndex++
         pnlContent.add(lblName, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtName, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
+        pnlContent.add(txtName, GridBagConstraints(1, rowIndex, 1, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
         pnlContent.add(txtMiddle, GridBagConstraints(2, rowIndex, 1, 1, 0.5, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 5, 0), 0, 0))
@@ -139,7 +143,7 @@ class EditPersonDialog : JDialog {
         rowIndex++
         pnlContent.add(lblLast, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtLast, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
+        pnlContent.add(txtLast, GridBagConstraints(1, rowIndex, 1, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
         pnlContent.add(txtMaiden, GridBagConstraints(2, rowIndex, 1, 1, 0.5, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 5, 0), 0, 0))
@@ -147,39 +151,39 @@ class EditPersonDialog : JDialog {
         rowIndex++
         pnlContent.add(lblSex, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(cmbSex, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
+        pnlContent.add(cmbSex, GridBagConstraints(1, rowIndex, 3, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 0), 0, 0))
 
         rowIndex++
         pnlContent.add(lblEvents, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(JScrollPane(lstEvents), GridBagConstraints(1, rowIndex, 1, 1, 1.0, 0.0,
+        pnlContent.add(JScrollPane(lstEvents), GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.BOTH, Insets(0, 0, 5, 0), 0, 0))
-        pnlContent.add(pnlEventButtons, GridBagConstraints(2, rowIndex, 1, 1, 1.0, 0.0,
-                GridBagConstraints.NORTHWEST, GridBagConstraints.VERTICAL, Insets(0, 0, 5, 0), 0, 0))
+        pnlContent.add(pnlEventButtons, GridBagConstraints(3, rowIndex, 1, 1, 1.0, 0.0,
+                GridBagConstraints.NORTHWEST, GridBagConstraints.VERTICAL, Insets(0, 5, 5, 0), 0, 0))
 
         rowIndex++
         pnlContent.add(lblPlace, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtPlace, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
+        pnlContent.add(txtPlace, GridBagConstraints(1, rowIndex, 3, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
         rowIndex++
         pnlContent.add(lblOccupation, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtOccupation, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
+        pnlContent.add(txtOccupation, GridBagConstraints(1, rowIndex, 3, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
         rowIndex++
         pnlContent.add(lblNote, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(JScrollPane(txtNote), GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
+        pnlContent.add(JScrollPane(txtNote), GridBagConstraints(1, rowIndex, 3, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
         rowIndex++
         pnlContent.add(lblFamily, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(cmbFamily, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
+        pnlContent.add(cmbFamily, GridBagConstraints(1, rowIndex, 3, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
         cmbSex.selectedItem = person.sex
@@ -198,7 +202,7 @@ class EditPersonDialog : JDialog {
         val last: String? = defaultIfEmpty(txtLast.text, null)
         val maiden: String? = defaultIfEmpty(txtMaiden.text, null)
         person.name = PersonNames(name, middle, last, maiden)
-        person.events = eventsModel.events.toMutableSet()
+        person.event = eventsModel.events.toMutableSet()
         person.sex = cmbSex.selectedItem as Sex
         person.place = defaultIfEmpty(txtPlace.text, null)
         person.occupation = defaultIfEmpty(txtOccupation.text, null)

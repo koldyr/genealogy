@@ -1,5 +1,7 @@
 package com.koldyr.genealogy.model
 
+import com.fasterxml.jackson.annotation.JsonProperty
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement
 
 /**
@@ -8,12 +10,17 @@ import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement
  */
 @JacksonXmlRootElement
 class Lineage(
-        var persons: Collection<Person>,
-        var families: Set<Family>
+        @field:JacksonXmlElementWrapper(localName = "persons")
+        @field:JsonProperty("persons")
+        var person: Collection<Person>,
+
+        @field:JacksonXmlElementWrapper(localName = "families")
+        @field:JsonProperty("families")
+        var family: Set<Family>
 ) {
 
     fun findFamily(id: Int?): Family? {
-        return families.stream()
+        return family.stream()
                 .filter { it.id == id }
                 .findFirst()
                 .orElse(null)

@@ -1,24 +1,40 @@
 package com.koldyr.genealogy.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlCData
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlElementWrapper
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
+import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlRootElement
 
 /**
  * Description of class Person
  *
  * @created: 2019-10-25
  */
-@JsonPropertyOrder("id", "name", "sex", "birth", "death", "place", "occupation", "note", "familyId")
+@JsonPropertyOrder("id", "name", "sex", "place", "occupation", "note", "familyId", "events")
+@JacksonXmlRootElement(localName = "person")
 data class Person(
-        @JacksonXmlProperty(isAttribute = true) var id: Int,
+        @field:JacksonXmlProperty(isAttribute = true) var id: Int,
         var name: PersonNames? = null,
-        var events: MutableSet<LifeEvent> = mutableSetOf(),
+
+        @field:JacksonXmlElementWrapper(localName = "events")
+        @JsonProperty("events")
+        var event: MutableSet<LifeEvent> = mutableSetOf(),
+
         var place: String? = null,
+
         var occupation: String? = null,
-        @JacksonXmlCData var note: String? = null,
-        @JacksonXmlProperty(isAttribute = true) var sex: Sex = Sex.MALE,
-        @JacksonXmlProperty(isAttribute = true) var familyId: Int? = null
+
+        @field:JacksonXmlCData
+        var note: String? = null,
+
+        @field:JacksonXmlProperty(isAttribute = true)
+        var sex: Sex = Sex.MALE,
+
+        @field:JacksonXmlProperty(isAttribute = true)
+        var familyId: Int? = null
 ) {
 
     override fun equals(other: Any?): Boolean {
@@ -32,15 +48,17 @@ data class Person(
         return id
     }
 
+    @JsonIgnore
     fun getBirth(): LifeEvent? {
-        return events.stream()
+        return event.stream()
                 .filter { it.type == EventType.Birth }
                 .findFirst()
                 .orElse(null)
     }
 
+    @JsonIgnore
     fun getDeath(): LifeEvent? {
-        return events.stream()
+        return event.stream()
                 .filter { it.type == EventType.Death }
                 .findFirst()
                 .orElse(null)
