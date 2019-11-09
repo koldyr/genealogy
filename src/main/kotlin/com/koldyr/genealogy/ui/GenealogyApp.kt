@@ -176,7 +176,6 @@ class GenealogyApp : JFrame, ActionListener {
         val fileChooser = JFileChooser(startDir)
         fileChooser.isAcceptAllFileFilterUsed = false
         fileChooser.addChoosableFileFilter(FileNameExtensionFilter("AgelongTree genealogy file", "ged"))
-        fileChooser.addChoosableFileFilter(FileNameExtensionFilter("XML genealogy file", "xml"))
         fileChooser.addChoosableFileFilter(FileNameExtensionFilter("CSV genealogy file", "csv"))
         fileChooser.addChoosableFileFilter(FileNameExtensionFilter("JSON genealogy file", "json"))
         fileChooser.showOpenDialog(this)
@@ -211,9 +210,8 @@ class GenealogyApp : JFrame, ActionListener {
         val startDir = System.getProperty("user.dir")
         val fileChooser = JFileChooser(startDir)
         fileChooser.isAcceptAllFileFilterUsed = false
-        fileChooser.addChoosableFileFilter(FileNameExtensionFilter("XML genealogy file", "xml"))
-        fileChooser.addChoosableFileFilter(FileNameExtensionFilter("CSV genealogy file", "csv"))
         fileChooser.addChoosableFileFilter(FileNameExtensionFilter("JSON genealogy file", "json"))
+        fileChooser.addChoosableFileFilter(FileNameExtensionFilter("CSV genealogy file", "csv"))
         fileChooser.addChoosableFileFilter(FileNameExtensionFilter("AgelongTree genealogy file", "ged"))
         fileChooser.showSaveDialog(this)
 

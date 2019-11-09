@@ -5,7 +5,7 @@ package com.koldyr.genealogy.model
  * @created: 2019-10-26
  */
 data class PersonNames(
-        var name: String,
+        var name: String?,
         var middle: String? = null,
         var last: String? = null,
         var maiden: String? = null
