@@ -81,7 +81,7 @@ class EditPersonDialog : JDialog {
         }
 
         val lblEvents = JLabel("Events:")
-        eventsModel = LifeEventListModel(person.event.toMutableList())
+        eventsModel = LifeEventListModel(person.events.toMutableList())
         lstEvents = JList(eventsModel)
         lstEvents.cellRenderer = LifeEventRenderer()
         lstEvents.addMouseListener(object : MouseAdapter() {
@@ -119,7 +119,7 @@ class EditPersonDialog : JDialog {
         txtNote = JTextArea(person.note, 4, 20)
 
         val lblFamily = JLabel("Family:")
-        cmbFamily = JComboBox(lineage.family.toTypedArray())
+        cmbFamily = JComboBox(lineage.families.toTypedArray())
         cmbFamily.renderer = FamilyRenderer(lineage)
         cmbFamily.selectedItem = lineage.findFamily(person.familyId)
 
@@ -202,7 +202,7 @@ class EditPersonDialog : JDialog {
         val last: String? = defaultIfEmpty(txtLast.text, null)
         val maiden: String? = defaultIfEmpty(txtMaiden.text, null)
         person.name = PersonNames(name, middle, last, maiden)
-        person.event = eventsModel.events.toMutableSet()
+        person.events = eventsModel.events.toMutableSet()
         person.sex = cmbSex.selectedItem as Sex
         person.place = defaultIfEmpty(txtPlace.text, null)
         person.occupation = defaultIfEmpty(txtOccupation.text, null)

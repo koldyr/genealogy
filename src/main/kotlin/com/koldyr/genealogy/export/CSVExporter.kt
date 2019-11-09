@@ -24,7 +24,7 @@ class CSVExporter : Exporter {
     override fun export(file: File, lineage: Lineage) {
         val stream = Files.newOutputStream(file.toPath())
         stream.bufferedWriter(Charsets.UTF_8).use { writer ->
-            lineage.person.forEach {
+            lineage.persons.forEach {
                 person -> writePerson(writer, person)
             }
         }

@@ -48,8 +48,8 @@ class CSVImporter : Importer {
             when (index) {
                 0 -> person.id = Integer.parseInt(value)
                 1 -> person.name = parseNames(value)
-                2 -> person.event.add(parseLifeEvent(value, EventType.Birth))
-                3 -> person.event.add(parseLifeEvent(value, EventType.Death))
+                2 -> person.events.add(parseLifeEvent(value, EventType.Birth))
+                3 -> person.events.add(parseLifeEvent(value, EventType.Death))
                 4 -> person.sex = Sex.valueOf(value)
                 5 -> person.place = value
                 6 -> person.occupation = value

@@ -121,22 +121,22 @@ class GEDImporter: Importer {
                 } else if (line.endsWith(BIRTH)) {
                     if (person != null) {
                         event = LifeEvent(EventType.Birth)
-                        person.event.add(event)
+                        person.events.add(event)
                     }
                 } else if (line.endsWith(DEATH)) {
                     if (person != null) {
                         event = LifeEvent(EventType.Death)
-                        person.event.add(event)
+                        person.events.add(event)
                     }
                 } else if (line.endsWith(MARRIAGE)) {
                     if (family != null) {
                         event = LifeEvent(EventType.Marriage)
-                        family.event.add(event)
+                        family.events.add(event)
                     }
                 } else if (line.endsWith(DIVORCE)) {
                     if (family != null) {
                         event = LifeEvent(EventType.Divorce)
-                        family.event.add(event)
+                        family.events.add(event)
                     }
                 } else if (line.contains(DATE)) {
                     if (event != null) {
