@@ -1,25 +1,23 @@
 package com.koldyr.genealogy.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlCData
-import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty
 
 /**
  * Description of class Person
  *
  * @created: 2019-10-25
  */
-@JsonPropertyOrder("id", "name", "sex", "birth", "death", "place", "occupation", "note", "familyId")
+@JsonPropertyOrder("id", "name", "sex", "place", "occupation", "note", "familyId", "events")
 data class Person(
-        @JacksonXmlProperty(isAttribute = true) var id: Int,
+        var id: Int,
         var name: PersonNames? = null,
-        var birth: LifeEvent? = null,
-        var death: LifeEvent? = null,
+        var events: MutableSet<LifeEvent> = mutableSetOf(),
         var place: String? = null,
         var occupation: String? = null,
-        @JacksonXmlCData var note: String? = null,
-        @JacksonXmlProperty(isAttribute = true) var sex: Sex = Sex.MALE,
-        @JacksonXmlProperty(isAttribute = true) var familyId: Int? = null
+        var note: String? = null,
+        var sex: Sex = Sex.MALE,
+        var familyId: Int? = null
 ) {
 
     override fun equals(other: Any?): Boolean {
@@ -31,5 +29,21 @@ data class Person(
 
     override fun hashCode(): Int {
         return id
+    }
+
+    @JsonIgnore
+    fun getBirth(): LifeEvent? {
+        return events.stream()
+                .filter { it.type == EventType.Birth }
+                .findFirst()
+                .orElse(null)
+    }
+
+    @JsonIgnore
+    fun getDeath(): LifeEvent? {
+        return events.stream()
+                .filter { it.type == EventType.Death }
+                .findFirst()
+                .orElse(null)
     }
 }

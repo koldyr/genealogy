@@ -31,7 +31,7 @@ import javax.swing.filechooser.FileNameExtensionFilter
  */
 class GenealogyApp : JFrame, ActionListener {
 
-    private val tableModel: PersonsTableModel
+    private val personsModel: PersonsTableModel
     private val tblPersons: JTable
 
     private var lineage: Lineage
@@ -41,22 +41,16 @@ class GenealogyApp : JFrame, ActionListener {
         this.lineage = lineage
         this.file = fileName?.let { File(it) }
 
-//        var persons: Set<Person?> = families.stream()
-//                .map { family: Family -> Stream.concat(Stream.of(family.husband, family.wife), family.children.stream()) }
-//                .flatMap { stream: Stream<Person?> -> stream }
-//                .filter { it != null }
-//                .collect(Collectors.toSet())
-
         createMenu()
 
-        tableModel = PersonsTableModel()
+        personsModel = PersonsTableModel()
         tblPersons = createTable()
 
         val pnlContent = contentPane as JPanel
         pnlContent.border = EmptyBorder(5, 5, 5, 5)
         pnlContent.add(JScrollPane(tblPersons))
 
-        tableModel.setPersons(lineage.persons)
+        personsModel.setPersons(lineage.persons)
 
         val frameSize = Dimension(1000, 800)
         preferredSize.size = frameSize
@@ -67,7 +61,7 @@ class GenealogyApp : JFrame, ActionListener {
     }
 
     private fun createTable(): JTable {
-        val tblPersons = JTable(tableModel, null)
+        val tblPersons = JTable(personsModel, null)
         tblPersons.setDefaultRenderer(PersonNames::class.java, NamesRenderer())
         tblPersons.setDefaultRenderer(LifeEvent::class.java, EventsRenderer())
         tblPersons.addMouseListener(object : MouseAdapter() {
@@ -142,7 +136,7 @@ class GenealogyApp : JFrame, ActionListener {
 
     private fun editPerson() {
         if (tblPersons.selectedRow > -1) {
-            val person = tableModel.getPerson(tblPersons.selectedRow)
+            val person = personsModel.getPerson(tblPersons.selectedRow)
             val toEdit = clonePerson(person)
 
             val editPersonDialog = EditPersonDialog(this, lineage, toEdit)
@@ -150,13 +144,13 @@ class GenealogyApp : JFrame, ActionListener {
 
             if (editPersonDialog.getModalResult()) {
                 val changed = editPersonDialog.getPerson()
-                tableModel.updatePerson(changed)
+                personsModel.update(changed)
             }
         }
     }
 
     private fun addPerson() {
-        val index = tableModel.getPersons().stream()
+        val index = personsModel.getAll().stream()
                 .map(Person::id)
                 .max(Integer::compare)
                 .get() + 1
@@ -167,13 +161,13 @@ class GenealogyApp : JFrame, ActionListener {
 
         if (editPersonDialog.getModalResult()) {
             person = editPersonDialog.getPerson()
-            tableModel.addPerson(person)
+            personsModel.add(person)
         }
     }
 
     private fun deletePerson() {
         if (tblPersons.selectedRow > -1) {
-            tableModel.removePerson(tblPersons.selectedRow)
+            personsModel.remove(tblPersons.selectedRow)
         }
     }
 
@@ -182,7 +176,6 @@ class GenealogyApp : JFrame, ActionListener {
         val fileChooser = JFileChooser(startDir)
         fileChooser.isAcceptAllFileFilterUsed = false
         fileChooser.addChoosableFileFilter(FileNameExtensionFilter("AgelongTree genealogy file", "ged"))
-        fileChooser.addChoosableFileFilter(FileNameExtensionFilter("XML genealogy file", "xml"))
         fileChooser.addChoosableFileFilter(FileNameExtensionFilter("CSV genealogy file", "csv"))
         fileChooser.addChoosableFileFilter(FileNameExtensionFilter("JSON genealogy file", "json"))
         fileChooser.showOpenDialog(this)
@@ -192,7 +185,7 @@ class GenealogyApp : JFrame, ActionListener {
 
             val importer = ImporterFactory.create(fileToOpen)
             lineage = importer.import(fileToOpen)
-            tableModel.setPersons(lineage.persons)
+            personsModel.setPersons(lineage.persons)
 
             title = "Genealogy: ${fileToOpen.absolutePath}"
             file = fileToOpen
@@ -206,7 +199,7 @@ class GenealogyApp : JFrame, ActionListener {
             val extension = fileToSave.extension
 
             val exporter = ExporterFactory.create(extension)
-            lineage.persons = tableModel.getPersons()
+            lineage.persons = personsModel.getAll()
             exporter.export(fileToSave, lineage)
 
             JOptionPane.showMessageDialog(this, "Saved to ${fileToSave.name}")
@@ -217,9 +210,8 @@ class GenealogyApp : JFrame, ActionListener {
         val startDir = System.getProperty("user.dir")
         val fileChooser = JFileChooser(startDir)
         fileChooser.isAcceptAllFileFilterUsed = false
-        fileChooser.addChoosableFileFilter(FileNameExtensionFilter("XML genealogy file", "xml"))
-        fileChooser.addChoosableFileFilter(FileNameExtensionFilter("CSV genealogy file", "csv"))
         fileChooser.addChoosableFileFilter(FileNameExtensionFilter("JSON genealogy file", "json"))
+        fileChooser.addChoosableFileFilter(FileNameExtensionFilter("CSV genealogy file", "csv"))
         fileChooser.addChoosableFileFilter(FileNameExtensionFilter("AgelongTree genealogy file", "ged"))
         fileChooser.showSaveDialog(this)
 
@@ -231,7 +223,7 @@ class GenealogyApp : JFrame, ActionListener {
                 }
             }
 
-            val persons = tableModel.getPersons()
+            val persons = personsModel.getAll()
             val filter = fileChooser.fileFilter as FileNameExtensionFilter
             val extension = filter.extensions[0]
             val file = handleExportFile(fileChooser.selectedFile, extension)
@@ -261,8 +253,7 @@ class GenealogyApp : JFrame, ActionListener {
     private fun clonePerson(person: Person): Person {
         val copy = person.copy()
         copy.name = person.name?.copy()
-        copy.birth = person.birth?.copy()
-        copy.death = person.death?.copy()
+        copy.events = person.events.map { it.copy() }.toMutableSet()
         return copy
     }
 }

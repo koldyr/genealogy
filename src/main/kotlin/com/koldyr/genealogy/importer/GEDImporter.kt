@@ -1,6 +1,7 @@
 package com.koldyr.genealogy.importer
 
 import com.koldyr.genealogy.model.EventPrefix
+import com.koldyr.genealogy.model.EventType
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Lineage
@@ -29,6 +30,7 @@ const val CONTINUE = "CONT"
 const val FAMC = "FAMC"
 const val FAMILY = "FAM"
 const val MARRIAGE = "MARR"
+const val DIVORCE = "DIV"
 const val HUSBAND = "HUSB"
 const val WIFE = "WIFE"
 const val CHILD = "CHIL"
@@ -97,7 +99,7 @@ class GEDImporter: Importer {
                 } else if (line.endsWith(FAMILY)) {
                     person = null
                     val familyId = parseFamilyId(line)
-                    family = families.stream().filter { it.id == familyId }.findFirst().orElseGet { Family(familyId) }
+                    family = findFamily(families, familyId)
                 } else if (line.contains(HUSBAND)) {
                     if (family != null) {
                         val personId = getPersonId(line)
@@ -118,18 +120,23 @@ class GEDImporter: Importer {
                     }
                 } else if (line.endsWith(BIRTH)) {
                     if (person != null) {
-                        event = LifeEvent()
-                        person.birth = event
+                        event = LifeEvent(EventType.Birth)
+                        person.events.add(event)
                     }
                 } else if (line.endsWith(DEATH)) {
                     if (person != null) {
-                        event = LifeEvent()
-                        person.death = event
+                        event = LifeEvent(EventType.Death)
+                        person.events.add(event)
                     }
                 } else if (line.endsWith(MARRIAGE)) {
                     if (family != null) {
-                        event = LifeEvent()
-                        family.marriage = event
+                        event = LifeEvent(EventType.Marriage)
+                        family.events.add(event)
+                    }
+                } else if (line.endsWith(DIVORCE)) {
+                    if (family != null) {
+                        event = LifeEvent(EventType.Divorce)
+                        family.events.add(event)
                     }
                 } else if (line.contains(DATE)) {
                     if (event != null) {
@@ -148,6 +155,9 @@ class GEDImporter: Importer {
 
         return Lineage(persons.values, families)
     }
+
+    private fun findFamily(families: MutableSet<Family>, familyId: Int) =
+            families.stream().filter { it.id == familyId }.findFirst().orElseGet { Family(familyId) }
 
     private fun getEncoding(file: File): Charset {
         val charset = Charsets.UTF_8

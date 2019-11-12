@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.importer
 
+import com.koldyr.genealogy.model.EventType
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
@@ -47,8 +48,8 @@ class CSVImporter : Importer {
             when (index) {
                 0 -> person.id = Integer.parseInt(value)
                 1 -> person.name = parseNames(value)
-                2 -> person.birth = parseLifeEvent(value)
-                3 -> person.death = parseLifeEvent(value)
+                2 -> person.events.add(parseLifeEvent(value, EventType.Birth))
+                3 -> person.events.add(parseLifeEvent(value, EventType.Death))
                 4 -> person.sex = Sex.valueOf(value)
                 5 -> person.place = value
                 6 -> person.occupation = value
@@ -101,12 +102,13 @@ class CSVImporter : Importer {
         return names
     }
 
-    private fun parseLifeEvent(value: String): LifeEvent? {
+    private fun parseLifeEvent(value: String, type: EventType): LifeEvent {
+        val event = LifeEvent(type)
+
         if (isEmpty(value)) {
-            return null
+            return event
         }
 
-        val event = LifeEvent()
         val values = value.split('|')
         for ((index, v) in values.withIndex()) {
             when (index) {

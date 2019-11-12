@@ -17,7 +17,6 @@ class ImporterFactory {
                 val extension = fileName.substring(i + 1)
 
                 return when (extension) {
-                    "xml" -> XMLImporter()
                     "json" -> JSONImporter()
                     "ged" -> GEDImporter()
                     else -> CSVImporter()

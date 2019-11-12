@@ -10,7 +10,6 @@ class ExporterFactory {
         @JvmStatic
         fun create(type: String): Exporter {
             return when (type) {
-                "xml" -> XMLExporter()
                 "json" -> JSONExporter()
                 "ged" -> GEDExporter()
                 else -> CSVExporter()

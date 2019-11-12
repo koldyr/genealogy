@@ -7,7 +7,6 @@ import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
 import com.koldyr.genealogy.model.Sex
 import org.apache.commons.lang3.StringUtils.*
-import org.jdatepicker.JDatePicker
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.FlowLayout
@@ -17,14 +16,18 @@ import java.awt.GridBagLayout
 import java.awt.Insets
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
-import java.time.LocalDate
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
 import javax.swing.AbstractAction
 import javax.swing.Action
+import javax.swing.BoxLayout
 import javax.swing.JButton
 import javax.swing.JComboBox
 import javax.swing.JComponent
 import javax.swing.JDialog
 import javax.swing.JLabel
+import javax.swing.JList
+import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
@@ -46,10 +49,8 @@ class EditPersonDialog : JDialog {
     private val txtLast: JTextField
     private val txtMaiden: JTextField
     private val cmbSex: JComboBox<Sex>
-    private val birthModel: LocalDateModel
-    private val txtBirthPlace: JTextField
-    private val deathModel: LocalDateModel
-    private val txtDeathPlace: JTextField
+    private val eventsModel: LifeEventListModel
+    private val lstEvents: JList<LifeEvent>
     private val txtPlace: JTextField
     private val txtOccupation: JTextField
     private val txtNote: JTextArea
@@ -73,34 +74,27 @@ class EditPersonDialog : JDialog {
         txtLast = JTextField(name.last)
         txtMaiden = JTextField(name.maiden)
 
+        val pnlNames2 = JPanel(GridBagLayout())
         val lblSex = JLabel("Sex:")
         cmbSex = JComboBox(Sex.values())
         cmbSex.addActionListener {
             txtMaiden.isVisible = cmbSex.selectedItem == Sex.FEMALE
+            pnlNames2.revalidate()
         }
 
-        val lblBirth = JLabel("Birth:")
+        val lblEvents = JLabel("Events:")
+        eventsModel = LifeEventListModel(person.events.toMutableList())
+        lstEvents = JList(eventsModel)
+        lstEvents.cellRenderer = LifeEventRenderer()
+        lstEvents.addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                if (e.button == MouseEvent.BUTTON1 && e.clickCount == 2) {
+                    editEvent(lstEvents.selectedValue as LifeEvent)
+                }
+            }
+        })
 
-        birthModel = LocalDateModel()
-        val dpBirth = JDatePicker(birthModel, "yyyy MMM dd")
-        txtBirthPlace = JTextField()
-
-        if (person.birth != null) {
-            val birth: LifeEvent = person.birth!!
-            birthModel.value = birth.date
-            txtBirthPlace.text = birth.place
-        }
-
-        val lblDeath = JLabel("Death:")
-        deathModel = LocalDateModel()
-        val dpDeath = JDatePicker(deathModel, "yyyy MMM dd")
-        txtDeathPlace = JTextField()
-
-        if (person.death != null) {
-            val death: LifeEvent = person.death!!
-            deathModel.value = death.date
-            txtDeathPlace.text = death.place
-        }
+        val pnlEventButtons = createEventButtons()
 
         val lblPlace = JLabel("Place:")
         txtPlace = JTextField(person.place)
@@ -118,28 +112,35 @@ class EditPersonDialog : JDialog {
 
         rootPane.border = EmptyBorder(10, 10, 10, 10)
 
+        val pnlNames1 = JPanel(GridBagLayout())
+        pnlNames1.add(txtName, GridBagConstraints(0, 0, 1, 1, 0.5, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 0), 0, 0))
+        pnlNames1.add(txtMiddle, GridBagConstraints(1, 0, 1, 1, 0.5, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 0, 0), 0, 0))
+
+        pnlNames2.add(txtLast, GridBagConstraints(0, 0, 1, 1, 0.5, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 0), 0, 0))
+        pnlNames2.add(txtMaiden, GridBagConstraints(1, 0, 1, 1, 0.5, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 0, 0), 0, 0))
+
         var rowIndex = 0
         val pnlContent = JPanel(GridBagLayout())
         pnlContent.add(lblId, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtId, GridBagConstraints(1, rowIndex, 1, 1, 1.0, 0.0,
+        pnlContent.add(txtId, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
         rowIndex++
         pnlContent.add(lblName, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtName, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
+        pnlContent.add(pnlNames1, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
-        pnlContent.add(txtMiddle, GridBagConstraints(2, rowIndex, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 5, 0), 0, 0))
 
         rowIndex++
         pnlContent.add(lblLast, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(txtLast, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
+        pnlContent.add(pnlNames2, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
-        pnlContent.add(txtMaiden, GridBagConstraints(2, rowIndex, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 5, 0), 0, 0))
 
         rowIndex++
         pnlContent.add(lblSex, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
@@ -148,20 +149,12 @@ class EditPersonDialog : JDialog {
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 0), 0, 0))
 
         rowIndex++
-        pnlContent.add(lblBirth, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(dpBirth, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
-        pnlContent.add(txtBirthPlace, GridBagConstraints(2, rowIndex, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 5, 0), 0, 0))
-
-        rowIndex++
-        pnlContent.add(lblDeath, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(dpDeath, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
-        pnlContent.add(txtDeathPlace, GridBagConstraints(2, rowIndex, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 5, 0), 0, 0))
+        pnlContent.add(lblEvents, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
+                GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+        pnlContent.add(JScrollPane(lstEvents), GridBagConstraints(1, rowIndex, 1, 1, 1.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.BOTH, Insets(0, 0, 5, 0), 0, 0))
+        pnlContent.add(pnlEventButtons, GridBagConstraints(2, rowIndex, 1, 1, 0.0, 0.0,
+                GridBagConstraints.NORTHWEST, GridBagConstraints.VERTICAL, Insets(0, 5, 5, 0), 0, 0))
 
         rowIndex++
         pnlContent.add(lblPlace, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
@@ -177,7 +170,7 @@ class EditPersonDialog : JDialog {
 
         rowIndex++
         pnlContent.add(lblNote, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+                GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
         pnlContent.add(JScrollPane(txtNote), GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
@@ -203,15 +196,7 @@ class EditPersonDialog : JDialog {
         val last: String? = defaultIfEmpty(txtLast.text, null)
         val maiden: String? = defaultIfEmpty(txtMaiden.text, null)
         person.name = PersonNames(name, middle, last, maiden)
-
-        val birthDate: LocalDate? = birthModel.value
-        val birthPlace: String? = defaultIfEmpty(txtBirthPlace.text, null)
-        person.birth = LifeEvent(birthDate, birthPlace)
-
-        val deathDate: LocalDate? = deathModel.value
-        val deathPlace: String? = defaultIfEmpty(txtDeathPlace.text, null)
-        person.death = LifeEvent(deathDate, deathPlace)
-
+        person.events = eventsModel.events.toMutableSet()
         person.sex = cmbSex.selectedItem as Sex
         person.place = defaultIfEmpty(txtPlace.text, null)
         person.occupation = defaultIfEmpty(txtOccupation.text, null)
@@ -222,6 +207,26 @@ class EditPersonDialog : JDialog {
 
     fun getModalResult(): Boolean {
         return modalResult
+    }
+
+    private fun createEventButtons(): JPanel {
+        val btnAdd = JButton(object : AbstractAction("+") {
+            override fun actionPerformed(e: ActionEvent) = editEvent(null)
+        })
+        btnAdd.margin = Insets(2, 3, 2, 3)
+
+        val btnRemove = JButton(object : AbstractAction("-") {
+            override fun actionPerformed(e: ActionEvent) = removeEvent()
+        })
+        btnRemove.margin = Insets(2, 5, 2, 4)
+
+        val pnlEventButtons = JPanel()
+        val boxLayout = BoxLayout(pnlEventButtons, BoxLayout.Y_AXIS)
+        pnlEventButtons.layout = boxLayout
+
+        pnlEventButtons.add(btnAdd)
+        pnlEventButtons.add(btnRemove)
+        return pnlEventButtons
     }
 
     private fun createButtonsPanel(): JPanel {
@@ -260,5 +265,24 @@ class EditPersonDialog : JDialog {
     private fun close(value: Boolean) {
         modalResult = value
         isVisible = false
+    }
+
+    private fun editEvent(event: LifeEvent?) {
+        val eventEditPanel = LifeEventEditPanel(event)
+        val result = JOptionPane.showConfirmDialog(this, eventEditPanel, "Edit event", JOptionPane.OK_CANCEL_OPTION)
+
+        if (result == JOptionPane.OK_OPTION) {
+            val newEvent = eventEditPanel.getEvent()
+
+            if (event == null) {
+                eventsModel.add(newEvent)
+            }
+        }
+    }
+
+    private fun removeEvent() {
+        if (lstEvents.selectedValue != null) {
+            eventsModel.remove(lstEvents.selectedValue)
+        }
     }
 }

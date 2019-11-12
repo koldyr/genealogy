@@ -11,9 +11,13 @@ import java.time.LocalDate
  * @created: 2019-10-26
  */
 data class LifeEvent(
-        @JsonSerialize(using = LocalDateSerializer::class)
-        @JsonDeserialize(using = LocalDateDeserializer::class)
+        var type: EventType,
+
+        var prefix: EventPrefix? = null,
+
+        @field:JsonSerialize(using = LocalDateSerializer::class)
+        @field:JsonDeserialize(using = LocalDateDeserializer::class)
         var date: LocalDate? = null,
-        var place: String? = null,
-        var prefix: EventPrefix? = null
+
+        var place: String? = null
 )
