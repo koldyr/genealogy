@@ -18,7 +18,7 @@ object Main {
         } else {
             val file = File(fileName)
             val parser = ImporterFactory.create(file)
-            lineage = parser.import(file)
+            lineage = parser.import(file.toPath())
             println("lineage = $lineage")
         }
 

@@ -12,11 +12,7 @@ class ImporterFactory {
         @JvmStatic
         fun create(file: File): Importer {
             if (file.isFile) {
-                val fileName = file.name
-                val i = fileName.lastIndexOf(".")
-                val extension = fileName.substring(i + 1)
-
-                return when (extension) {
+                return when (file.extension) {
                     "json" -> JSONImporter()
                     "ged" -> GEDImporter()
                     else -> CSVImporter()

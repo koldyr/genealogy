@@ -4,7 +4,7 @@ package com.koldyr.genealogy.model
  * Description of class Lineage
  * @created: 2019-10-30
  */
-class Lineage(
+data class Lineage(
         var persons: Collection<Person>,
         var families: Set<Family>
 ) {

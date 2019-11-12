@@ -7,8 +7,9 @@ import com.koldyr.genealogy.model.PersonNames
 import org.apache.commons.lang3.StringUtils.*
 import org.apache.commons.text.StringEscapeUtils.*
 import java.io.BufferedWriter
-import java.io.File
+import java.io.OutputStream
 import java.nio.file.Files
+import java.nio.file.Path
 import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.regex.Pattern
@@ -18,14 +19,16 @@ import java.util.regex.Pattern
  * @created: 2019.10.31
  */
 class CSVExporter : Exporter {
-
     private val pattern = Pattern.compile("\\n")
 
-    override fun export(file: File, lineage: Lineage) {
-        val stream = Files.newOutputStream(file.toPath())
-        stream.bufferedWriter(Charsets.UTF_8).use { writer ->
-            lineage.persons.forEach {
-                person -> writePerson(writer, person)
+    override fun export(lineage: Lineage, file: Path) {
+        export(lineage, Files.newOutputStream(file))
+    }
+
+    override fun export(lineage: Lineage, output: OutputStream) {
+        output.bufferedWriter(Charsets.UTF_8).use { writer ->
+            lineage.persons.forEach { person ->
+                writePerson(writer, person)
             }
         }
     }

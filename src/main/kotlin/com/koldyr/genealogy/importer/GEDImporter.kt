@@ -8,8 +8,10 @@ import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
 import com.koldyr.genealogy.model.Sex
-import java.io.File
+import java.io.InputStream
 import java.nio.charset.Charset
+import java.nio.file.Files
+import java.nio.file.Path
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
@@ -42,19 +44,22 @@ const val BEFORE = "BEF"
  * Description of class GEDImporter
  * @created: 2019.10.31
  */
-class GEDImporter: Importer {
-
+class GEDImporter : Importer {
     private val datePattern = DateTimeFormatter.ofPattern("yyyy MMM d")
     private val personIdPattern = Pattern.compile("@(\\d+)@")
     private val familyIdPattern = Pattern.compile("@\\w(\\d+)@")
 
-    override fun import(file: File): Lineage {
+    override fun import(file: Path): Lineage {
+        return import(Files.newInputStream(file))
+    }
+
+    override fun import(input: InputStream): Lineage {
         val families: MutableSet<Family> = mutableSetOf()
         val persons: MutableMap<Int, Person> = mutableMapOf()
 
-        val charset = getEncoding(file)
+        val charset = getEncoding(input)
 
-        file.bufferedReader(charset).use { reader ->
+        input.bufferedReader(charset).use { reader ->
             var person: Person? = null
             var family: Family? = null
             var event: LifeEvent? = null
@@ -159,9 +164,9 @@ class GEDImporter: Importer {
     private fun findFamily(families: MutableSet<Family>, familyId: Int) =
             families.stream().filter { it.id == familyId }.findFirst().orElseGet { Family(familyId) }
 
-    private fun getEncoding(file: File): Charset {
+    private fun getEncoding(input: InputStream): Charset {
         val charset = Charsets.UTF_8
-        file.bufferedReader(charset).use { reader ->
+        input.bufferedReader(charset).use { reader ->
             var line: String? = reader.readLine()
             while (line != null) {
                 if (line.contains(CHAR_ENCODING)) {
@@ -174,7 +179,7 @@ class GEDImporter: Importer {
     }
 
     private fun handleFamily(familyId: Int, person: Person, families: MutableSet<Family>) {
-        val noFamily = families.stream().noneMatch{ it.id == familyId }
+        val noFamily = families.stream().noneMatch { it.id == familyId }
         if (noFamily) {
             families.add(Family(familyId))
         }

@@ -8,19 +8,22 @@ import com.koldyr.genealogy.model.PersonNames
 import com.koldyr.genealogy.model.Sex
 import org.apache.commons.lang3.StringUtils.*
 import java.io.BufferedReader
-import java.io.File
+import java.io.InputStream
 import java.nio.file.Files
+import java.nio.file.Path
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 
 class CSVImporter : Importer {
-
     private val pattern = Pattern.compile("\\\\n")
 
-    override fun import(file: File): Lineage {
-        val stream = Files.newInputStream(file.toPath())
-        val persons = stream.bufferedReader(Charsets.UTF_8).use { reader ->
+    override fun import(file: Path): Lineage {
+        return import(Files.newInputStream(file))
+    }
+
+    override fun import(input: InputStream): Lineage {
+        val persons = input.bufferedReader(Charsets.UTF_8).use { reader ->
             parse(reader)
         }
         return Lineage(persons, setOf())
