@@ -17,32 +17,7 @@ class JSONImporter : Importer {
 
     override fun import(input: InputStream): Lineage {
         val lineage = mapper().readValue(input, Lineage::class.java)
-
-        lineage.families.forEach {
-            if (it.wife != null) {
-                val person = lineage.findPerson(it.wife?.id)
-                if (person != null) {
-                    it.wife = person
-                }
-            }
-
-            if (it.husband != null) {
-                val person = lineage.findPerson(it.husband?.id)
-                if (person != null) {
-                    it.husband = person
-                }
-            }
-
-            for (child in it.children.toSet()) {
-                val person = lineage.findPerson(child.id)
-                if (person != null) {
-                    it.children.remove(child)
-                    it.children.add(person)
-                }
-            }
-        }
-
-        return lineage
+        return Lineage(lineage.persons, lineage.families, true)
     }
 
     private fun mapper(): ObjectMapper {
