@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder
  */
 @JsonPropertyOrder("id", "name", "gender", "place", "occupation", "note", "familyId", "events")
 data class Person(
-        var id: Int,
+        val id: Int,
         var name: PersonNames? = null,
         var events: MutableSet<LifeEvent> = mutableSetOf(),
         var place: String? = null,
