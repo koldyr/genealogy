@@ -15,4 +15,11 @@ data class Lineage(
                 .findFirst()
                 .orElse(null)
     }
+
+    fun findPerson(id: Int?): Person? {
+        return persons.stream()
+                .filter { it.id == id }
+                .findFirst()
+                .orElse(null)
+    }
 }
