@@ -14,7 +14,6 @@ class PersonIdDeserializer : StdDeserializer<Person>(Person::class.java) {
 
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Person? {
         val node: JsonNode = p.codec.readTree(p)
-        val id = node.get("id").asInt()
-        return Person(id)
+        return Person(node.asInt())
     }
 }

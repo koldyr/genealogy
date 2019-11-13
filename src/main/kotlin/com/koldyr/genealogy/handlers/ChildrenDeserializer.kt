@@ -13,9 +13,13 @@ import com.koldyr.genealogy.model.Person
 class ChildrenDeserializer : StdDeserializer<Set<Person>>(Set::class.java) {
 
     override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Set<Person> {
-        val node: ArrayNode = p.codec.readTree(p)
-        val id = node.get("id").asInt()
+        val children = mutableSetOf<Person>()
 
-        return emptySet()
+        val node: ArrayNode = p.codec.readTree(p)
+        node.elements().forEach {
+            children.add(Person(it.asInt()))
+        }
+
+        return children
     }
 }
