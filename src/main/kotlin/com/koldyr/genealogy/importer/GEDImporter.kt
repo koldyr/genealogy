@@ -9,6 +9,7 @@ import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
 import org.apache.commons.lang3.StringUtils
+import java.io.BufferedInputStream
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.nio.file.Files
@@ -58,9 +59,13 @@ class GEDImporter : Importer {
         val families: MutableSet<Family> = mutableSetOf()
         val persons: MutableMap<Int, Person> = mutableMapOf()
 
-        val charset = getEncoding(input)
+        val rewindInput = if (input.markSupported()) input else BufferedInputStream(input)
+        rewindInput.mark(rewindInput.available())
 
-        input.bufferedReader(charset).use { reader ->
+        val charset = getEncoding(rewindInput)
+        rewindInput.reset()
+
+        rewindInput.bufferedReader(charset).use { reader ->
             var person: Person? = null
             var family: Family? = null
             var event: LifeEvent? = null
@@ -71,6 +76,7 @@ class GEDImporter : Importer {
                     val personId: Int = getPersonId(line)
                     person = Person(personId)
                     persons[personId] = person
+                    event = null
                 } else if (line.contains(NAME)) {
                     if (person != null) {
                         person.name = parseFullName(line)
@@ -153,6 +159,8 @@ class GEDImporter : Importer {
                 } else if (line.contains(PLACE)) {
                     if (event != null) {
                         event.place = parseGeneric(line, PLACE)
+                    } else if (person != null) {
+                        person.place = parseGeneric(line, PLACE)
                     }
                 }
                 line = reader.readLine()
@@ -167,15 +175,16 @@ class GEDImporter : Importer {
 
     private fun getEncoding(input: InputStream): Charset {
         val charset = Charsets.UTF_8
-        input.bufferedReader(charset).use { reader ->
-            var line: String? = reader.readLine()
-            while (line != null) {
-                if (line.contains(CHAR_ENCODING)) {
-                    return Charset.forName(parseGeneric(line, CHAR_ENCODING))
-                }
-                line = reader.readLine()
+
+        val reader = input.bufferedReader(charset)
+        var line: String? = reader.readLine()
+        while (line != null) {
+            if (line.contains(CHAR_ENCODING)) {
+                return Charset.forName(parseGeneric(line, CHAR_ENCODING))
             }
+            line = reader.readLine()
         }
+
         return charset
     }
 

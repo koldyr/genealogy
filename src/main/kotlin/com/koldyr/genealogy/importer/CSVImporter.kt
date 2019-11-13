@@ -43,14 +43,15 @@ class CSVImporter : Importer {
         val values = splitValues(line)
 
         val person = Person(Integer.parseInt(values[0].removePrefix("P")))
+
         for ((index, value) in values.withIndex()) {
             when (index) {
                 1 -> person.name = parseNames(value)
-                2 -> person.events.addAll(parseLifeEvents(value))
+                2 -> person.events.addAll(lifeEvents(value))
                 3 -> person.gender = Gender.valueOf(value)
                 4 -> person.place = value
                 5 -> person.occupation = value
-                6 -> person.note = parseNote(value)
+                6 -> person.note = note(value)
                 7 -> person.familyId = if (isEmpty(value)) null else Integer.parseInt(value)
             }
         }
@@ -61,13 +62,14 @@ class CSVImporter : Importer {
         val values = line.split(',')
 
         val family = Family(Integer.parseInt(values[0].removePrefix("F")))
+
         for ((index, value) in values.withIndex()) {
             when (index) {
                 1 -> family.husband = if (isEmpty(value)) null else Person(Integer.parseInt(value))
                 2 -> family.wife = if (isEmpty(value)) null else Person(Integer.parseInt(value))
-                3 -> family.children.addAll(parsePersons(value))
-                4 -> family.events.addAll(parseLifeEvents(value))
-                5 -> family.note = parseNote(value)
+                3 -> family.children.addAll(persons(value))
+                4 -> family.events.addAll(lifeEvents(value))
+                5 -> family.note = note(value)
             }
         }
         return family
@@ -115,13 +117,14 @@ class CSVImporter : Importer {
         return names
     }
 
-    private fun parseLifeEvents(value: String): Collection<LifeEvent> {
+    private fun lifeEvents(value: String): Collection<LifeEvent> {
         if (isEmpty(value)) {
             return setOf()
         }
 
-        val values = value.split('!')
-        return values.map { parseLifeEvent(it) }
+        return value.split('!').map {
+            parseLifeEvent(it)
+        }
     }
 
     private fun parseLifeEvent(value: String): LifeEvent {
@@ -139,9 +142,10 @@ class CSVImporter : Importer {
         return event
     }
 
-    private fun parsePersons(value: String): Collection<Person> {
-        val values = value.split('|')
-        return values.map { Person(Integer.parseInt(it)) }
+    private fun persons(value: String): Collection<Person> {
+        return value.split('|').map {
+            Person(Integer.parseInt(it))
+        }
     }
 
     private fun parseDate(date: String): LocalDate? {
@@ -150,7 +154,7 @@ class CSVImporter : Importer {
         } else LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE)
     }
 
-    private fun parseNote(value: String): String? {
+    private fun note(value: String): String? {
         return when {
             isEmpty(value) -> null
             else -> {

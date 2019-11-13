@@ -7,7 +7,6 @@ import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
 import org.apache.commons.lang3.StringUtils.*
 import org.apache.commons.text.StringEscapeUtils.*
-import java.io.BufferedWriter
 import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.Path
@@ -30,43 +29,41 @@ class CSVExporter : Exporter {
     override fun export(lineage: Lineage, output: OutputStream) {
         output.bufferedWriter(Charsets.UTF_8).use { writer ->
             lineage.persons.forEach { person ->
-                writePerson(writer, person)
+                writer.write(person(person))
             }
             lineage.families.forEach { family ->
-                writeFamily(writer, family)
+                writer.write(family(family))
             }
         }
     }
 
-    private fun writePerson(writer: BufferedWriter, it: Person) {
+    private fun person(it: Person): String {
         val line = StringJoiner(",", EMPTY, "\n")
 
         line.add('P' + it.id.toString())
-        line.add(personNamesToCSV(it.name))
-        line.add(eventsToCSV(it.events))
+        line.add(personNames(it.name))
+        line.add(events(it.events))
         line.add(it.gender.name)
         line.add(escapeCsv(it.place ?: EMPTY))
         line.add(escapeCsv(it.occupation ?: EMPTY))
-        line.add(prepareNote(it.note))
+        line.add(note(it.note))
         line.add(escapeCsv(it.familyId?.toString() ?: EMPTY))
-
-        writer.write(line.toString())
+        return line.toString()
     }
 
-    private fun writeFamily(writer: BufferedWriter, it: Family) {
+    private fun family(it: Family): String {
         val line = StringJoiner(",", EMPTY, "\n")
 
         line.add('F' + it.id.toString())
         line.add(if (it.husband == null) EMPTY else it.husband!!.id.toString())
         line.add(if (it.wife == null) EMPTY else it.wife!!.id.toString())
-        line.add(personsToCSV(it.children))
-        line.add(eventsToCSV(it.events))
-        line.add(prepareNote(it.note))
-
-        writer.write(line.toString())
+        line.add(persons(it.children))
+        line.add(events(it.events))
+        line.add(note(it.note))
+        return line.toString()
     }
 
-    private fun personNamesToCSV(name: PersonNames?): String {
+    private fun personNames(name: PersonNames?): String {
         if (name == null) {
             return EMPTY
         }
@@ -82,17 +79,17 @@ class CSVExporter : Exporter {
         return value.toString()
     }
 
-    private fun eventsToCSV(events: Set<LifeEvent>?): String {
+    private fun events(events: Set<LifeEvent>?): String {
         if (events == null || events.isEmpty()) {
             return EMPTY
         }
 
         return events.stream()
-                .map { eventToCSV(it) }
+                .map { event(it) }
                 .collect(Collectors.joining("!"))
     }
 
-    private fun eventToCSV(it: LifeEvent): String {
+    private fun event(it: LifeEvent): String {
         val value = StringBuilder()
         value.append(it.type.name)
         value.append('|')
@@ -104,7 +101,7 @@ class CSVExporter : Exporter {
         return value.toString()
     }
 
-    private fun personsToCSV(children: Set<Person>?): String {
+    private fun persons(children: Set<Person>?): String {
         if (children == null || children.isEmpty()) {
             return EMPTY
         }
@@ -114,7 +111,7 @@ class CSVExporter : Exporter {
                 .collect(Collectors.joining("|"))
     }
 
-    private fun prepareNote(note: String?): String? {
+    private fun note(note: String?): String? {
         if (isEmpty(note)) {
             return EMPTY
         }
