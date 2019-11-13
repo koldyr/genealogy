@@ -47,11 +47,11 @@ class CSVImporter : Importer {
             when (index) {
                 1 -> person.name = parseNames(value)
                 2 -> person.events.addAll(parseLifeEvents(value))
-                4 -> person.gender = Gender.valueOf(value)
-                5 -> person.place = value
-                6 -> person.occupation = value
-                7 -> person.note = parseNote(value)
-                8 -> person.familyId = if (isEmpty(value)) null else Integer.parseInt(value)
+                3 -> person.gender = Gender.valueOf(value)
+                4 -> person.place = value
+                5 -> person.occupation = value
+                6 -> person.note = parseNote(value)
+                7 -> person.familyId = if (isEmpty(value)) null else Integer.parseInt(value)
             }
         }
         return person

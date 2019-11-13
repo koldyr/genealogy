@@ -57,8 +57,8 @@ class CSVExporter : Exporter {
         val line = StringJoiner(",", EMPTY, "\n")
 
         line.add('F' + it.id.toString())
-        line.add(it.husband?.id.toString())
-        line.add(it.wife?.id.toString())
+        line.add(if (it.husband == null) EMPTY else it.husband!!.id.toString())
+        line.add(if (it.wife == null) EMPTY else it.wife!!.id.toString())
         line.add(personsToCSV(it.children))
         line.add(eventsToCSV(it.events))
         line.add(prepareNote(it.note))
@@ -87,16 +87,21 @@ class CSVExporter : Exporter {
             return EMPTY
         }
 
-        return events.stream().map {
-            val value = StringBuilder()
-            value.append(it.type.name)
-            value.append('|')
-            value.append(escapeCsv(it.prefix?.name ?: EMPTY))
-            value.append('|')
-            value.append(it.date?.format(DateTimeFormatter.ISO_LOCAL_DATE) ?: EMPTY)
-            value.append('|')
-            value.append(escapeCsv(it.place ?: EMPTY))
-        }.collect(Collectors.joining("!"))
+        return events.stream()
+                .map { eventToCSV(it) }
+                .collect(Collectors.joining("!"))
+    }
+
+    private fun eventToCSV(it: LifeEvent): String {
+        val value = StringBuilder()
+        value.append(it.type.name)
+        value.append('|')
+        value.append(escapeCsv(it.prefix?.name ?: EMPTY))
+        value.append('|')
+        value.append(it.date?.format(DateTimeFormatter.ISO_LOCAL_DATE) ?: EMPTY)
+        value.append('|')
+        value.append(escapeCsv(it.place ?: EMPTY))
+        return value.toString()
     }
 
     private fun personsToCSV(children: Set<Person>?): String {
