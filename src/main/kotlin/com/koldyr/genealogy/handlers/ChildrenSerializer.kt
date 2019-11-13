@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer
 import com.koldyr.genealogy.model.Person
 
 /**
- * Description of class PersonSerializer
+ * Description of class ChildrenSerializer
  * @created: 2019-11-05
  */
 class ChildrenSerializer : StdSerializer<Set<*>>(Set::class.java) {
