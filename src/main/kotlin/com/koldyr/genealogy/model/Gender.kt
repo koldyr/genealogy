@@ -1,9 +1,9 @@
 package com.koldyr.genealogy.model
 
 /**
- * Description of class Sex
+ * Description of class Gender
  * @created: 2019-10-26
  */
-enum class Sex {
+enum class Gender {
     MALE, FEMALE
 }

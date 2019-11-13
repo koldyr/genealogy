@@ -1,11 +1,11 @@
 package com.koldyr.genealogy.ui
 
 import com.koldyr.genealogy.model.Family
+import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
-import com.koldyr.genealogy.model.Sex
 import org.apache.commons.lang3.StringUtils.*
 import java.awt.BorderLayout
 import java.awt.Dimension
@@ -48,7 +48,7 @@ class EditPersonDialog : JDialog {
     private val txtMiddle: JTextField
     private val txtLast: JTextField
     private val txtMaiden: JTextField
-    private val cmbSex: JComboBox<Sex>
+    private val cmbGender: JComboBox<Gender>
     private val eventsModel: LifeEventListModel
     private val lstEvents: JList<LifeEvent>
     private val txtPlace: JTextField
@@ -75,10 +75,10 @@ class EditPersonDialog : JDialog {
         txtMaiden = JTextField(name.maiden)
 
         val pnlNames2 = JPanel(GridBagLayout())
-        val lblSex = JLabel("Sex:")
-        cmbSex = JComboBox(Sex.values())
-        cmbSex.addActionListener {
-            txtMaiden.isVisible = cmbSex.selectedItem == Sex.FEMALE
+        val lblSex = JLabel("Gender:")
+        cmbGender = JComboBox(Gender.values())
+        cmbGender.addActionListener {
+            txtMaiden.isVisible = cmbGender.selectedItem == Gender.FEMALE
             pnlNames2.revalidate()
         }
 
@@ -145,7 +145,7 @@ class EditPersonDialog : JDialog {
         rowIndex++
         pnlContent.add(lblSex, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
-        pnlContent.add(cmbSex, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
+        pnlContent.add(cmbGender, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 0), 0, 0))
 
         rowIndex++
@@ -180,7 +180,7 @@ class EditPersonDialog : JDialog {
         pnlContent.add(cmbFamily, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
-        cmbSex.selectedItem = person.sex
+        cmbGender.selectedItem = person.gender
         val pnlButtons = createButtonsPanel()
 
         contentPane.add(pnlContent)
@@ -197,7 +197,7 @@ class EditPersonDialog : JDialog {
         val maiden: String? = defaultIfEmpty(txtMaiden.text, null)
         person.name = PersonNames(name, middle, last, maiden)
         person.events = eventsModel.events.toMutableSet()
-        person.sex = cmbSex.selectedItem as Sex
+        person.gender = cmbGender.selectedItem as Gender
         person.place = defaultIfEmpty(txtPlace.text, null)
         person.occupation = defaultIfEmpty(txtOccupation.text, null)
         person.note = defaultIfEmpty(txtNote.text, null)

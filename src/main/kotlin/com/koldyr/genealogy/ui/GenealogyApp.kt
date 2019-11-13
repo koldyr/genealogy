@@ -184,7 +184,7 @@ class GenealogyApp : JFrame, ActionListener {
             val fileToOpen: File = fileChooser.selectedFile
 
             val importer = ImporterFactory.create(fileToOpen)
-            lineage = importer.import(fileToOpen)
+            lineage = importer.import(fileToOpen.toPath())
             personsModel.setPersons(lineage.persons)
 
             title = "Genealogy: ${fileToOpen.absolutePath}"
@@ -200,7 +200,7 @@ class GenealogyApp : JFrame, ActionListener {
 
             val exporter = ExporterFactory.create(extension)
             lineage.persons = personsModel.getAll()
-            exporter.export(fileToSave, lineage)
+            exporter.export(lineage, fileToSave.toPath())
 
             JOptionPane.showMessageDialog(this, "Saved to ${fileToSave.name}")
         }
@@ -230,7 +230,7 @@ class GenealogyApp : JFrame, ActionListener {
 
             val exporter = ExporterFactory.create(extension)
             lineage.persons = persons
-            exporter.export(file, lineage)
+            exporter.export(lineage, file.toPath())
 
             JOptionPane.showMessageDialog(this, "Exported to ${file.name}")
         }

@@ -8,15 +8,15 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder
  *
  * @created: 2019-10-25
  */
-@JsonPropertyOrder("id", "name", "sex", "place", "occupation", "note", "familyId", "events")
+@JsonPropertyOrder("id", "name", "gender", "place", "occupation", "note", "familyId", "events")
 data class Person(
-        var id: Int,
+        val id: Int,
         var name: PersonNames? = null,
         var events: MutableSet<LifeEvent> = mutableSetOf(),
         var place: String? = null,
         var occupation: String? = null,
         var note: String? = null,
-        var sex: Sex = Sex.MALE,
+        var gender: Gender = Gender.MALE,
         var familyId: Int? = null
 ) {
 

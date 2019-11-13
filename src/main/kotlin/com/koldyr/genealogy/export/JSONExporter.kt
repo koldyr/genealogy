@@ -6,20 +6,22 @@ import com.fasterxml.jackson.databind.SerializationFeature.*
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.koldyr.genealogy.model.Lineage
-import java.io.File
+import java.io.OutputStream
 import java.nio.file.Files
+import java.nio.file.Path
 
 /**
  * Description of class JSONExporter
  * @created: 2019.10.31
  */
-class JSONExporter: Exporter {
+class JSONExporter : Exporter {
 
-    override fun export(file: File, lineage: Lineage) {
-        val stream = Files.newOutputStream(file.toPath())
-        stream.bufferedWriter(Charsets.UTF_8).use { writer ->
-            mapper().writeValue(writer, lineage)
-        }
+    override fun export(lineage: Lineage, output: OutputStream) {
+        mapper().writeValue(output, lineage)
+    }
+
+    override fun export(lineage: Lineage, file: Path) {
+        export(lineage, Files.newOutputStream(file))
     }
 
     private fun mapper(): ObjectMapper {

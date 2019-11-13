@@ -1,63 +1,78 @@
 package com.koldyr.genealogy.importer
 
+import com.koldyr.genealogy.model.EventPrefix
 import com.koldyr.genealogy.model.EventType
+import com.koldyr.genealogy.model.Family
+import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
-import com.koldyr.genealogy.model.Sex
 import org.apache.commons.lang3.StringUtils.*
-import java.io.BufferedReader
-import java.io.File
+import java.io.InputStream
 import java.nio.file.Files
+import java.nio.file.Path
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
 
 class CSVImporter : Importer {
-
     private val pattern = Pattern.compile("\\\\n")
 
-    override fun import(file: File): Lineage {
-        val stream = Files.newInputStream(file.toPath())
-        val persons = stream.bufferedReader(Charsets.UTF_8).use { reader ->
-            parse(reader)
-        }
-        return Lineage(persons, setOf())
+    override fun import(file: Path): Lineage {
+        return import(Files.newInputStream(file))
     }
 
-    private fun parse(reader: BufferedReader): Collection<Person> {
-        val persons: MutableCollection<Person> = mutableListOf()
-
-        var line: String? = reader.readLine()
-        while (line != null) {
-            val person: Person = readPerson(line)
-            persons.add(person)
-
-            line = reader.readLine()
+    override fun import(input: InputStream): Lineage {
+        val persons = mutableListOf<Person>()
+        val families = mutableSetOf<Family>()
+        input.bufferedReader(Charsets.UTF_8).use { reader ->
+            reader.lines().forEach { line ->
+                if (line.startsWith('P')) {
+                    persons.add(readPerson(line))
+                } else {
+                    families.add(readFamily(line))
+                }
+            }
         }
 
-        return persons
+        return Lineage(persons, families, true)
     }
 
     private fun readPerson(line: String): Person {
         val values = splitValues(line)
 
-        val person = Person(-1)
+        val person = Person(Integer.parseInt(values[0].removePrefix("P")))
+
         for ((index, value) in values.withIndex()) {
             when (index) {
-                0 -> person.id = Integer.parseInt(value)
                 1 -> person.name = parseNames(value)
-                2 -> person.events.add(parseLifeEvent(value, EventType.Birth))
-                3 -> person.events.add(parseLifeEvent(value, EventType.Death))
-                4 -> person.sex = Sex.valueOf(value)
-                5 -> person.place = value
-                6 -> person.occupation = value
-                7 -> person.note = parseNote(value)
-                8 -> person.familyId = if (isEmpty(value)) null else Integer.parseInt(value)
+                2 -> person.events.addAll(lifeEvents(value))
+                3 -> person.gender = Gender.valueOf(value)
+                4 -> person.place = value
+                5 -> person.occupation = value
+                6 -> person.note = note(value)
+                7 -> person.familyId = if (isEmpty(value)) null else Integer.parseInt(value)
             }
         }
         return person
+    }
+
+    private fun readFamily(line: String): Family {
+        val values = line.split(',')
+
+        val family = Family(Integer.parseInt(values[0].removePrefix("F")))
+
+        for ((index, value) in values.withIndex()) {
+            when (index) {
+                1 -> family.husband = if (isEmpty(value)) null else Person(Integer.parseInt(value))
+                2 -> family.wife = if (isEmpty(value)) null else Person(Integer.parseInt(value))
+                3 -> family.children.addAll(persons(value))
+                4 -> family.events.addAll(lifeEvents(value))
+                5 -> family.note = note(value)
+            }
+        }
+        return family
     }
 
     private fun splitValues(line: String): List<String> {
@@ -102,21 +117,35 @@ class CSVImporter : Importer {
         return names
     }
 
-    private fun parseLifeEvent(value: String, type: EventType): LifeEvent {
-        val event = LifeEvent(type)
-
+    private fun lifeEvents(value: String): Collection<LifeEvent> {
         if (isEmpty(value)) {
-            return event
+            return setOf()
         }
 
+        return value.split('!').map {
+            parseLifeEvent(it)
+        }
+    }
+
+    private fun parseLifeEvent(value: String): LifeEvent {
         val values = value.split('|')
+
+        val event = LifeEvent(EventType.valueOf(values[0]))
         for ((index, v) in values.withIndex()) {
             when (index) {
-                0 -> event.date = parseDate(v)
-                1 -> event.place = v
+                1 -> event.prefix = if (isEmpty(v)) null else EventPrefix.valueOf(v)
+                2 -> event.date = parseDate(v)
+                3 -> event.place = v
             }
         }
+
         return event
+    }
+
+    private fun persons(value: String): Collection<Person> {
+        return value.split('|').map {
+            Person(Integer.parseInt(it))
+        }
     }
 
     private fun parseDate(date: String): LocalDate? {
@@ -125,7 +154,7 @@ class CSVImporter : Importer {
         } else LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE)
     }
 
-    private fun parseNote(value: String): String? {
+    private fun note(value: String): String? {
         return when {
             isEmpty(value) -> null
             else -> {

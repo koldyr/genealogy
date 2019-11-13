@@ -5,16 +5,19 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.koldyr.genealogy.model.Lineage
-import java.io.File
+import java.io.InputStream
 import java.nio.file.Files
+import java.nio.file.Path
 
 class JSONImporter : Importer {
 
-    override fun import(file: File): Lineage {
-        val stream = Files.newInputStream(file.toPath())
-        return stream.bufferedReader(Charsets.UTF_8).use {
-            reader -> mapper().readValue(reader, Lineage::class.java)
-        }
+    override fun import(file: Path): Lineage {
+        return import(Files.newInputStream(file))
+    }
+
+    override fun import(input: InputStream): Lineage {
+        val lineage = mapper().readValue(input, Lineage::class.java)
+        return Lineage(lineage.persons, lineage.families, true)
     }
 
     private fun mapper(): ObjectMapper {

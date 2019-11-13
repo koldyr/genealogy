@@ -3,13 +3,17 @@ package com.koldyr.genealogy.importer
 import com.koldyr.genealogy.model.EventPrefix
 import com.koldyr.genealogy.model.EventType
 import com.koldyr.genealogy.model.Family
+import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
-import com.koldyr.genealogy.model.Sex
-import java.io.File
+import org.apache.commons.lang3.StringUtils
+import java.io.BufferedInputStream
+import java.io.InputStream
 import java.nio.charset.Charset
+import java.nio.file.Files
+import java.nio.file.Path
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
@@ -42,19 +46,26 @@ const val BEFORE = "BEF"
  * Description of class GEDImporter
  * @created: 2019.10.31
  */
-class GEDImporter: Importer {
-
+class GEDImporter : Importer {
     private val datePattern = DateTimeFormatter.ofPattern("yyyy MMM d")
     private val personIdPattern = Pattern.compile("@(\\d+)@")
     private val familyIdPattern = Pattern.compile("@\\w(\\d+)@")
 
-    override fun import(file: File): Lineage {
+    override fun import(file: Path): Lineage {
+        return import(Files.newInputStream(file))
+    }
+
+    override fun import(input: InputStream): Lineage {
         val families: MutableSet<Family> = mutableSetOf()
         val persons: MutableMap<Int, Person> = mutableMapOf()
 
-        val charset = getEncoding(file)
+        val rewindInput = if (input.markSupported()) input else BufferedInputStream(input)
+        rewindInput.mark(rewindInput.available())
 
-        file.bufferedReader(charset).use { reader ->
+        val charset = getEncoding(rewindInput)
+        rewindInput.reset()
+
+        rewindInput.bufferedReader(charset).use { reader ->
             var person: Person? = null
             var family: Family? = null
             var event: LifeEvent? = null
@@ -65,13 +76,14 @@ class GEDImporter: Importer {
                     val personId: Int = getPersonId(line)
                     person = Person(personId)
                     persons[personId] = person
+                    event = null
                 } else if (line.contains(NAME)) {
                     if (person != null) {
                         person.name = parseFullName(line)
                     }
                 } else if (line.contains(SEX)) {
                     if (person != null) {
-                        person.sex = parseSex(line)
+                        person.gender = parseSex(line)
                     }
                 } else if (line.contains(OCCUPATION)) {
                     if (person != null) {
@@ -147,6 +159,8 @@ class GEDImporter: Importer {
                 } else if (line.contains(PLACE)) {
                     if (event != null) {
                         event.place = parseGeneric(line, PLACE)
+                    } else if (person != null) {
+                        person.place = parseGeneric(line, PLACE)
                     }
                 }
                 line = reader.readLine()
@@ -159,22 +173,23 @@ class GEDImporter: Importer {
     private fun findFamily(families: MutableSet<Family>, familyId: Int) =
             families.stream().filter { it.id == familyId }.findFirst().orElseGet { Family(familyId) }
 
-    private fun getEncoding(file: File): Charset {
+    private fun getEncoding(input: InputStream): Charset {
         val charset = Charsets.UTF_8
-        file.bufferedReader(charset).use { reader ->
-            var line: String? = reader.readLine()
-            while (line != null) {
-                if (line.contains(CHAR_ENCODING)) {
-                    return Charset.forName(parseGeneric(line, CHAR_ENCODING))
-                }
-                line = reader.readLine()
+
+        val reader = input.bufferedReader(charset)
+        var line: String? = reader.readLine()
+        while (line != null) {
+            if (line.contains(CHAR_ENCODING)) {
+                return Charset.forName(parseGeneric(line, CHAR_ENCODING))
             }
+            line = reader.readLine()
         }
+
         return charset
     }
 
     private fun handleFamily(familyId: Int, person: Person, families: MutableSet<Family>) {
-        val noFamily = families.stream().noneMatch{ it.id == familyId }
+        val noFamily = families.stream().noneMatch { it.id == familyId }
         if (noFamily) {
             families.add(Family(familyId))
         }
@@ -186,16 +201,16 @@ class GEDImporter: Importer {
         return line.substring(line.indexOf(name) + name.length).trim()
     }
 
-    private fun parseSex(line: String?): Sex {
+    private fun parseSex(line: String?): Gender {
         if (line == null) {
-            return Sex.FEMALE
+            return Gender.FEMALE
         }
 
         val sex = parseGeneric(line, SEX)
         if (sex.equals("M", true)) {
-            return Sex.MALE
+            return Gender.MALE
         }
-        return Sex.FEMALE
+        return Gender.FEMALE
     }
 
     private fun parseFullName(line: String): PersonNames {
@@ -296,8 +311,6 @@ class GEDImporter: Importer {
     }
 
     private fun parseMonth(month: String): String {
-        val chars = month.toLowerCase().toCharArray()
-        chars[0] = Character.toUpperCase(chars[0])
-        return String(chars)
+        return StringUtils.capitalize(month.toLowerCase())
     }
 }
