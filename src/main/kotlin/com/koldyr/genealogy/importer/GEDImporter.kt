@@ -3,11 +3,12 @@ package com.koldyr.genealogy.importer
 import com.koldyr.genealogy.model.EventPrefix
 import com.koldyr.genealogy.model.EventType
 import com.koldyr.genealogy.model.Family
+import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
-import com.koldyr.genealogy.model.Sex
+import org.apache.commons.lang3.StringUtils
 import java.io.InputStream
 import java.nio.charset.Charset
 import java.nio.file.Files
@@ -76,7 +77,7 @@ class GEDImporter : Importer {
                     }
                 } else if (line.contains(SEX)) {
                     if (person != null) {
-                        person.sex = parseSex(line)
+                        person.gender = parseSex(line)
                     }
                 } else if (line.contains(OCCUPATION)) {
                     if (person != null) {
@@ -191,16 +192,16 @@ class GEDImporter : Importer {
         return line.substring(line.indexOf(name) + name.length).trim()
     }
 
-    private fun parseSex(line: String?): Sex {
+    private fun parseSex(line: String?): Gender {
         if (line == null) {
-            return Sex.FEMALE
+            return Gender.FEMALE
         }
 
         val sex = parseGeneric(line, SEX)
         if (sex.equals("M", true)) {
-            return Sex.MALE
+            return Gender.MALE
         }
-        return Sex.FEMALE
+        return Gender.FEMALE
     }
 
     private fun parseFullName(line: String): PersonNames {
@@ -301,8 +302,6 @@ class GEDImporter : Importer {
     }
 
     private fun parseMonth(month: String): String {
-        val chars = month.toLowerCase().toCharArray()
-        chars[0] = Character.toUpperCase(chars[0])
-        return String(chars)
+        return StringUtils.capitalize(month.toLowerCase())
     }
 }

@@ -1,11 +1,11 @@
 package com.koldyr.genealogy.importer
 
 import com.koldyr.genealogy.model.EventType
+import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
-import com.koldyr.genealogy.model.Sex
 import org.apache.commons.lang3.StringUtils.*
 import java.io.BufferedReader
 import java.io.InputStream
@@ -53,7 +53,7 @@ class CSVImporter : Importer {
                 1 -> person.name = parseNames(value)
                 2 -> person.events.add(parseLifeEvent(value, EventType.Birth))
                 3 -> person.events.add(parseLifeEvent(value, EventType.Death))
-                4 -> person.sex = Sex.valueOf(value)
+                4 -> person.gender = Gender.valueOf(value)
                 5 -> person.place = value
                 6 -> person.occupation = value
                 7 -> person.note = parseNote(value)

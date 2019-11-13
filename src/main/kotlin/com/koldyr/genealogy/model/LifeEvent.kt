@@ -15,8 +15,8 @@ data class LifeEvent(
 
         var prefix: EventPrefix? = null,
 
-        @field:JsonSerialize(using = LocalDateSerializer::class)
-        @field:JsonDeserialize(using = LocalDateDeserializer::class)
+        @JsonSerialize(using = LocalDateSerializer::class)
+        @JsonDeserialize(using = LocalDateDeserializer::class)
         var date: LocalDate? = null,
 
         var place: String? = null

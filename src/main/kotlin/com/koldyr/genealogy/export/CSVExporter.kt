@@ -40,7 +40,7 @@ class CSVExporter : Exporter {
         line.add(personNamesToCSV(it.name))
         line.add(liveEventToCSV(it.getBirth()))
         line.add(liveEventToCSV(it.getDeath()))
-        line.add(it.sex.name)
+        line.add(it.gender.name)
         line.add(escapeCsv(it.place ?: EMPTY))
         line.add(escapeCsv(it.occupation ?: EMPTY))
         line.add(prepareNote(it.note))

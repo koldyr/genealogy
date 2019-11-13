@@ -12,7 +12,7 @@ import javax.swing.table.AbstractTableModel
 class PersonsTableModel : AbstractTableModel() {
 
     private var persons: MutableList<Person> = mutableListOf()
-    private val columnNames = listOf("Id", "Name", "Sex", "Birth", "Death", "Place", "Occupation", "Note", "Family Id")
+    private val columnNames = listOf("Id", "Name", "Gender", "Birth", "Death", "Place", "Occupation", "Note", "Family Id")
 
     fun setPersons(value: Collection<Person>) {
         persons = value as? MutableList ?: value.toMutableList()
@@ -75,7 +75,7 @@ class PersonsTableModel : AbstractTableModel() {
         return when (columnIndex) {
             0 -> person.id
             1 -> person.name
-            2 -> person.sex
+            2 -> person.gender
             3 -> person.getBirth()
             4 -> person.getDeath()
             5 -> person.place
