@@ -2,6 +2,7 @@ package com.koldyr.genealogy.model
 
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
+import java.util.function.Predicate
 
 /**
  * Description of class Person
@@ -33,17 +34,26 @@ data class Person(
 
     @JsonIgnore
     fun getBirth(): LifeEvent? {
-        return events.stream()
-                .filter { it.type == EventType.Birth }
-                .findFirst()
-                .orElse(null)
+        return events.firstOrNull { it.type == EventType.Birth }
     }
 
     @JsonIgnore
     fun getDeath(): LifeEvent? {
-        return events.stream()
-                .filter { it.type == EventType.Death }
-                .findFirst()
-                .orElse(null)
+        return events.firstOrNull { it.type == EventType.Death }
+    }
+
+    fun search(checkFn: Predicate<String?>): Boolean {
+        return checkFn.test(note)
+                || checkFn.test(occupation)
+                || checkFn.test(place)
+                || checkFn.test(note)
+                || checkFn.test(gender.name)
+                || (if (name == null) false else name!!.search(checkFn))
+                || checkEvents(checkFn)
+
+    }
+
+    private fun checkEvents(checkFn: Predicate<String?>): Boolean {
+        return events.firstOrNull { it.search(checkFn) } != null
     }
 }

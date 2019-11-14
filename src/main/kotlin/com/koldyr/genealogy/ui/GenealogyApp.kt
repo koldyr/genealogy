@@ -96,6 +96,10 @@ class GenealogyApp : JFrame, ActionListener {
 
         val mnuEdit = JMenu("Edit")
 
+        val jmiSearch = JMenuItem("Search")
+        jmiSearch.addActionListener(this)
+        mnuEdit.add(jmiSearch)
+
         val jmiAdd = JMenuItem("Add")
         jmiAdd.addActionListener(this)
         mnuEdit.add(jmiAdd)
@@ -129,8 +133,19 @@ class GenealogyApp : JFrame, ActionListener {
             "Edit" -> editPerson()
             "Delete" -> deletePerson()
             "Add" -> addPerson()
+            "Search" -> searchPerson()
             "About" -> showAbout()
             else -> println(e.actionCommand)
+        }
+    }
+
+    private fun searchPerson() {
+        val searchPane = SearchPersonPanel()
+        val result = JOptionPane.showConfirmDialog(this, searchPane, "Search", JOptionPane.OK_CANCEL_OPTION)
+
+        if (result == JOptionPane.OK_OPTION) {
+            val data = searchPane.getSearch()
+            personsModel.filter(data)
         }
     }
 

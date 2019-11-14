@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import java.time.LocalDate
+import java.util.function.Predicate
 
 /**
  * Description of class LifeEvent
@@ -20,4 +21,8 @@ data class LifeEvent(
         var date: LocalDate? = null,
 
         var place: String? = null
-)
+) {
+    fun search(checkFn: Predicate<String?>): Boolean {
+        return checkFn.test(type.name) || checkFn.test(prefix?.name) || checkFn.test(date?.toString()) || checkFn.test(place)
+    }
+}

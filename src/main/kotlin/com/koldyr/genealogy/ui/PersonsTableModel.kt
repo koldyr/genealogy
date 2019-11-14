@@ -3,6 +3,7 @@ package com.koldyr.genealogy.ui
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
+import java.util.function.Predicate
 import javax.swing.table.AbstractTableModel
 
 /**
@@ -11,12 +12,13 @@ import javax.swing.table.AbstractTableModel
  */
 class PersonsTableModel : AbstractTableModel() {
 
+    private var original: MutableList<Person>? = null
     private var persons: MutableList<Person> = mutableListOf()
     private val columnNames = listOf("Id", "Name", "Gender", "Birth", "Death", "Place", "Occupation", "Note", "Family Id")
 
     fun setPersons(value: Collection<Person>) {
         persons = value as? MutableList ?: value.toMutableList()
-        persons.sortBy { it.id }
+        persons.sortBy(Person::id)
         fireTableDataChanged()
     }
 
@@ -71,7 +73,7 @@ class PersonsTableModel : AbstractTableModel() {
     }
 
     override fun getValueAt(rowIndex: Int, columnIndex: Int): Any? {
-        val person = persons.get(rowIndex)
+        val person = persons[rowIndex]
         return when (columnIndex) {
             0 -> person.id
             1 -> person.name
@@ -83,6 +85,49 @@ class PersonsTableModel : AbstractTableModel() {
             7 -> person.note
             8 -> person.familyId
             else -> "N/A"
+        }
+    }
+
+    fun filter(data: SearchData?) {
+        if (data == null) {
+            if (original != null) {
+                persons = original!!
+                fireTableDataChanged()
+            }
+        } else {
+            if (original == null) {
+                original = persons
+            }
+
+            val input = if (data.matchCase) data.input else data.input.toLowerCase()
+
+            val checkFn: Predicate<String?> = if (data.wholeWord)
+                Predicate {
+                    if (it == null) {
+                        return@Predicate false
+                    }
+                    if (data.matchCase) {
+                        it.contains(input)
+                    } else {
+                        it.toLowerCase().contains(input)
+                    }
+                }
+            else
+                Predicate {
+                    if (it == null) {
+                        return@Predicate false
+                    }
+                    if (data.matchCase) {
+                        it.equals(input)
+                    } else {
+                        it.toLowerCase().equals(input)
+                    }
+                }
+
+            persons = original!!.filter { it.search(checkFn) }.toMutableList()
+            persons.sortBy(Person::id)
+
+            fireTableDataChanged()
         }
     }
 }
