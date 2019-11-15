@@ -13,6 +13,8 @@ import java.awt.event.ActionListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
+import java.time.LocalDate
+import java.util.*
 import javax.swing.JFileChooser
 import javax.swing.JFrame
 import javax.swing.JMenu
@@ -24,6 +26,8 @@ import javax.swing.JScrollPane
 import javax.swing.JTable
 import javax.swing.border.EmptyBorder
 import javax.swing.filechooser.FileNameExtensionFilter
+import javax.swing.table.TableRowSorter
+import kotlin.Comparator
 
 /**
  * Description of class GenealogyApp
@@ -72,6 +76,33 @@ class GenealogyApp : JFrame, ActionListener {
                 }
             }
         })
+
+        tblPersons.autoCreateRowSorter = true
+
+        val dateComparator = Comparator(fun(date1: LocalDate?, date2: LocalDate?): Int {
+            if (date1 == null) {
+                return if (date2 == null) 0 else -1
+            }
+            if (date2 == null) {
+                return 1
+            }
+            return date1.compareTo(date2)
+        })
+        val eventComparator = Comparator(fun(event1: LifeEvent?, event2: LifeEvent?): Int {
+            if (event1 == null) {
+                return if (event2 == null) 0 else -1
+            }
+            if (event2 == null) {
+                return 1
+            }
+            return Objects.compare(event1.date, event2.date, dateComparator)
+        })
+
+        val rowSorter = tblPersons.rowSorter as TableRowSorter
+        rowSorter.setComparator(0, Comparator(Integer::compare))
+        rowSorter.setComparator(3, eventComparator)
+        rowSorter.setComparator(4, eventComparator)
+        rowSorter.setComparator(8, Comparator(Integer::compare))
         return tblPersons
     }
 
