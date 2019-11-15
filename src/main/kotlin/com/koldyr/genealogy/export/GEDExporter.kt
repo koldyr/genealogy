@@ -58,27 +58,67 @@ class GEDExporter : Exporter {
     }
 
     private fun id(id: Int, person: Boolean, builder: StringBuilder) {
-        TODO("not implemented")
+        if (person) {
+            builder.append("0 @").append(id).append("@ INDI")
+        } else {
+            builder.append("0 @F").append(id).append("@ FAM")
+        }
     }
 
-    private fun name(person: PersonNames?, builder: StringBuilder) {
-        TODO("not implemented")
+    private fun name(names: PersonNames?, builder: StringBuilder) {
+        if (names != null) {
+            val nameBuilder = StringBuilder()
+
+            if (names.name != null) {
+                builder.append(names.name)
+            }
+            if (names.middle != null) {
+                if (nameBuilder.isNotEmpty()) nameBuilder.append(' ')
+                builder.append(names.middle)
+            }
+            if (names.last != null || names.maiden != null) {
+                if (nameBuilder.isNotEmpty()) nameBuilder.append(' ')
+
+                builder.append('/')
+
+                if (names.last != null) {
+                    builder.append(names.last)
+                }
+
+                if (names.maiden != null) {
+                    if (names.last != null) nameBuilder.append(' ')
+                    builder.append('(').append(names.maiden).append(')')
+                }
+
+                builder.append('/')
+            }
+
+            nameBuilder.insert(0, "1 NAME ")
+
+            builder.append(nameBuilder)
+        }
     }
 
     private fun gender(gender: Gender, builder: StringBuilder) {
-        TODO("not implemented")
+        builder.append("1 SEX ").append(if (gender == Gender.FEMALE) 'F' else 'M')
     }
 
     private fun place(place: String?, builder: StringBuilder) {
-        TODO("not implemented")
+        if (place != null) {
+            builder.append("1 RESI ").append(place)
+        }
     }
 
     private fun occupation(occupation: String?, builder: StringBuilder) {
-        TODO("not implemented")
+        if (occupation != null) {
+            builder.append("1 OCCU ").append(occupation)
+        }
     }
 
     private fun note(note: String?, builder: StringBuilder) {
-        TODO("not implemented")
+        if (note != null) {
+            builder.append("1 NOTE ").append(note)
+        }
     }
 
     private fun events(events: MutableSet<LifeEvent>, builder: StringBuilder) {
