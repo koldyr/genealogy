@@ -12,15 +12,21 @@ import javax.swing.table.DefaultTableCellRenderer
 class NamesRenderer: DefaultTableCellRenderer() {
     override fun getTableCellRendererComponent(table: JTable?, value: Any?, isSelected: Boolean, hasFocus: Boolean, row: Int, column: Int): Component {
         val name: PersonNames = value as PersonNames;
-        val nameBuilder: StringBuilder = StringBuilder(name.name)
+        val nameBuilder: StringBuilder = StringBuilder()
+        if (name.name != null) {
+            nameBuilder.append(name.name)
+        }
         if (name.middle != null) {
-            nameBuilder.append(' ').append(name.middle)
+            if (nameBuilder.isNotEmpty()) nameBuilder.append(' ')
+            nameBuilder.append(name.middle)
         }
         if (name.last != null) {
-            nameBuilder.append(' ').append(name.last)
+            if (nameBuilder.isNotEmpty()) nameBuilder.append(' ')
+            nameBuilder.append(name.last)
         }
         if (name.maiden != null) {
-            nameBuilder.append(" (").append(name.maiden).append(')')
+            if (nameBuilder.isNotEmpty()) nameBuilder.append(' ')
+            nameBuilder.append('(').append(name.maiden).append(')')
         }
         return super.getTableCellRendererComponent(table, nameBuilder.toString(), isSelected, hasFocus, row, column)
     }

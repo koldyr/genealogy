@@ -163,7 +163,8 @@ class GenealogyApp : JFrame, ActionListener {
 
     private fun editPerson() {
         if (tblPersons.selectedRow > -1) {
-            val person = personsModel.getPerson(tblPersons.selectedRow)
+            val index = tblPersons.rowSorter.convertRowIndexToModel(tblPersons.selectedRow)
+            val person = personsModel.getPerson(index)
             val toEdit = clonePerson(person)
 
             val editPersonDialog = EditPersonDialog(this, lineage, toEdit)
@@ -194,7 +195,8 @@ class GenealogyApp : JFrame, ActionListener {
 
     private fun deletePerson() {
         if (tblPersons.selectedRow > -1) {
-            personsModel.remove(tblPersons.selectedRow)
+            val index = tblPersons.rowSorter.convertRowIndexToModel(tblPersons.selectedRow)
+            personsModel.remove(index)
         }
     }
 
