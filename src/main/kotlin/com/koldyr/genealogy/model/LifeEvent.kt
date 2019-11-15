@@ -21,7 +21,22 @@ data class LifeEvent(
         var date: LocalDate? = null,
 
         var place: String? = null
-) {
+) : Comparable<LifeEvent?> {
+
+    override fun compareTo(other: LifeEvent?): Int {
+        if (other == null) {
+            return 1
+        }
+
+        if (date == null) {
+            return if (other.date == null) 0 else -1
+        }
+        if (other.date == null) {
+            return 1
+        }
+        return date!!.compareTo(other.date)
+    }
+
     fun search(checkFn: Predicate<String?>): Boolean {
         return checkFn.test(type.name) || checkFn.test(prefix?.name) || checkFn.test(date?.toString()) || checkFn.test(place)
     }
