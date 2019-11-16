@@ -11,6 +11,10 @@ enum class EventType(
     Birth("BIRT"), Death("DEAT"), Engagement("ENGA"), Marriage("MARR"), Divorce("DIV"), Adoption("ADOP"), Christening("CHRI"),
     Relocation("RESI"), Education("EDUC"), Emigration("EMIG"), GetJob("OCCU"), Graduation("GRAD"), Retirement("RETI"), Immigration("IMMI");
 
+    fun getCode(): String {
+        return code
+    }
+
     companion object {
         fun isEvent(value: String): Boolean {
             for (type in values()) {

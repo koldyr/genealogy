@@ -52,7 +52,7 @@ class CSVImporter : Importer {
                 4 -> person.place = value
                 5 -> person.occupation = value
                 6 -> person.note = note(value)
-                7 -> person.familyId = if (isEmpty(value)) null else Integer.parseInt(value)
+                7 -> person.parentFamily = if (isEmpty(value)) null else Integer.parseInt(value)
             }
         }
         return person

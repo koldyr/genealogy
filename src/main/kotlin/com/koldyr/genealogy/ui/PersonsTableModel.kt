@@ -83,7 +83,7 @@ class PersonsTableModel : AbstractTableModel() {
             5 -> person.place
             6 -> person.occupation
             7 -> person.note
-            8 -> person.familyId
+            8 -> person.parentFamily
             else -> "N/A"
         }
     }

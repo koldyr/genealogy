@@ -47,7 +47,7 @@ class CSVExporter : Exporter {
         line.add(escapeCsv(it.place ?: EMPTY))
         line.add(escapeCsv(it.occupation ?: EMPTY))
         line.add(note(it.note))
-        line.add(escapeCsv(it.familyId?.toString() ?: EMPTY))
+        line.add(escapeCsv(it.parentFamily?.toString() ?: EMPTY))
         return line.toString()
     }
 

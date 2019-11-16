@@ -59,9 +59,9 @@ class GEDExporter : Exporter {
 
     private fun id(id: Int, person: Boolean, builder: StringBuilder) {
         if (person) {
-            builder.append("0 @").append(id).append("@ INDI")
+            builder.append("0 @").append(id).append("@ INDI").append('\n')
         } else {
-            builder.append("0 @F").append(id).append("@ FAM")
+            builder.append("0 @F").append(id).append("@ FAM").append('\n')
         }
     }
 
@@ -70,62 +70,91 @@ class GEDExporter : Exporter {
             val nameBuilder = StringBuilder()
 
             if (names.name != null) {
-                builder.append(names.name)
+                nameBuilder.append(names.name)
             }
             if (names.middle != null) {
                 if (nameBuilder.isNotEmpty()) nameBuilder.append(' ')
-                builder.append(names.middle)
+                nameBuilder.append(names.middle)
             }
             if (names.last != null || names.maiden != null) {
                 if (nameBuilder.isNotEmpty()) nameBuilder.append(' ')
 
-                builder.append('/')
+                nameBuilder.append('/')
 
                 if (names.last != null) {
-                    builder.append(names.last)
+                    nameBuilder.append(names.last)
                 }
 
                 if (names.maiden != null) {
                     if (names.last != null) nameBuilder.append(' ')
-                    builder.append('(').append(names.maiden).append(')')
+                    nameBuilder.append('(').append(names.maiden).append(')')
                 }
 
-                builder.append('/')
+                nameBuilder.append('/')
             }
 
             nameBuilder.insert(0, "1 NAME ")
 
-            builder.append(nameBuilder)
+            builder.append(nameBuilder).append('\n')
         }
     }
 
     private fun gender(gender: Gender, builder: StringBuilder) {
-        builder.append("1 SEX ").append(if (gender == Gender.FEMALE) 'F' else 'M')
+        builder.append("1 SEX ").append(if (gender == Gender.FEMALE) 'F' else 'M').append('\n')
     }
 
     private fun place(place: String?, builder: StringBuilder) {
         if (place != null) {
-            builder.append("1 RESI ").append(place)
+            builder.append("1 RESI ").append(place).append('\n')
         }
     }
 
     private fun occupation(occupation: String?, builder: StringBuilder) {
         if (occupation != null) {
-            builder.append("1 OCCU ").append(occupation)
+            builder.append("1 OCCU ").append(occupation).append('\n')
         }
     }
 
     private fun note(note: String?, builder: StringBuilder) {
         if (note != null) {
-            builder.append("1 NOTE ").append(note)
+            val paragraphs = note.split('\n')
+            for ((index, paragraph) in paragraphs.withIndex()) {
+                if (index == 0) {
+                    builder.append("1 NOTE ").append(paragraph).append('\n')
+                } else {
+                    builder.append("2 CONT ").append(paragraph).append('\n')
+                }
+            }
         }
     }
 
     private fun events(events: MutableSet<LifeEvent>, builder: StringBuilder) {
-        TODO("not implemented")
+        if (events.isNotEmpty()) {
+            events.forEach { event(it, builder) }
+        }
+    }
+
+    private fun event(event: LifeEvent, builder: StringBuilder) {
+        builder.append("1 ").append(event.type.getCode()).append('\n')
+
+        if (event.date != null) {
+            builder.append("2 DATE ").append(event.date).append('\n')
+        }
+        if (event.place != null) {
+            builder.append("2 PLAC ").append(event.place).append('\n')
+        }
+        if (event.note != null) {
+            val paragraphs = event.note!!.split('\n')
+            for ((index, paragraph) in paragraphs.withIndex()) {
+                if (index == 0) {
+                    builder.append("2 NOTE ").append(paragraph).append('\n')
+                } else {
+                    builder.append("3 CONT ").append(paragraph).append('\n')
+                }
+            }
+        }
     }
 
     private fun children(children: Set<Person>, builder: StringBuilder) {
-        TODO("not implemented")
     }
 }

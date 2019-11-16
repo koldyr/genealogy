@@ -54,6 +54,7 @@ class EditPersonDialog : JDialog {
     private val txtPlace: JTextField
     private val txtOccupation: JTextField
     private val txtNote: JTextArea
+    private val cmbParentFamily: JComboBox<Family>
     private val cmbFamily: JComboBox<Family>
 
     constructor(owner: Frame?, lineage: Lineage, person: Person) : super(owner, "Edit Person", true) {
@@ -105,10 +106,15 @@ class EditPersonDialog : JDialog {
         val lblNote = JLabel("Note:")
         txtNote = JTextArea(person.note, 4, 20)
 
+        val lblParentFamily = JLabel("Parent Family:")
+        cmbParentFamily = JComboBox(lineage.families.toTypedArray())
+        cmbParentFamily.renderer = FamilyRenderer(lineage)
+        cmbParentFamily.selectedItem = lineage.findFamily(person.parentFamily)
+
         val lblFamily = JLabel("Family:")
         cmbFamily = JComboBox(lineage.families.toTypedArray())
         cmbFamily.renderer = FamilyRenderer(lineage)
-        cmbFamily.selectedItem = lineage.findFamily(person.familyId)
+        cmbFamily.selectedItem = lineage.findFamily(person.family)
 
         rootPane.border = EmptyBorder(10, 10, 10, 10)
 
@@ -172,6 +178,12 @@ class EditPersonDialog : JDialog {
         pnlContent.add(lblNote, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
                 GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
         pnlContent.add(JScrollPane(txtNote), GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+
+        rowIndex++
+        pnlContent.add(lblParentFamily, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
+                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+        pnlContent.add(cmbParentFamily, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
                 GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
         rowIndex++

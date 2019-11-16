@@ -30,7 +30,8 @@ const val OCCUPATION = "OCCU"
 const val NOTE = "NOTE"
 const val CONTINUE = "CONT"
 const val CONTINUE_LINE = "CONC"
-const val FAMC = "FAMC"
+const val PARRENT_FAMILY = "FAMC"
+const val OWN_FAMILY = "FAMS"
 const val FAMILY = "FAM"
 const val HUSBAND = "HUSB"
 const val WIFE = "WIFE"
@@ -110,10 +111,17 @@ class GEDImporter : Importer {
                     continueNote(line, event, person, family)
                 } else if (line.contains(CONTINUE_LINE)) {
                     continueLine(line, event, person, family)
-                } else if (line.contains(FAMC)) {
+                } else if (line.contains(PARRENT_FAMILY)) {
                     if (person != null) {
                         val familyId = parseFamilyId(line)
-                        handleFamily(familyId, person, families)
+                        person.parentFamily = familyId
+                        handleFamily(familyId, families)
+                    }
+                } else if (line.contains(OWN_FAMILY)) {
+                    if (person != null) {
+                        val familyId = parseFamilyId(line)
+                        person.family = familyId
+                        handleFamily(familyId, families)
                     }
                 } else if (line.endsWith(FAMILY)) {
                     val familyId = parseFamilyId(line)
@@ -182,13 +190,11 @@ class GEDImporter : Importer {
         return charset
     }
 
-    private fun handleFamily(familyId: Int, person: Person, families: MutableSet<Family>) {
-        val noFamily = families.stream().noneMatch { it.id == familyId }
-        if (noFamily) {
+    private fun handleFamily(familyId: Int, families: MutableSet<Family>) {
+        val family = families.firstOrNull { it.id == familyId }
+        if (family == null) {
             families.add(Family(familyId))
         }
-
-        person.familyId = familyId
     }
 
     private fun parseGeneric(line: String, name: String): String {
@@ -331,11 +337,11 @@ class GEDImporter : Importer {
 
     private fun continueLine(line: String, event: LifeEvent?, person: Person?, family: Family?) {
         if (event != null) {
-            event.note = event.note + parseGeneric(line, CONTINUE)
+            event.note = event.note + parseGeneric(line, CONTINUE_LINE)
         } else if (person != null) {
-            person.note = person.note + parseGeneric(line, CONTINUE)
+            person.note = person.note + parseGeneric(line, CONTINUE_LINE)
         } else if (family != null) {
-            family.note = family.note + parseGeneric(line, CONTINUE)
+            family.note = family.note + parseGeneric(line, CONTINUE_LINE)
         }
     }
 }
