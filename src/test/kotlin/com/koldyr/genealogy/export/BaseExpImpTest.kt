@@ -35,19 +35,18 @@ abstract class BaseExpImpTest {
 
         lineage.families.forEach {
             val family = result.findFamily(it.id)
-            assertEquals(it, family)
+            assertEquals(it.id, family!!.id)
+            assertPerson(it.husband, family.husband)
+            assertPerson(it.wife, family.wife)
+            assertEquals(it.events, family.events)
+            assertEquals(it.children, family.children)
+            assertEquals(it.note, family.note)
         }
 
         lineage.persons.forEach {
             val person = result.findPerson(it.id)
             assertNotNull(person)
-            assertEquals(it.name, person!!.name)
-            assertEquals(it.gender, person.gender)
-            assertEquals(it.place, person.place)
-            assertEquals(it.occupation, person.occupation)
-            assertEquals(it.note, person.note)
-            assertEquals(it.parentFamily, person.parentFamily)
-            assertEquals(it.events, person.events)
+            assertPerson(it, person)
         }
     }
 
@@ -91,5 +90,15 @@ abstract class BaseExpImpTest {
         val families = setOf(family)
 
         return Lineage(persons, families)
+    }
+
+    private fun assertPerson(expected: Person?, actual: Person?) {
+        assertEquals(expected!!.name, actual!!.name)
+        assertEquals(expected.gender, actual.gender)
+        assertEquals(expected.place, actual.place)
+        assertEquals(expected.occupation, actual.occupation)
+        assertEquals(expected.note, actual.note)
+        assertEquals(expected.parentFamily, actual.parentFamily)
+        assertEquals(expected.events, actual.events)
     }
 }

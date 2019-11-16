@@ -23,7 +23,7 @@ enum class EventType(
             return false
         }
 
-        fun parseType(value: String): EventType {
+        fun parse(value: String): EventType {
             for (type in values()) {
                 if (value.endsWith(type.code)) return type
             }
