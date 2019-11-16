@@ -47,7 +47,8 @@ class CSVExporter : Exporter {
         line.add(escapeCsv(it.place ?: EMPTY))
         line.add(escapeCsv(it.occupation ?: EMPTY))
         line.add(note(it.note))
-        line.add(escapeCsv(it.familyId?.toString() ?: EMPTY))
+        line.add(it.parentFamily?.toString() ?: EMPTY)
+        line.add(it.family?.toString() ?: EMPTY)
         return line.toString()
     }
 
@@ -79,8 +80,8 @@ class CSVExporter : Exporter {
         return value.toString()
     }
 
-    private fun events(events: Set<LifeEvent>?): String {
-        if (events == null || events.isEmpty()) {
+    private fun events(events: Set<LifeEvent>): String {
+        if (events.isEmpty()) {
             return EMPTY
         }
 
@@ -98,6 +99,8 @@ class CSVExporter : Exporter {
         value.append(it.date?.format(DateTimeFormatter.ISO_LOCAL_DATE) ?: EMPTY)
         value.append('|')
         value.append(escapeCsv(it.place ?: EMPTY))
+        value.append('|')
+        value.append(note(it.note))
         return value.toString()
     }
 

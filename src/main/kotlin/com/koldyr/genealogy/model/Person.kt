@@ -9,7 +9,7 @@ import java.util.function.Predicate
  *
  * @created: 2019-10-25
  */
-@JsonPropertyOrder("id", "name", "gender", "place", "occupation", "note", "familyId", "events")
+@JsonPropertyOrder("id", "name", "gender", "place", "occupation", "note", "events", "parentFamily", "family")
 data class Person(
         val id: Int,
         var name: PersonNames? = null,
@@ -18,7 +18,8 @@ data class Person(
         var occupation: String? = null,
         var note: String? = null,
         var gender: Gender = Gender.MALE,
-        var familyId: Int? = null
+        var parentFamily: Int? = null,
+        var family: Int? = null
 ) {
 
     override fun equals(other: Any?): Boolean {

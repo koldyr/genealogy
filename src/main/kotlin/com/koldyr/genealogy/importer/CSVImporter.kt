@@ -52,7 +52,8 @@ class CSVImporter : Importer {
                 4 -> person.place = value
                 5 -> person.occupation = value
                 6 -> person.note = note(value)
-                7 -> person.familyId = if (isEmpty(value)) null else Integer.parseInt(value)
+                7 -> person.parentFamily = if (isEmpty(value)) null else Integer.parseInt(value)
+                8 -> person.family = if (isEmpty(value)) null else Integer.parseInt(value)
             }
         }
         return person
@@ -136,6 +137,7 @@ class CSVImporter : Importer {
                 1 -> event.prefix = if (isEmpty(v)) null else EventPrefix.valueOf(v)
                 2 -> event.date = parseDate(v)
                 3 -> event.place = v
+                4 -> event.note = note(v)
             }
         }
 

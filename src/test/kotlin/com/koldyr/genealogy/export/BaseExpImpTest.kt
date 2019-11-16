@@ -35,19 +35,18 @@ abstract class BaseExpImpTest {
 
         lineage.families.forEach {
             val family = result.findFamily(it.id)
-            assertEquals(it, family)
+            assertEquals(it.id, family!!.id)
+            assertPerson(it.husband, family.husband)
+            assertPerson(it.wife, family.wife)
+            assertEquals(it.events, family.events)
+            assertEquals(it.children, family.children)
+            assertEquals(it.note, family.note)
         }
 
         lineage.persons.forEach {
             val person = result.findPerson(it.id)
             assertNotNull(person)
-            assertEquals(it.name, person!!.name)
-            assertEquals(it.gender, person.gender)
-            assertEquals(it.place, person.place)
-            assertEquals(it.occupation, person.occupation)
-            assertEquals(it.note, person.note)
-            assertEquals(it.familyId, person.familyId)
-            assertEquals(it.events, person.events)
+            assertPerson(it, person)
         }
     }
 
@@ -60,19 +59,21 @@ abstract class BaseExpImpTest {
                 LifeEvent(EventType.Birth, null, LocalDate.of(1960, 10, 10), "place11"),
                 LifeEvent(EventType.Education, EventPrefix.After, LocalDate.of(1970, 1, 1), "place12")
         )
-        val person1 = Person(1, PersonNames("p1_name", "p1_middle", "p1_last", "p1_maiden"), events1, "place1", "occupation1", "note1", Gender.FEMALE, 1)
+        val name1 = PersonNames("p1_name", "p1_middle", "p1_last", "p1_maiden")
+        val person1 = Person(1, name1, events1, "place1", "occupation1", "person1\nnote", Gender.FEMALE, null, 1)
 
         val events2 = mutableSetOf(
-                LifeEvent(EventType.Birth, null, LocalDate.of(1970, 10, 10), "place21"),
+                LifeEvent(EventType.Birth, null, LocalDate.of(1970, 10, 10), "place21", "person2 birth\nnotes"),
                 LifeEvent(EventType.Christening, EventPrefix.About, LocalDate.of(1980, 1, 1), "place22")
         )
-        val person2 = Person(2, PersonNames("p2_name", "p2_middle", "p2_last", null), events2, "place2", "occupation2", "note2", Gender.MALE, 1)
+        val name2 = PersonNames("p2_name", "p2_middle", "p2_last", null)
+        val person2 = Person(2, name2, events2, "place2", "occupation2", "note2\nnote2n", Gender.MALE, null, 1)
 
         val events3 = mutableSetOf(
                 LifeEvent(EventType.Birth, null, LocalDate.of(1995, 10, 10), "place21")
         )
-        val person3 = Person(3, PersonNames("p3_name", "p3_middle", "p3_last", null), events3, "place3", "occupation3", "note3", Gender.MALE, 1)
-
+        val name3 = PersonNames("p3_name", "p3_middle", "p3_last", null)
+        val person3 = Person(3, name3, events3, "place3", "occupation3", "note3", Gender.MALE, 1)
 
         val familyEvents = mutableSetOf(
                 LifeEvent(EventType.Engagement, null, LocalDate.of(1990, 10, 10), "place21"),
@@ -89,5 +90,15 @@ abstract class BaseExpImpTest {
         val families = setOf(family)
 
         return Lineage(persons, families)
+    }
+
+    private fun assertPerson(expected: Person?, actual: Person?) {
+        assertEquals(expected!!.name, actual!!.name)
+        assertEquals(expected.gender, actual.gender)
+        assertEquals(expected.place, actual.place)
+        assertEquals(expected.occupation, actual.occupation)
+        assertEquals(expected.note, actual.note)
+        assertEquals(expected.parentFamily, actual.parentFamily)
+        assertEquals(expected.events, actual.events)
     }
 }
