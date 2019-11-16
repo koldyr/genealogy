@@ -20,7 +20,9 @@ data class LifeEvent(
         @JsonDeserialize(using = LocalDateDeserializer::class)
         var date: LocalDate? = null,
 
-        var place: String? = null
+        var place: String? = null,
+        
+        var note: String? = null
 ) : Comparable<LifeEvent?> {
 
     override fun compareTo(other: LifeEvent?): Int {
@@ -38,6 +40,6 @@ data class LifeEvent(
     }
 
     fun search(checkFn: Predicate<String?>): Boolean {
-        return checkFn.test(type.name) || checkFn.test(prefix?.name) || checkFn.test(date?.toString()) || checkFn.test(place)
+        return checkFn.test(type.name) || checkFn.test(prefix?.name) || checkFn.test(date?.toString()) || checkFn.test(place) || checkFn.test(note)
     }
 }

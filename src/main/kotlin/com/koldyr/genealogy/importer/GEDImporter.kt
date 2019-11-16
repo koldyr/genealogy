@@ -23,18 +23,15 @@ const val PERSON = "INDI"
 const val CHAR_ENCODING = "CHAR"
 const val NAME = "NAME"
 const val SEX = "SEX"
-const val BIRTH = "BIRT"
-const val DEATH = "DEAT"
 const val DATE = "DATE"
 const val PLACE = "PLAC"
 const val RESIDENCE = "RESI"
 const val OCCUPATION = "OCCU"
 const val NOTE = "NOTE"
 const val CONTINUE = "CONT"
+const val CONTINUE_LINE = "CONC"
 const val FAMC = "FAMC"
 const val FAMILY = "FAM"
-const val MARRIAGE = "MARR"
-const val DIVORCE = "DIV"
 const val HUSBAND = "HUSB"
 const val WIFE = "WIFE"
 const val CHILD = "CHIL"
@@ -76,7 +73,9 @@ class GEDImporter : Importer {
                     val personId: Int = getPersonId(line)
                     person = Person(personId)
                     persons[personId] = person
+
                     event = null
+                    family = null
                 } else if (line.contains(NAME)) {
                     if (person != null) {
                         person.name = parseFullName(line)
@@ -87,31 +86,41 @@ class GEDImporter : Importer {
                     }
                 } else if (line.contains(OCCUPATION)) {
                     if (person != null) {
-                        person.occupation = parseGeneric(line, OCCUPATION)
+                        val occupation = parseGeneric(line, OCCUPATION)
+                        if (StringUtils.isBlank(occupation)) {
+                            event = LifeEvent(EventType.GetJob)
+                            person.events.add(event)
+                        } else {
+                            person.occupation = occupation
+                        }
                     }
                 } else if (line.contains(RESIDENCE)) {
                     if (person != null) {
-                        person.place = parseGeneric(line, RESIDENCE)
+                        val residence = parseGeneric(line, RESIDENCE)
+                        if (StringUtils.isBlank(residence)) {
+                            event = LifeEvent(EventType.Relocation)
+                            person.events.add(event)
+                        } else {
+                            person.place = residence
+                        }
                     }
                 } else if (line.contains(NOTE)) {
-                    if (person != null) {
-                        person.note = parseGeneric(line, NOTE)
-                    } else if (family != null) {
-                        family.note = parseGeneric(line, NOTE)
-                    }
+                    handleNote(line, event, person, family)
                 } else if (line.contains(CONTINUE)) {
-                    if (person != null) {
-                        person.note = person.note + '\n' + parseGeneric(line, CONTINUE)
-                    }
+                    continueNote(line, event, person, family)
+                } else if (line.contains(CONTINUE_LINE)) {
+                    continueLine(line, event, person, family)
                 } else if (line.contains(FAMC)) {
                     if (person != null) {
                         val familyId = parseFamilyId(line)
                         handleFamily(familyId, person, families)
                     }
                 } else if (line.endsWith(FAMILY)) {
-                    person = null
                     val familyId = parseFamilyId(line)
                     family = findFamily(families, familyId)
+
+                    person = null
+                    event = null
                 } else if (line.contains(HUSBAND)) {
                     if (family != null) {
                         val personId = getPersonId(line)
@@ -130,25 +139,10 @@ class GEDImporter : Importer {
                             family.children.add(child)
                         }
                     }
-                } else if (line.endsWith(BIRTH)) {
+                } else if (EventType.isEvent(line)) {
                     if (person != null) {
-                        event = LifeEvent(EventType.Birth)
+                        event = LifeEvent(EventType.parseType(line))
                         person.events.add(event)
-                    }
-                } else if (line.endsWith(DEATH)) {
-                    if (person != null) {
-                        event = LifeEvent(EventType.Death)
-                        person.events.add(event)
-                    }
-                } else if (line.endsWith(MARRIAGE)) {
-                    if (family != null) {
-                        event = LifeEvent(EventType.Marriage)
-                        family.events.add(event)
-                    }
-                } else if (line.endsWith(DIVORCE)) {
-                    if (family != null) {
-                        event = LifeEvent(EventType.Divorce)
-                        family.events.add(event)
                     }
                 } else if (line.contains(DATE)) {
                     if (event != null) {
@@ -312,5 +306,36 @@ class GEDImporter : Importer {
 
     private fun parseMonth(month: String): String {
         return StringUtils.capitalize(month.toLowerCase())
+    }
+
+    private fun handleNote(line: String, event: LifeEvent?, person: Person?, family: Family?) {
+        val eventNote = line.startsWith("2 NOTE")
+        if (eventNote && event != null) {
+            event.note = parseGeneric(line, NOTE)
+        } else if (person != null) {
+            person.note = parseGeneric(line, NOTE)
+        } else if (family != null) {
+            family.note = parseGeneric(line, NOTE)
+        }
+    }
+
+    private fun continueNote(line: String, event: LifeEvent?, person: Person?, family: Family?) {
+        if (event != null) {
+            event.note = event.note + '\n' + parseGeneric(line, CONTINUE)
+        } else if (person != null) {
+            person.note = person.note + '\n' + parseGeneric(line, CONTINUE)
+        } else if (family != null) {
+            family.note = family.note + '\n' + parseGeneric(line, CONTINUE)
+        }
+    }
+
+    private fun continueLine(line: String, event: LifeEvent?, person: Person?, family: Family?) {
+        if (event != null) {
+            event.note = event.note + parseGeneric(line, CONTINUE)
+        } else if (person != null) {
+            person.note = person.note + parseGeneric(line, CONTINUE)
+        } else if (family != null) {
+            family.note = family.note + parseGeneric(line, CONTINUE)
+        }
     }
 }
