@@ -318,8 +318,9 @@ class GEDImporter : Importer {
     }
 
     private fun continueLine(line: String, event: LifeEvent?, person: Person?, family: Family?) {
+        val evenNote = line.startsWith('3')
         when {
-            event != null -> event.note = event.note + parseGeneric(line, CONTINUE_LINE)
+            event != null && evenNote -> event.note = event.note + parseGeneric(line, CONTINUE_LINE)
             person != null -> person.note = person.note + parseGeneric(line, CONTINUE_LINE)
             family != null -> family.note = family.note + parseGeneric(line, CONTINUE_LINE)
         }
