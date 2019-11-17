@@ -1,9 +1,9 @@
 name: Build All & Test
 
-on: [push]
-  branches:
-    - master
-
+on:
+  push:
+    branches:
+      - master
 jobs:
   build:
 
