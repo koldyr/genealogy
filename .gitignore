@@ -24,3 +24,4 @@ target
 build
 out
 test*.*
+/db/*
