@@ -1,0 +1,40 @@
+GET http://localhost:8080/api/genealogy/person
+
+###
+GET http://localhost:8080/api/genealogy/person/1
+Accept: application/json
+
+###
+POST http://localhost:8080/api/genealogy/person
+Content-Type: application/json
+
+{
+  "name": {
+    "name": "p1_name",
+    "middle": "p1_middle",
+    "last": "p1_last"
+  },
+  "gender": "MALE",
+  "place": "p1_place",
+  "occupation": "p1_occup",
+  "note": "p1_note"
+}
+
+###
+PUT http://localhost:8080/api/genealogy/person/1
+Content-Type: application/json
+
+{
+  "name": {
+    "name": "p1_name",
+    "middle": "p1_middle",
+    "last": "p1_last"
+  },
+  "gender": "MALE",
+  "place": "p1_place",
+  "occupation": "p1_occup",
+  "note": "p1_note"
+}
+
+###
+DELETE http://localhost:8080/api/genealogy/person/1

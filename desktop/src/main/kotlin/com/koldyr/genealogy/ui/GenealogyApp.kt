@@ -178,11 +178,12 @@ class GenealogyApp : JFrame, ActionListener {
     }
 
     private fun addPerson() {
-        val index = personsModel.getAll().stream()
-            .filter { it.id != null }
-            .map(Person::id)
-            .max { Integer.compare() }
-            .get() + 1
+        val index = 1;
+//        val index = personsModel.getAll().stream()
+//            .filter { it.id != null }
+//            .map(Person::id)
+//            .max(Comparator({ (p1: Int?, p2: Int?) -> compareValues(p1, p2) }))
+//            .get() + 1
         var person = Person(index)
 
         val editPersonDialog = EditPersonDialog(this, lineage, person)
