@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:h2:./db;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:./db/genealogy;DB_CLOSE_DELAY=-1
     username: sa
     password: sa
     schema: classpath:sql/schema.sql
