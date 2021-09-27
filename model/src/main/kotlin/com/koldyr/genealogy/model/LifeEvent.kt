@@ -1,15 +1,22 @@
 package com.koldyr.genealogy.model
 
-import java.time.LocalDate
-import java.util.function.Predicate
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
+import com.koldyr.genealogy.model.converter.EventTypeConverter
+import java.time.LocalDate
+import java.util.function.Predicate
+import javax.persistence.Basic
 import javax.persistence.Column
+import javax.persistence.Convert
 import javax.persistence.Entity
+import javax.persistence.EnumType.*
 import javax.persistence.Enumerated
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType.*
 import javax.persistence.Id
+import javax.persistence.SequenceGenerator
 import javax.persistence.Table
 
 /**
@@ -18,17 +25,22 @@ import javax.persistence.Table
  */
 @Entity
 @Table(name = "T_LIFE_EVENT")
+@SequenceGenerator(name = "EventIds", sequenceName = "SEQ_EVENT", allocationSize = 1)
 class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
 
     @Id
+    @GeneratedValue(strategy = SEQUENCE, generator = "EventIds")
     @Column(name = "EVENT_ID")
     var id: Int? = null
 
-    @Enumerated
+    @Basic(optional = false)
+    @Convert(converter = EventTypeConverter::class)
     var type: EventType = EventType.Birth
 
+    @Enumerated(STRING)
     var prefix: EventPrefix? = null
 
+    @Column(name = "EVENT_DATE", nullable = false, columnDefinition = "DATE")
     @JsonSerialize(using = LocalDateSerializer::class)
     @JsonDeserialize(using = LocalDateDeserializer::class)
     var date: LocalDate? = null

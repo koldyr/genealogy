@@ -1,6 +1,6 @@
 package com.koldyr.genealogy.controllers
 
-import java.net.URI
+import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonRepository
@@ -12,9 +12,11 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.client.HttpClientErrorException
+import java.net.URI
 
 /**
  * Description of class GenealogyController
@@ -38,7 +40,7 @@ class GenealogyController(
     fun personById(@PathVariable personId: Int): Person = personRepository.findById(personId).orElseThrow(::IllegalStateException)
 
     @PostMapping("/person")
-    fun createPerson(person: Person): ResponseEntity<String> {
+    fun createPerson(@RequestBody person: Person): ResponseEntity<String> {
         val saved = personRepository.save(person)
         return ResponseEntity.created(URI.create("/person/${saved.id}")).build()
     }
@@ -64,4 +66,9 @@ class GenealogyController(
         personRepository.deleteById(personId)
     }
 
+    @PostMapping("/person/{personId}/event")
+    fun createPersonEvent(@PathVariable personId: Int, @RequestBody event: LifeEvent) {
+        val persisted = personRepository.findById(personId).get()
+
+    }
 }

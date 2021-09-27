@@ -10,7 +10,7 @@ Content-Type: application/json
 
 {
   "name": {
-    "name": "p1_name",
+    "first": "p1_name",
     "middle": "p1_middle",
     "last": "p1_last"
   },
@@ -26,14 +26,14 @@ Content-Type: application/json
 
 {
   "name": {
-    "name": "p1_name",
-    "middle": "p1_middle",
-    "last": "p1_last"
+    "first": "p1_name_?",
+    "middle": "p1_middle_?",
+    "last": "p1_last_?"
   },
   "gender": "MALE",
-  "place": "p1_place",
-  "occupation": "p1_occup",
-  "note": "p1_note"
+  "place": "p1_place_?",
+  "occupation": "p1_occup_?",
+  "note": "p1_note_?"
 }
 
 ###

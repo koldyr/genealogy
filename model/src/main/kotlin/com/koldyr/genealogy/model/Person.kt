@@ -1,13 +1,20 @@
 package com.koldyr.genealogy.model
 
-import java.util.function.Predicate
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
+import com.koldyr.genealogy.model.converter.GenderConverter
+import java.util.function.Predicate
+import javax.persistence.AttributeOverride
+import javax.persistence.AttributeOverrides
+import javax.persistence.Basic
 import javax.persistence.Column
+import javax.persistence.Convert
 import javax.persistence.Embedded
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType.*
 import javax.persistence.Id
+import javax.persistence.SequenceGenerator
 import javax.persistence.Table
 import javax.persistence.Transient
 
@@ -18,15 +25,22 @@ import javax.persistence.Transient
  */
 @Entity
 @Table(name = "T_PERSON")
+@SequenceGenerator(name = "PersonIds", sequenceName = "SEQ_PERSON", allocationSize = 1)
 @JsonPropertyOrder("id", "name", "gender", "place", "occupation", "note", "events", "parentFamily", "family")
-class Person(): Cloneable {
+class Person() : Cloneable {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = SEQUENCE, generator = "PersonIds")
     @Column(name = "PERSON_ID")
     var id: Int? = null
 
     @Embedded
+    @AttributeOverrides(value = [
+        AttributeOverride(name = "first", column = Column(name = "FIRST_NAME")),
+        AttributeOverride(name = "middle", column = Column(name = "MIDDLE_NAME")),
+        AttributeOverride(name = "last", column = Column(name = "LAST_NAME")),
+        AttributeOverride(name = "maiden", column = Column(name = "MAIDEN_NAME"))
+    ])
     var name: PersonNames? = null
 
     @Transient
@@ -38,6 +52,8 @@ class Person(): Cloneable {
 
     var note: String? = null
 
+    @Basic(optional = false)
+    @Convert(converter = GenderConverter::class)
     var gender: Gender = Gender.MALE
 
     @Column(name = "PARENT_FAMILY_ID", nullable = true)
