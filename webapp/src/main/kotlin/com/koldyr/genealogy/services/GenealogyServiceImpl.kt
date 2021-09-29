@@ -55,8 +55,8 @@ open class GenealogyServiceImpl(
 
     @Transactional
     override fun createPersonEvent(personId: Int, event: PersonEvent) {
-        val person: Person = personRepository.findById(personId).orElseThrow()
-        person.addEvent(event)
+        val person: Person = personRepository.findById(personId)
+                .orElseThrow { HttpClientErrorException(NOT_FOUND, "Person with id '$personId' is not found") }
         personRepository.save(person)
     }
 
