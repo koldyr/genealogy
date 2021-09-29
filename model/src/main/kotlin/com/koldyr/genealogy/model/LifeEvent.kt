@@ -4,40 +4,39 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
+import com.koldyr.genealogy.handlers.EventTypeDeserializer
+import com.koldyr.genealogy.handlers.EventTypeSerializer
 import com.koldyr.genealogy.model.converter.EventTypeConverter
 import java.time.LocalDate
 import java.util.function.Predicate
 import javax.persistence.Basic
 import javax.persistence.Column
 import javax.persistence.Convert
-import javax.persistence.Entity
 import javax.persistence.EnumType.*
 import javax.persistence.Enumerated
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.*
 import javax.persistence.Id
-import javax.persistence.Inheritance
-import javax.persistence.InheritanceType.*
+import javax.persistence.MappedSuperclass
 import javax.persistence.SequenceGenerator
-import javax.persistence.Table
 
 /**
  * Description of class LifeEvent
  * @created: 2019-10-26
  */
-@Entity
-@Table(name = "T_LIFE_EVENT")
-@Inheritance(strategy = JOINED)
-@SequenceGenerator(name = "EventIds", sequenceName = "SEQ_EVENT", allocationSize = 1)
+@MappedSuperclass
 open class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
 
     @Id
-    @GeneratedValue(strategy = SEQUENCE, generator = "EventIds")
+    @GeneratedValue(strategy = SEQUENCE, generator = "SEQ_EVENT")
+    @SequenceGenerator(name = "SEQ_EVENT", sequenceName = "SEQ_EVENT", allocationSize = 1)
     @Column(name = "EVENT_ID")
     open var id: Int? = null
 
     @Basic(optional = false)
     @Convert(converter = EventTypeConverter::class)
+    @JsonSerialize(using = EventTypeSerializer::class)
+    @JsonDeserialize(using = EventTypeDeserializer::class)
     open var type: EventType = EventType.Birth
 
     @Enumerated(STRING)

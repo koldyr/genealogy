@@ -45,7 +45,7 @@ class Person() : Cloneable {
     ])
     var name: PersonNames? = null
 
-    @OneToMany(cascade = [ALL], fetch = EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "person",cascade = [ALL], fetch = EAGER, orphanRemoval = true)
     var events: MutableSet<PersonEvent> = mutableSetOf()
 
     var place: String? = null
@@ -117,5 +117,18 @@ class Person() : Cloneable {
 
     private fun checkEvents(checkFn: Predicate<String?>): Boolean {
         return events.firstOrNull { it.search(checkFn) } != null
+    }
+
+    fun addEvent(event: PersonEvent) {
+        events.add(event)
+        event.person = this
+    }
+
+    fun removeEvent(eventId: Int) {
+        val event = events.find { it.id == eventId }
+        if (event != null) {
+            events.remove(event)
+            event.person = null
+        }
     }
 }

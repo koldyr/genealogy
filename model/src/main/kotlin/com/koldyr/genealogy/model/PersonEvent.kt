@@ -1,7 +1,11 @@
 package com.koldyr.genealogy.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.LocalDate
 import javax.persistence.Entity
+import javax.persistence.FetchType
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
 import javax.persistence.Table
 
 /**
@@ -11,10 +15,9 @@ import javax.persistence.Table
 @Entity
 @Table(name = "T_PERSON_EVENT")
 class PersonEvent() : LifeEvent() {
-
-//    @ManyToOne(fetch = LAZY)
-//    @JsonIgnore
-//    var person: Person? = null
+    
+    @ManyToOne(fetch = FetchType.LAZY) @JsonIgnore @JoinColumn(name = "PERSON_ID")
+    var person: Person? = null
 
     constructor(type: EventType) : this() {
         this.type = type

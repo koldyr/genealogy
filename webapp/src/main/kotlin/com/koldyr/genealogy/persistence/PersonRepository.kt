@@ -1,6 +1,7 @@
 package com.koldyr.genealogy.persistence
 
 import com.koldyr.genealogy.model.Person
+import com.koldyr.genealogy.model.PersonEvent
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
@@ -9,4 +10,6 @@ import org.springframework.stereotype.Repository
  * @created: 2021-09-25
  */
 @Repository("personRepository")
-interface PersonRepository : JpaRepository<Person, Int>
+interface PersonRepository : JpaRepository<Person, Int> {
+    fun findEventsById(eventId: Int): Collection<PersonEvent>
+}

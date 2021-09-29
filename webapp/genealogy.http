@@ -4,7 +4,7 @@ GET http://localhost:8080/api/genealogy/person
 GET http://localhost:8080/api/genealogy/person/1
 Accept: application/json
 
-###
+### Create Person
 POST http://localhost:8080/api/genealogy/person
 Content-Type: application/json
 
@@ -40,12 +40,16 @@ Content-Type: application/json
 DELETE http://localhost:8080/api/genealogy/person/1
 
 ###
-POST http://localhost:8080/api/genealogy/person/4/event
+POST http://localhost:8080/api/genealogy/person/1/event
 Content-Type: application/json
 
 {
-  "type": "EDUC",
-  "date": "2021-09-21",
+  "type": "OCCU",
+  "date": "2021-09-22",
   "place": "Minsk, Belarus",
-  "note": "Test event"
+  "note": "Test event2"
 }
+
+###
+GET http://localhost:8080/api/genealogy/person/1/event
+Accept: application/json

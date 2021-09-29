@@ -24,11 +24,9 @@ create sequence SEQ_FAMILY start with 1;
 
 CREATE TABLE IF NOT EXISTS T_CHILDREN
 (
-    FAMILY_ID INTEGER,
-    CHILD_ID  INTEGER
+    FAMILY_ID INTEGER not null ,
+    CHILD_ID  INTEGER not null
 );
-
-create sequence SEQ_EVENT start with 1;
 
 CREATE TABLE IF NOT EXISTS T_PERSON_EVENT
 (
@@ -38,7 +36,7 @@ CREATE TABLE IF NOT EXISTS T_PERSON_EVENT
     PLACE      VARCHAR(256),
     NOTE       VARCHAR(256),
     EVENT_DATE DATE        not null,
-    PERSON_ID  INTEGER     not null,
+    PERSON_ID  INTEGER     not null
 );
 
 CREATE TABLE IF NOT EXISTS T_FAMILY_EVENT
@@ -49,8 +47,10 @@ CREATE TABLE IF NOT EXISTS T_FAMILY_EVENT
     PLACE      VARCHAR(256),
     NOTE       VARCHAR(256),
     EVENT_DATE DATE        not null,
-    FAMILY_ID  INTEGER     not null,
+    FAMILY_ID  INTEGER     not null
 );
+
+create sequence SEQ_EVENT start with 1;
 
 alter table T_PERSON
     add constraint PK_PERSON PRIMARY KEY (PERSON_ID);

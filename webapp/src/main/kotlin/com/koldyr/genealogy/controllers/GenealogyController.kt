@@ -24,12 +24,12 @@ import java.net.URI
 class GenealogyController(private val genealogyService: GenealogyService) {
 
     @GetMapping("/person")
-    fun persons(): List<Person> {
+    fun persons(): Collection<Person> {
         return genealogyService.findAllPersons()
     }
 
     @GetMapping("/family")
-    fun families(): List<FamilyDTO> = genealogyService.findAllFamilies()
+    fun families(): Collection<FamilyDTO> = genealogyService.findAllFamilies()
 
     @GetMapping("/person/{personId}")
     fun personById(@PathVariable personId: Int): Person = genealogyService.findPersonById(personId)
@@ -42,7 +42,7 @@ class GenealogyController(private val genealogyService: GenealogyService) {
 
     @PutMapping("/person/{personId}")
     fun updatePerson(@PathVariable personId: Int, person: Person) {
-        genealogyService.update(personId, person);
+        genealogyService.update(personId, person)
     }
 
     @DeleteMapping("/person/{personId}")
@@ -51,8 +51,22 @@ class GenealogyController(private val genealogyService: GenealogyService) {
     }
 
     @PostMapping("/person/{personId}/event")
-    fun createPersonEvent(@PathVariable personId: Int, @RequestBody event: PersonEvent) {
+    fun createPersonEvent(@PathVariable personId: Int, @RequestBody event: PersonEvent): ResponseEntity<Unit> {
         genealogyService.createPersonEvent(personId, event)
+
+        return ResponseEntity.created(URI.create("/person/$personId/event/${event.id}")).build()
+    }
+
+    @GetMapping("/person/{personId}/event/{eventId}")
+    fun personEvent(@PathVariable personId: Int, @PathVariable eventId: Int): PersonEvent {
+        val person = genealogyService.findPersonById(personId)
+        return person.events.first { event -> event.id === eventId }
+    }
+
+    @GetMapping("/person/{personId}/event")
+    fun personEvents(@PathVariable personId: Int): Collection<PersonEvent> {
+        val person = genealogyService.findPersonById(personId)
+        return person.events
     }
 
     @DeleteMapping("/person/{personId}/event/{eventId}")
