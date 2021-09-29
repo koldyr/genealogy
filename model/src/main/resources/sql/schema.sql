@@ -41,14 +41,14 @@ create sequence SEQ_EVENT start with 1;
 
 CREATE TABLE IF NOT EXISTS T_PERSON_EVENT
 (
-    PERSON_ID INTEGER,
-    EVENT_ID  INTEGER
+    PERSON_ID INTEGER not null,
+    EVENT_ID  INTEGER not null 
 );
 
 CREATE TABLE IF NOT EXISTS T_FAMILY_EVENT
 (
-    FAMILY_ID INTEGER,
-    EVENT_ID  INTEGER
+    FAMILY_ID INTEGER not null,
+    EVENT_ID  INTEGER not null
 );
 
 alter table T_PERSON
@@ -59,6 +59,12 @@ alter table T_FAMILY
 
 alter table T_LIFE_EVENT
     add constraint PK_EVENT PRIMARY KEY (EVENT_ID);
+
+alter table T_PERSON_EVENT
+    add constraint PK_PERSON_EVENT PRIMARY KEY (PERSON_ID, EVENT_ID);
+
+alter table T_FAMILY_EVENT
+    add constraint PK_FAMILY_EVENT PRIMARY KEY (FAMILY_ID, EVENT_ID);
 
 alter table T_PERSON
     add constraint FK_PERSON_PARENT_FAMILY FOREIGN KEY (PARENT_FAMILY_ID) REFERENCES T_FAMILY (FAMILY_ID);

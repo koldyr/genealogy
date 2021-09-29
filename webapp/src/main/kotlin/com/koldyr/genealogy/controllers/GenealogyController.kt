@@ -1,11 +1,9 @@
 package com.koldyr.genealogy.controllers
 
-import com.koldyr.genealogy.model.LifeEvent
+import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.Person
-import com.koldyr.genealogy.persistence.FamilyRepository
-import com.koldyr.genealogy.persistence.PersonRepository
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpStatus
+import com.koldyr.genealogy.model.PersonEvent
+import com.koldyr.genealogy.services.GenealogyService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -15,7 +13,6 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.web.client.HttpClientErrorException
 import java.net.URI
 
 /**
@@ -24,51 +21,42 @@ import java.net.URI
  */
 @RestController
 @RequestMapping("/api/genealogy")
-class GenealogyController(
-    private val personRepository: PersonRepository,
-    private val familyRepository: FamilyRepository) {
-
-    @GetMapping("/")
-    fun index(): String {
-        return "Greetings from Genealogy"
-    }
+class GenealogyController(private val genealogyService: GenealogyService) {
 
     @GetMapping("/person")
-    fun persons(): List<Person> = personRepository.findAll()
+    fun persons(): List<Person> {
+        return genealogyService.findAllPersons()
+    }
+
+    @GetMapping("/family")
+    fun families(): List<FamilyDTO> = genealogyService.findAllFamilies()
 
     @GetMapping("/person/{personId}")
-    fun personById(@PathVariable personId: Int): Person = personRepository.findById(personId).orElseThrow(::IllegalStateException)
+    fun personById(@PathVariable personId: Int): Person = genealogyService.findPersonById(personId)
 
     @PostMapping("/person")
     fun createPerson(@RequestBody person: Person): ResponseEntity<String> {
-        val saved = personRepository.save(person)
-        return ResponseEntity.created(URI.create("/person/${saved.id}")).build()
+        val personId: Int = genealogyService.create(person)
+        return ResponseEntity.created(URI.create("/person/$personId")).build()
     }
 
     @PutMapping("/person/{personId}")
     fun updatePerson(@PathVariable personId: Int, person: Person) {
-        val persisted = personRepository.findById(personId).orElseThrow {
-            HttpClientErrorException.create(
-                "Person with id '$personId' not found",
-                HttpStatus.NOT_FOUND,
-                "",
-                HttpHeaders.EMPTY,
-                ByteArray(0),
-                null
-            )
-        }
-
-        personRepository.save(person);
+        genealogyService.update(personId, person);
     }
 
     @DeleteMapping("/person/{personId}")
-    fun deletePersonById(@PathVariable personId: Int) {
-        personRepository.deleteById(personId)
+    fun deletePerson(@PathVariable personId: Int) {
+        genealogyService.deletePerson(personId)
     }
 
     @PostMapping("/person/{personId}/event")
-    fun createPersonEvent(@PathVariable personId: Int, @RequestBody event: LifeEvent) {
-        val persisted = personRepository.findById(personId).get()
+    fun createPersonEvent(@PathVariable personId: Int, @RequestBody event: PersonEvent) {
+        genealogyService.createPersonEvent(personId, event)
+    }
 
+    @DeleteMapping("/person/{personId}/event/{eventId}")
+    fun deletePersonEvent(@PathVariable personId: Int, @PathVariable eventId: Int) {
+        genealogyService.deletePersonEvent(personId, eventId)
     }
 }

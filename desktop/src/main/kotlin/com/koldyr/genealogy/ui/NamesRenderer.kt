@@ -1,7 +1,7 @@
 package com.koldyr.genealogy.ui
 
-import java.awt.Component
 import com.koldyr.genealogy.model.PersonNames
+import java.awt.Component
 import javax.swing.JTable
 import javax.swing.table.DefaultTableCellRenderer
 
@@ -13,8 +13,8 @@ class NamesRenderer: DefaultTableCellRenderer() {
     override fun getTableCellRendererComponent(table: JTable?, value: Any?, isSelected: Boolean, hasFocus: Boolean, row: Int, column: Int): Component {
         val name: PersonNames = value as PersonNames;
         val nameBuilder: StringBuilder = StringBuilder()
-        if (name.name != null) {
-            nameBuilder.append(name.name)
+        if (name.first != null) {
+            nameBuilder.append(name.first)
         }
         if (name.middle != null) {
             if (nameBuilder.isNotEmpty()) nameBuilder.append(' ')

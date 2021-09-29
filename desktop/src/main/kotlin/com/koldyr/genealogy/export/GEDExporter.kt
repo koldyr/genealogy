@@ -1,9 +1,5 @@
 package com.koldyr.genealogy.export
 
-import java.io.OutputStream
-import java.nio.file.Files
-import java.nio.file.Path
-import java.time.format.DateTimeFormatter
 import com.koldyr.genealogy.importer.CHILD
 import com.koldyr.genealogy.importer.CONTINUE
 import com.koldyr.genealogy.importer.DATE
@@ -26,6 +22,10 @@ import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
+import java.io.OutputStream
+import java.nio.file.Files
+import java.nio.file.Path
+import java.time.format.DateTimeFormatter
 
 /**
  * Description of class GEDExporter
@@ -99,8 +99,8 @@ class GEDExporter : Exporter {
         if (names != null) {
             val nameBuilder = StringBuilder()
 
-            if (names.name != null) {
-                nameBuilder.append(names.name)
+            if (names.first != null) {
+                nameBuilder.append(names.first)
             }
             if (names.middle != null) {
                 if (nameBuilder.isNotEmpty()) nameBuilder.append(' ')
@@ -158,7 +158,7 @@ class GEDExporter : Exporter {
         }
     }
 
-    private fun events(events: MutableSet<LifeEvent>, builder: StringBuilder) {
+    private fun events(events: MutableSet<out LifeEvent>, builder: StringBuilder) {
         if (events.isNotEmpty()) {
             events.forEach { event(it, builder) }
         }

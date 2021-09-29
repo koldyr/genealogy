@@ -1,18 +1,19 @@
 package com.koldyr.genealogy.ui
 
+import com.koldyr.genealogy.export.ExporterFactory
+import com.koldyr.genealogy.importer.ImporterFactory
+import com.koldyr.genealogy.model.LifeEvent
+import com.koldyr.genealogy.model.Lineage
+import com.koldyr.genealogy.model.Person
+import com.koldyr.genealogy.model.PersonEvent
+import com.koldyr.genealogy.model.PersonNames
+import org.apache.commons.lang3.StringUtils.*
 import java.awt.Dimension
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
-import com.koldyr.genealogy.export.ExporterFactory
-import com.koldyr.genealogy.importer.ImporterFactory
-import com.koldyr.genealogy.model.LifeEvent
-import com.koldyr.genealogy.model.Lineage
-import com.koldyr.genealogy.model.Person
-import com.koldyr.genealogy.model.PersonNames
-import org.apache.commons.lang3.StringUtils.isEmpty
 import javax.swing.JFileChooser
 import javax.swing.JFrame
 import javax.swing.JMenu
@@ -283,7 +284,7 @@ class GenealogyApp : JFrame, ActionListener {
     private fun clonePerson(person: Person): Person {
         val copy = person.clone()
         copy.name = person.name?.clone()
-        copy.events = person.events.map { it.clone() }.toMutableSet()
+        copy.events = person.events.map(PersonEvent::clone).toMutableSet()
         return copy
     }
 }

@@ -1,5 +1,12 @@
 package com.koldyr.genealogy.export
 
+import com.koldyr.genealogy.model.Family
+import com.koldyr.genealogy.model.LifeEvent
+import com.koldyr.genealogy.model.Lineage
+import com.koldyr.genealogy.model.Person
+import com.koldyr.genealogy.model.PersonNames
+import org.apache.commons.lang3.StringUtils.*
+import org.apache.commons.text.StringEscapeUtils.*
 import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.Path
@@ -7,14 +14,6 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import java.util.regex.Pattern
 import java.util.stream.Collectors
-import com.koldyr.genealogy.model.Family
-import com.koldyr.genealogy.model.LifeEvent
-import com.koldyr.genealogy.model.Lineage
-import com.koldyr.genealogy.model.Person
-import com.koldyr.genealogy.model.PersonNames
-import org.apache.commons.lang3.StringUtils.EMPTY
-import org.apache.commons.lang3.StringUtils.isEmpty
-import org.apache.commons.text.StringEscapeUtils.escapeCsv
 
 /**
  * Description of class CSVExporter
@@ -71,7 +70,7 @@ class CSVExporter : Exporter {
         }
 
         val value = StringBuilder()
-        value.append(name.name)
+        value.append(name.first)
         value.append('|')
         value.append(name.middle ?: EMPTY)
         value.append('|')

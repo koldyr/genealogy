@@ -6,11 +6,14 @@ import com.koldyr.genealogy.handlers.ChildrenDeserializer
 import com.koldyr.genealogy.handlers.ChildrenSerializer
 import com.koldyr.genealogy.handlers.PersonIdDeserializer
 import com.koldyr.genealogy.handlers.PersonIdSerializer
+import javax.persistence.CascadeType.*
 import javax.persistence.Column
 import javax.persistence.Entity
+import javax.persistence.FetchType.*
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.*
 import javax.persistence.Id
+import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
@@ -45,8 +48,8 @@ class Family() {
     @JsonDeserialize(using = ChildrenDeserializer::class)
     val children: MutableSet<Person> = mutableSetOf()
 
-    @Transient
-    val events: MutableSet<LifeEvent> = mutableSetOf()
+    @OneToMany(cascade = [ALL], fetch = EAGER, orphanRemoval = true)
+    val events: MutableSet<FamilyEvent> = mutableSetOf()
 
     var note: String? = null
 

@@ -7,16 +7,18 @@ import java.util.function.Predicate
 import javax.persistence.AttributeOverride
 import javax.persistence.AttributeOverrides
 import javax.persistence.Basic
+import javax.persistence.CascadeType.*
 import javax.persistence.Column
 import javax.persistence.Convert
 import javax.persistence.Embedded
 import javax.persistence.Entity
+import javax.persistence.FetchType.*
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.*
 import javax.persistence.Id
+import javax.persistence.OneToMany
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
-import javax.persistence.Transient
 
 /**
  * Description of class Person
@@ -43,8 +45,8 @@ class Person() : Cloneable {
     ])
     var name: PersonNames? = null
 
-    @Transient
-    var events: MutableSet<LifeEvent> = mutableSetOf()
+    @OneToMany(cascade = [ALL], fetch = EAGER, orphanRemoval = true)
+    var events: MutableSet<PersonEvent> = mutableSetOf()
 
     var place: String? = null
 
@@ -66,7 +68,7 @@ class Person() : Cloneable {
         this.id = id
     }
 
-    constructor(id: Int, name: PersonNames, events: MutableSet<LifeEvent>, place: String?, occupation: String?, note: String?, gender: Gender, family: Int?) : this() {
+    constructor(id: Int, name: PersonNames, events: MutableSet<PersonEvent>, place: String?, occupation: String?, note: String?, gender: Gender, family: Int?) : this() {
         this.id = id
         this.name = name
         this.events = events
@@ -75,17 +77,6 @@ class Person() : Cloneable {
         this.note = note
         this.gender = gender
         this.familyId = family
-    }
-
-    override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (other !is Person) return false
-
-        return id == other.id
-    }
-
-    override fun hashCode(): Int {
-        return id!!
     }
 
     @JsonIgnore
@@ -107,6 +98,17 @@ class Person() : Cloneable {
                 || (if (name == null) false else name!!.search(checkFn))
                 || checkEvents(checkFn)
 
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (other !is Person) return false
+
+        return id == other.id
+    }
+
+    override fun hashCode(): Int {
+        return id!!
     }
 
     public override fun clone(): Person {

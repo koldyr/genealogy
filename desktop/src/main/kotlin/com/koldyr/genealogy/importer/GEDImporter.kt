@@ -1,5 +1,16 @@
 package com.koldyr.genealogy.importer
 
+import com.koldyr.genealogy.model.EventPrefix
+import com.koldyr.genealogy.model.EventType
+import com.koldyr.genealogy.model.Family
+import com.koldyr.genealogy.model.FamilyEvent
+import com.koldyr.genealogy.model.Gender
+import com.koldyr.genealogy.model.LifeEvent
+import com.koldyr.genealogy.model.Lineage
+import com.koldyr.genealogy.model.Person
+import com.koldyr.genealogy.model.PersonEvent
+import com.koldyr.genealogy.model.PersonNames
+import org.apache.commons.lang3.StringUtils
 import java.io.BufferedInputStream
 import java.io.InputStream
 import java.nio.charset.Charset
@@ -8,15 +19,6 @@ import java.nio.file.Path
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
-import com.koldyr.genealogy.model.EventPrefix
-import com.koldyr.genealogy.model.EventType
-import com.koldyr.genealogy.model.Family
-import com.koldyr.genealogy.model.Gender
-import com.koldyr.genealogy.model.LifeEvent
-import com.koldyr.genealogy.model.Lineage
-import com.koldyr.genealogy.model.Person
-import com.koldyr.genealogy.model.PersonNames
-import org.apache.commons.lang3.StringUtils
 import kotlin.math.max
 
 const val PERSON = "INDI"
@@ -86,7 +88,7 @@ class GEDImporter : Importer {
                     if (person != null) {
                         val occupation = parseGeneric(line, OCCUPATION)
                         if (StringUtils.isBlank(occupation)) {
-                            event = LifeEvent(EventType.GetJob)
+                            event = PersonEvent(EventType.GetJob)
                             person.events.add(event)
                         } else {
                             person.occupation = occupation
@@ -96,7 +98,7 @@ class GEDImporter : Importer {
                     if (person != null) {
                         val residence = parseGeneric(line, RESIDENCE)
                         if (StringUtils.isBlank(residence)) {
-                            event = LifeEvent(EventType.Relocation)
+                            event = PersonEvent(EventType.Relocation)
                             person.events.add(event)
                         } else {
                             person.place = residence
@@ -145,10 +147,11 @@ class GEDImporter : Importer {
                         }
                     }
                 } else if (EventType.isEvent(line)) {
-                    event = LifeEvent(EventType.parse(line))
                     if (person != null) {
+                        event = PersonEvent(EventType.parse(line))
                         person.events.add(event)
                     } else if (family != null) {
+                        event = FamilyEvent(EventType.parse(line))
                         family.events.add(event)
                     }
                 } else if (line.contains(DATE)) {

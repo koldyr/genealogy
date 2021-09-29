@@ -38,3 +38,14 @@ Content-Type: application/json
 
 ###
 DELETE http://localhost:8080/api/genealogy/person/1
+
+###
+POST http://localhost:8080/api/genealogy/person/4/event
+Content-Type: application/json
+
+{
+  "type": "EDUC",
+  "date": "2021-09-21",
+  "place": "Minsk, Belarus",
+  "note": "Test event"
+}

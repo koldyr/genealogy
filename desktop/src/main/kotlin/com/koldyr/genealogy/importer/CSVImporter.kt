@@ -1,21 +1,22 @@
 package com.koldyr.genealogy.importer
 
+import com.koldyr.genealogy.model.EventPrefix
+import com.koldyr.genealogy.model.EventType
+import com.koldyr.genealogy.model.Family
+import com.koldyr.genealogy.model.FamilyEvent
+import com.koldyr.genealogy.model.Gender
+import com.koldyr.genealogy.model.LifeEvent
+import com.koldyr.genealogy.model.Lineage
+import com.koldyr.genealogy.model.Person
+import com.koldyr.genealogy.model.PersonEvent
+import com.koldyr.genealogy.model.PersonNames
+import org.apache.commons.lang3.StringUtils.*
 import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.regex.Pattern
-import com.koldyr.genealogy.model.EventPrefix
-import com.koldyr.genealogy.model.EventType
-import com.koldyr.genealogy.model.Family
-import com.koldyr.genealogy.model.Gender
-import com.koldyr.genealogy.model.LifeEvent
-import com.koldyr.genealogy.model.Lineage
-import com.koldyr.genealogy.model.Person
-import com.koldyr.genealogy.model.PersonNames
-import org.apache.commons.lang3.StringUtils.defaultIfEmpty
-import org.apache.commons.lang3.StringUtils.isEmpty
 
 class CSVImporter : Importer {
     private val pattern = Pattern.compile("\\\\n")
@@ -48,7 +49,7 @@ class CSVImporter : Importer {
         for ((index, value) in values.withIndex()) {
             when (index) {
                 1 -> person.name = parseNames(value)
-                2 -> person.events.addAll(lifeEvents(value))
+                2 -> person.events.addAll(personEvents(value))
                 3 -> person.gender = Gender.valueOf(value)
                 4 -> person.place = value
                 5 -> person.occupation = value
@@ -70,7 +71,7 @@ class CSVImporter : Importer {
                 1 -> family.husband = if (isEmpty(value)) null else Person(Integer.parseInt(value))
                 2 -> family.wife = if (isEmpty(value)) null else Person(Integer.parseInt(value))
                 3 -> family.children.addAll(persons(value))
-                4 -> family.events.addAll(lifeEvents(value))
+                4 -> family.events.addAll(familyEvents(value))
                 5 -> family.note = note(value)
             }
         }
@@ -110,7 +111,7 @@ class CSVImporter : Importer {
         val values = value.split('|')
         for ((index, name) in values.withIndex()) {
             when (index) {
-                0 -> names.name = name
+                0 -> names.first = name
                 1 -> names.middle = defaultIfEmpty(name, null)
                 2 -> names.last = defaultIfEmpty(name, null)
                 3 -> names.maiden = defaultIfEmpty(name, null)
@@ -119,20 +120,32 @@ class CSVImporter : Importer {
         return names
     }
 
-    private fun lifeEvents(value: String): Collection<LifeEvent> {
+    private fun personEvents(value: String): Collection<PersonEvent> {
         if (isEmpty(value)) {
             return setOf()
         }
 
         return value.split('!').map {
-            parseLifeEvent(it)
+            parseLifeEvent(it, false) as PersonEvent
         }
     }
 
-    private fun parseLifeEvent(value: String): LifeEvent {
+    private fun familyEvents(value: String): Collection<FamilyEvent> {
+        if (isEmpty(value)) {
+            return setOf()
+        }
+
+        return value.split('!').map {
+            parseLifeEvent(it, true) as FamilyEvent
+        }
+    }
+
+    private fun parseLifeEvent(value: String, isFamily: Boolean): LifeEvent {
         val values = value.split('|')
 
-        val event = LifeEvent(EventType.valueOf(values[0]))
+        val eventType = EventType.valueOf(values[0])
+        val event = if (isFamily) FamilyEvent(eventType) else PersonEvent(eventType)
+
         for ((index, v) in values.withIndex()) {
             when (index) {
                 1 -> event.prefix = if (isEmpty(v)) null else EventPrefix.valueOf(v)

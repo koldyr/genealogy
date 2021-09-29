@@ -1,5 +1,12 @@
 package com.koldyr.genealogy.ui
 
+import com.koldyr.genealogy.model.Family
+import com.koldyr.genealogy.model.Gender
+import com.koldyr.genealogy.model.LifeEvent
+import com.koldyr.genealogy.model.Lineage
+import com.koldyr.genealogy.model.Person
+import com.koldyr.genealogy.model.PersonNames
+import org.apache.commons.lang3.StringUtils.*
 import java.awt.BorderLayout
 import java.awt.Dimension
 import java.awt.FlowLayout
@@ -11,13 +18,7 @@ import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import com.koldyr.genealogy.model.Family
-import com.koldyr.genealogy.model.Gender
-import com.koldyr.genealogy.model.LifeEvent
-import com.koldyr.genealogy.model.Lineage
-import com.koldyr.genealogy.model.Person
-import com.koldyr.genealogy.model.PersonNames
-import org.apache.commons.lang3.StringUtils.defaultIfEmpty
+import java.util.stream.Collectors.*
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.BoxLayout
@@ -67,7 +68,7 @@ class EditPersonDialog : JDialog {
 
         val name: PersonNames = person.name ?: PersonNames("", "", "", "")
         val lblName = JLabel("Name/Middle:")
-        txtName = JTextField(name.name)
+        txtName = JTextField(name.first)
         txtMiddle = JTextField(name.middle)
         txtMiddle.preferredSize = Dimension(200, 20)
 
@@ -208,7 +209,7 @@ class EditPersonDialog : JDialog {
         val last: String? = defaultIfEmpty(txtLast.text, null)
         val maiden: String? = defaultIfEmpty(txtMaiden.text, null)
         person.name = PersonNames(name, middle, last, maiden)
-        person.events = eventsModel.events.toMutableSet()
+        person.events = eventsModel.events.stream().map { it.toPersonEvent() }.collect(toSet())
         person.gender = cmbGender.selectedItem as Gender
         person.place = defaultIfEmpty(txtPlace.text, null)
         person.occupation = defaultIfEmpty(txtOccupation.text, null)

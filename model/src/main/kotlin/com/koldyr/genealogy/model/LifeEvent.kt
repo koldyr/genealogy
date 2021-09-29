@@ -16,6 +16,8 @@ import javax.persistence.Enumerated
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.*
 import javax.persistence.Id
+import javax.persistence.Inheritance
+import javax.persistence.InheritanceType.*
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
 
@@ -25,29 +27,30 @@ import javax.persistence.Table
  */
 @Entity
 @Table(name = "T_LIFE_EVENT")
+@Inheritance(strategy = JOINED)
 @SequenceGenerator(name = "EventIds", sequenceName = "SEQ_EVENT", allocationSize = 1)
-class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
+open class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
 
     @Id
     @GeneratedValue(strategy = SEQUENCE, generator = "EventIds")
     @Column(name = "EVENT_ID")
-    var id: Int? = null
+    open var id: Int? = null
 
     @Basic(optional = false)
     @Convert(converter = EventTypeConverter::class)
-    var type: EventType = EventType.Birth
+    open var type: EventType = EventType.Birth
 
     @Enumerated(STRING)
-    var prefix: EventPrefix? = null
+    open var prefix: EventPrefix? = null
 
     @Column(name = "EVENT_DATE", nullable = false, columnDefinition = "DATE")
     @JsonSerialize(using = LocalDateSerializer::class)
     @JsonDeserialize(using = LocalDateDeserializer::class)
-    var date: LocalDate? = null
+    open var date: LocalDate? = null
 
-    var place: String? = null
+    open var place: String? = null
 
-    var note: String? = null
+    open var note: String? = null
 
     constructor(type: EventType) : this() {
         this.type = type
@@ -81,5 +84,15 @@ class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
 
     public override fun clone(): LifeEvent {
         return super.clone() as LifeEvent
+    }
+
+    fun toPersonEvent(): PersonEvent {
+        val event = PersonEvent(type)
+        event.id = this.id
+        event.date = this.date
+        event.prefix = this.prefix
+        event.place = this.place
+        event.note = this.note
+        return event
     }
 }
