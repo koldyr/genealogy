@@ -1,8 +1,8 @@
 alter table T_PERSON drop constraint FK_PERSON_FAMILY;
 alter table T_PERSON drop constraint FK_PERSON_PARENT_FAMILY;
 
-alter table T_FAMILY drop constraint FK_FAMILY_FATHER;
-alter table T_FAMILY drop constraint FK_FAMILY_MOTHER;
+alter table T_FAMILY drop constraint FK_FAMILY_HUSBAND;
+alter table T_FAMILY drop constraint FK_FAMILY_WIFE;
 
 DROP TABLE T_FAMILY_EVENT;
 DROP TABLE T_PERSON_EVENT;

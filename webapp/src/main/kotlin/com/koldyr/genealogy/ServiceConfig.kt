@@ -22,7 +22,7 @@ open class ServiceConfig {
     }
 
     @Bean
-    open fun familyService(familyRepository: FamilyRepository): FamilyService {
-        return FamilyServiceImpl(familyRepository)
+    open fun familyService(familyRepository: FamilyRepository, personRepository: PersonRepository): FamilyService {
+        return FamilyServiceImpl(familyRepository, personRepository)
     }
 }

@@ -7,5 +7,6 @@ package com.koldyr.genealogy.dto
 class FamilyDTO(val id: Int) {
     var husband: Int? = null
     var wife: Int? = null
-    var children: List<Int>? = null
+    var children: Collection<Int>? = null
+    var events: Collection<Int>? = null
 }

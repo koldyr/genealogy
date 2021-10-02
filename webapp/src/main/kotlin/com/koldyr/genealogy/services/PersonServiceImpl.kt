@@ -15,13 +15,13 @@ open class PersonServiceImpl(
     private val personRepository: PersonRepository
 ) : PersonService {
 
+    override fun findAll(): List<Person> = personRepository.findAll()
+    
     @Transactional
     override fun create(person: Person): Int {
         val saved = personRepository.save(person)
         return saved.id!!
     }
-
-    override fun findAll(): List<Person> = personRepository.findAll()
 
     override fun findById(personId: Int): Person {
         return personRepository.findById(personId)
@@ -37,8 +37,9 @@ open class PersonServiceImpl(
         persisted.note = person.note
         persisted.occupation = person.occupation
         persisted.place = person.place
+        persisted.gender = person.gender
 
-        personRepository.save(person);
+        personRepository.save(persisted);
     }
 
     @Transactional

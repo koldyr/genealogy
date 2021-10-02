@@ -19,54 +19,56 @@ import org.springframework.web.bind.annotation.RestController
  * @created: 2021-09-25
  */
 @RestController
-@RequestMapping("/api/genealogy/person")
+@RequestMapping("/api/genealogy/person/")
 class PersonController(private val personService: PersonService) {
 
-    @GetMapping("/person")
+    @GetMapping
     fun persons(): Collection<Person> {
         return personService.findAll()
     }
 
-    @GetMapping("/person/{personId}")
-    fun personById(@PathVariable personId: Int): Person = personService.findById(personId)
-
-    @PostMapping("/person")
-    fun createPerson(@RequestBody person: Person): ResponseEntity<String> {
+    @PostMapping
+    fun create(@RequestBody person: Person): ResponseEntity<String> {
         val personId: Int = personService.create(person)
-        return ResponseEntity.created(URI.create("/person/$personId")).build()
+        return ResponseEntity.created(URI.create("/api/genealogy/person/$personId")).build()
     }
 
-    @PutMapping("/person/{personId}")
-    fun updatePerson(@PathVariable personId: Int, person: Person) {
+    @PutMapping("{personId}")
+    fun update(@PathVariable personId: Int, @RequestBody person: Person) {
         personService.update(personId, person)
     }
 
-    @DeleteMapping("/person/{personId}")
-    fun deletePerson(@PathVariable personId: Int) {
+    @GetMapping("{personId}")
+    fun personById(@PathVariable personId: Int): Person = personService.findById(personId)
+    
+    @DeleteMapping("{personId}")
+    fun delete(@PathVariable personId: Int): ResponseEntity<Unit> {
         personService.delete(personId)
+        return ResponseEntity.noContent().build()
     }
 
-    @PostMapping("/person/{personId}/event")
-    fun createPersonEvent(@PathVariable personId: Int, @RequestBody event: PersonEvent): ResponseEntity<Unit> {
-        personService.createEvent(personId, event)
+    @PostMapping("{personId}/event")
+    fun createEvent(@PathVariable personId: Int, @RequestBody event: PersonEvent): ResponseEntity<Unit> {
+        val eventId = personService.createEvent(personId, event)
 
-        return ResponseEntity.created(URI.create("/person/$personId/event/${event.id}")).build()
+        return ResponseEntity.created(URI.create("/api/genealogy/person/$personId/event/$eventId")).build()
     }
 
-    @GetMapping("/person/{personId}/event/{eventId}")
+    @GetMapping("{personId}/event/{eventId}")
     fun personEvent(@PathVariable personId: Int, @PathVariable eventId: Int): PersonEvent {
         val person = personService.findById(personId)
         return person.events.first { event -> event.id === eventId }
     }
 
-    @GetMapping("/person/{personId}/event")
-    fun personEvents(@PathVariable personId: Int): Collection<PersonEvent> {
+    @GetMapping("{personId}/event")
+    fun events(@PathVariable personId: Int): Collection<PersonEvent> {
         val person = personService.findById(personId)
         return person.events
     }
 
-    @DeleteMapping("/person/{personId}/event/{eventId}")
-    fun deletePersonEvent(@PathVariable personId: Int, @PathVariable eventId: Int) {
+    @DeleteMapping("person/{personId}/event/{eventId}")
+    fun deleteEvent(@PathVariable personId: Int, @PathVariable eventId: Int): ResponseEntity<Unit> {
         personService.deleteEvent(personId, eventId)
+        return ResponseEntity.noContent().build()
     }
 }

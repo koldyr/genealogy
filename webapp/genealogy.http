@@ -1,46 +1,46 @@
-GET http://localhost:8080/api/genealogy/person
+GET http://localhost:8080/api/genealogy/person/
 
 ###
-GET http://localhost:8080/api/genealogy/person/1
+GET http://localhost:8080/api/genealogy/person/6
 Accept: application/json
 
 ### Create Person
-POST http://localhost:8080/api/genealogy/person
+POST http://localhost:8080/api/genealogy/person/
 Content-Type: application/json
 
 {
   "name": {
-    "first": "p1_name",
-    "middle": "p1_middle",
-    "last": "p1_last"
+    "first": "p4_name",
+    "middle": "p4_middle",
+    "last": "p4_last"
   },
   "gender": "MALE",
-  "place": "p1_place",
-  "occupation": "p1_occup",
-  "note": "p1_note"
+  "place": "p4_place",
+  "occupation": "p4_occup",
+  "note": "p4_note"
 }
 
 ###
-PUT http://localhost:8080/api/genealogy/person/1
+PUT http://localhost:8080/api/genealogy/person/4
 Content-Type: application/json
 
 {
   "name": {
-    "first": "p1_name_?",
-    "middle": "p1_middle_?",
-    "last": "p1_last_?"
+    "first": "p4_name",
+    "middle": "p4_middle",
+    "last": "p4_last"
   },
-  "gender": "MALE",
-  "place": "p1_place_?",
-  "occupation": "p1_occup_?",
-  "note": "p1_note_?"
+  "gender": "FEMALE",
+  "place": "p4_place",
+  "occupation": "p4_occup",
+  "note": "p4_note"
 }
 
 ###
 DELETE http://localhost:8080/api/genealogy/person/1
 
 ###
-POST http://localhost:8080/api/genealogy/person/1/event
+POST http://localhost:8080/api/genealogy/person/2/event
 Content-Type: application/json
 
 {
@@ -53,3 +53,31 @@ Content-Type: application/json
 ###
 GET http://localhost:8080/api/genealogy/person/1/event
 Accept: application/json
+
+###
+GET http://localhost:8080/api/genealogy/family/
+Accept: application/json
+
+###
+POST http://localhost:8080/api/genealogy/family/
+Content-Type: application/json
+
+{
+  "husband": 2,
+  "wife": 1
+}
+
+###
+POST http://localhost:8080/api/genealogy/family/1/children
+Content-Type: application/json
+
+{
+  "husband": 2,
+  "wife": 1
+}
+
+###
+GET http://localhost:8080/api/genealogy/family/1/children
+Accept: application/json
+
+

@@ -13,6 +13,7 @@ import javax.persistence.FetchType.EAGER
 import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.SEQUENCE
 import javax.persistence.Id
+import javax.persistence.JoinColumn
 import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 import javax.persistence.SequenceGenerator
@@ -34,11 +35,13 @@ class Family() {
     var id: Int? = null
 
     @OneToOne
+    @JoinColumn(name = "HUSBAND_ID", referencedColumnName = "PERSON_ID")
     @JsonSerialize(using = PersonIdSerializer::class)
     @JsonDeserialize(using = PersonIdDeserializer::class)
     var husband: Person? = null
 
     @OneToOne
+    @JoinColumn(name = "WIFE_ID", referencedColumnName = "PERSON_ID")
     @JsonSerialize(using = PersonIdSerializer::class)
     @JsonDeserialize(using = PersonIdDeserializer::class)
     var wife: Person? = null
