@@ -2,8 +2,10 @@ package com.koldyr.genealogy
 
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonRepository
-import com.koldyr.genealogy.services.GenealogyService
-import com.koldyr.genealogy.services.GenealogyServiceImpl
+import com.koldyr.genealogy.services.FamilyService
+import com.koldyr.genealogy.services.FamilyServiceImpl
+import com.koldyr.genealogy.services.PersonService
+import com.koldyr.genealogy.services.PersonServiceImpl
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -15,7 +17,12 @@ import org.springframework.context.annotation.Configuration
 open class ServiceConfig {
 
     @Bean
-    open fun genealogyService(personRepository: PersonRepository, familyRepository: FamilyRepository): GenealogyService {
-        return GenealogyServiceImpl(personRepository, familyRepository)
+    open fun personService(personRepository: PersonRepository): PersonService {
+        return PersonServiceImpl(personRepository)
+    }
+
+    @Bean
+    open fun familyService(familyRepository: FamilyRepository): FamilyService {
+        return FamilyServiceImpl(familyRepository)
     }
 }
