@@ -4,6 +4,7 @@ import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.services.PersonService
 import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.*
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -28,7 +29,9 @@ class PersonController(private val personService: PersonService) {
     @PostMapping
     fun create(@RequestBody person: Person): ResponseEntity<String> {
         val personId: Int = personService.create(person)
-        return ResponseEntity.created(URI.create("/api/genealogy/person/$personId")).build()
+        
+        val uri = URI.create("/api/genealogy/person/$personId")
+        return created(uri).build()
     }
 
     @PutMapping("{personId}")
@@ -40,14 +43,16 @@ class PersonController(private val personService: PersonService) {
     @DeleteMapping("{personId}")
     fun delete(@PathVariable personId: Int): ResponseEntity<Unit> {
         personService.delete(personId)
-        return ResponseEntity.noContent().build()
+        
+        return noContent().build()
     }
 
     @PostMapping("{personId}/event")
     fun createEvent(@PathVariable personId: Int, @RequestBody event: PersonEvent): ResponseEntity<Unit> {
         val eventId = personService.createEvent(personId, event)
 
-        return ResponseEntity.created(URI.create("/api/genealogy/person/$personId/event/$eventId")).build()
+        val uri = URI.create("/api/genealogy/person/$personId/event/$eventId")
+        return created(uri).build()
     }
 
     @GetMapping("{personId}/event/{eventId}")
@@ -62,6 +67,7 @@ class PersonController(private val personService: PersonService) {
     @DeleteMapping("person/{personId}/event/{eventId}")
     fun deleteEvent(@PathVariable personId: Int, @PathVariable eventId: Int): ResponseEntity<Unit> {
         personService.deleteEvent(personId, eventId)
-        return ResponseEntity.noContent().build()
+        
+        return noContent().build()
     }
 }

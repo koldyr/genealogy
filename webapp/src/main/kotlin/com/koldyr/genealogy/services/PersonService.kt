@@ -13,6 +13,7 @@ interface PersonService {
     fun findById(personId: Int): Person
     fun update(personId: Int, person: Person)
     fun delete(personId: Int)
+
     fun createEvent(personId: Int, event: PersonEvent): Int
     fun findEvents(personId: Int): Collection<PersonEvent>
     fun deleteEvent(personId: Int, eventId: Int)

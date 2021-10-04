@@ -6,6 +6,7 @@ import com.koldyr.genealogy.model.FamilyEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.services.FamilyService
 import org.springframework.http.ResponseEntity
+import org.springframework.http.ResponseEntity.*
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -30,7 +31,9 @@ class FamilyController(private val familyService: FamilyService) {
     @PostMapping("/")
     fun create(@RequestBody family: FamilyDTO): ResponseEntity<Unit> {
         val familyId = familyService.create(family)
-        return ResponseEntity.created(URI.create("/api/genealogy/family/${familyId}")).build()
+        
+        val uri = URI.create("/api/genealogy/family/${familyId}")
+        return created(uri).build()
     }
 
     @GetMapping("/{familyId}")
@@ -42,14 +45,16 @@ class FamilyController(private val familyService: FamilyService) {
     @DeleteMapping("/{familyId}")
     fun delete(@PathVariable familyId: Int): ResponseEntity<Unit> {
         familyService.delete(familyId)
-        return ResponseEntity.noContent().build()
+
+        return noContent().build()
     }
 
     @PostMapping("/{familyId}/event")
     fun createEvent(@PathVariable familyId: Int, @RequestBody event: FamilyEvent): ResponseEntity<Unit> {
         val eventId = familyService.createEvent(familyId, event)
 
-        return ResponseEntity.created(URI.create("/api/genealogy/family/$familyId/event/$eventId")).build()
+        val uri = URI.create("/api/genealogy/family/$familyId/event/$eventId")
+        return created(uri).build()
     }
     
     @GetMapping("/{familyId}/event")
@@ -58,14 +63,16 @@ class FamilyController(private val familyService: FamilyService) {
     @DeleteMapping("/{familyId}/event/{eventId}")
     fun deleteEvent(@PathVariable familyId: Int, @PathVariable eventId: Int): ResponseEntity<Unit> {
         familyService.deleteEvent(familyId, eventId)
-        return ResponseEntity.noContent().build()
+
+        return noContent().build()
     }
 
     @PostMapping("/{familyId}/children")
     fun addChild(@PathVariable familyId: Int, @RequestBody child: Person): ResponseEntity<Unit> {
         val childId = familyService.createChild(familyId, child)
 
-        return ResponseEntity.created(URI.create("/api/genealogy/person/$childId")).build()
+        val uri = URI.create("/api/genealogy/person/$childId")
+        return created(uri).build()
     }
 
     @GetMapping("/{familyId}/children")
@@ -74,7 +81,7 @@ class FamilyController(private val familyService: FamilyService) {
     @DeleteMapping("/{familyId}/children/{childId}")
     fun deleteChild(@PathVariable familyId: Int, @PathVariable childId: Int): ResponseEntity<Unit> {
         familyService.deleteChild(familyId, childId)
-        return ResponseEntity.noContent().build()
-    }
 
+        return noContent().build()
+    }
 }
