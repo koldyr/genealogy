@@ -3,7 +3,7 @@ package com.koldyr.genealogy.services
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.persistence.PersonRepository
-import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 
@@ -43,18 +43,19 @@ open class PersonServiceImpl(
     }
 
     @Transactional
-    override fun delete(personId: Int) {
-        personRepository.deleteById(personId)
-    }
+    override fun delete(personId: Int) = personRepository.deleteById(personId)
 
     @Transactional
-    override fun createEvent(personId: Int, event: PersonEvent) {
+    override fun createEvent(personId: Int, event: PersonEvent): Int {
         val person: Person = personRepository.findById(personId)
             .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$personId' is not found") }
         person.addEvent(event)
 
-        val saved = personRepository.save(person)
+        personRepository.save(person)
+        return event.id!!
     }
+
+    override fun findEvents(personId: Int): Collection<PersonEvent> = personRepository.findEvents(personId)
 
     @Transactional
     override fun deleteEvent(personId: Int, eventId: Int) {

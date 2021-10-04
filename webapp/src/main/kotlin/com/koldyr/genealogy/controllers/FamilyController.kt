@@ -1,6 +1,5 @@
 package com.koldyr.genealogy.controllers
 
-import java.net.URI
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.FamilyEvent
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.net.URI
 
 /**
  * Description of class FamilyController
@@ -37,9 +37,7 @@ class FamilyController(private val familyService: FamilyService) {
     fun familyById(@PathVariable familyId: Int): FamilyDTO = familyService.findById(familyId)
 
     @PutMapping("/{familyId}")
-    fun update(@PathVariable familyId: Int, @RequestBody family: Family) {
-        familyService.update(familyId, family)
-    }
+    fun update(@PathVariable familyId: Int, @RequestBody family: Family) = familyService.update(familyId, family)
 
     @DeleteMapping("/{familyId}")
     fun delete(@PathVariable familyId: Int): ResponseEntity<Unit> {

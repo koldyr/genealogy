@@ -1,6 +1,5 @@
 package com.koldyr.genealogy.controllers
 
-import java.net.URI
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.services.PersonService
@@ -13,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import java.net.URI
 
 /**
  * Description of class GenealogyController
@@ -23,9 +23,7 @@ import org.springframework.web.bind.annotation.RestController
 class PersonController(private val personService: PersonService) {
 
     @GetMapping
-    fun persons(): Collection<Person> {
-        return personService.findAll()
-    }
+    fun persons(): Collection<Person> = personService.findAll()
 
     @PostMapping
     fun create(@RequestBody person: Person): ResponseEntity<String> {
@@ -34,9 +32,7 @@ class PersonController(private val personService: PersonService) {
     }
 
     @PutMapping("{personId}")
-    fun update(@PathVariable personId: Int, @RequestBody person: Person) {
-        personService.update(personId, person)
-    }
+    fun update(@PathVariable personId: Int, @RequestBody person: Person) = personService.update(personId, person)
 
     @GetMapping("{personId}")
     fun personById(@PathVariable personId: Int): Person = personService.findById(personId)
@@ -61,10 +57,7 @@ class PersonController(private val personService: PersonService) {
     }
 
     @GetMapping("{personId}/event")
-    fun events(@PathVariable personId: Int): Collection<PersonEvent> {
-        val person = personService.findById(personId)
-        return person.events
-    }
+    fun events(@PathVariable personId: Int): Collection<PersonEvent> = personService.findEvents(personId)
 
     @DeleteMapping("person/{personId}/event/{eventId}")
     fun deleteEvent(@PathVariable personId: Int, @PathVariable eventId: Int): ResponseEntity<Unit> {

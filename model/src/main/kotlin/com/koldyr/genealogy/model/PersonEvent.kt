@@ -16,7 +16,8 @@ import javax.persistence.Table
 @Table(name = "T_PERSON_EVENT")
 class PersonEvent() : LifeEvent() {
     
-    @ManyToOne(fetch = FetchType.LAZY) @JsonIgnore @JoinColumn(name = "PERSON_ID")
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "PERSON_ID")
+    @JsonIgnore
     var person: Person? = null
 
     constructor(type: EventType) : this() {

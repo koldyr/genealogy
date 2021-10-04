@@ -1,15 +1,15 @@
 package com.koldyr.genealogy.services
 
-import java.util.stream.Collectors.toList
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.FamilyEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonRepository
-import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
+import java.util.stream.Collectors.*
 
 /**
  * Description of class FamilyServiceImpl
@@ -79,9 +79,7 @@ open class FamilyServiceImpl(
     }
 
     @Transactional
-    override fun delete(familyId: Int) {
-        familyRepository.deleteById(familyId)
-    }
+    override fun delete(familyId: Int) = familyRepository.deleteById(familyId)
 
     @Transactional
     override fun createEvent(familyId: Int, event: FamilyEvent): Int {
@@ -89,8 +87,8 @@ open class FamilyServiceImpl(
             .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
         family.addEvent(event)
 
-        val saved = familyRepository.save(family)
-        return saved.id!!
+        familyRepository.save(family)
+        return event.id!!
     }
 
     @Transactional
@@ -101,9 +99,7 @@ open class FamilyServiceImpl(
         familyRepository.save(family)
     }
 
-    override fun findEvents(familyId: Int): Collection<FamilyEvent> {
-        return familyRepository.findEvents(familyId)
-    }
+    override fun findEvents(familyId: Int): Collection<FamilyEvent> = familyRepository.findEvents(familyId)
 
     @Transactional
     override fun createChild(familyId: Int, child: Person): Int {
