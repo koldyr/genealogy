@@ -1,7 +1,6 @@
 package com.koldyr.genealogy.services
 
 import com.koldyr.genealogy.dto.FamilyDTO
-import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.FamilyEvent
 import com.koldyr.genealogy.model.Person
 
@@ -13,7 +12,7 @@ interface FamilyService {
     fun findAll(): List<FamilyDTO>
     fun create(family: FamilyDTO): Int
     fun findById(familyId: Int): FamilyDTO
-    fun update(familyId: Int, family: Family)
+    fun update(familyId: Int, family: FamilyDTO)
     fun delete(familyId: Int)
 
     fun createEvent(familyId: Int, event: FamilyEvent): Int

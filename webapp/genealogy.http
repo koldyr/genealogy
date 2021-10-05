@@ -57,8 +57,12 @@ Accept: application/json
 GET http://localhost:8080/api/genealogy/person/1/event
 Accept: application/json
 
-### Get Family
+### Get Families
 GET http://localhost:8080/api/genealogy/family
+Accept: application/json
+
+### Get Family
+GET http://localhost:8080/api/genealogy/family/1
 Accept: application/json
 
 ### Create Family

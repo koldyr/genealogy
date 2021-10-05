@@ -6,12 +6,15 @@ import com.koldyr.genealogy.handlers.ChildrenSerializer
 import com.koldyr.genealogy.handlers.EventTypeDeserializer
 import com.koldyr.genealogy.handlers.PersonIdDeserializer
 import com.koldyr.genealogy.handlers.PersonIdSerializer
-import javax.persistence.CascadeType.*
+import javax.persistence.CascadeType.ALL
+import javax.persistence.CascadeType.MERGE
+import javax.persistence.CascadeType.PERSIST
+import javax.persistence.CascadeType.REFRESH
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType.*
+import javax.persistence.FetchType.EAGER
 import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType.*
+import javax.persistence.GenerationType.SEQUENCE
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.OneToMany
@@ -45,7 +48,7 @@ class Family() {
     @JsonDeserialize(using = PersonIdDeserializer::class)
     var wife: Person? = null
 
-    @OneToMany
+    @OneToMany(targetEntity = Person::class, cascade = [PERSIST, MERGE, REFRESH])
     @JsonSerialize(using = ChildrenSerializer::class)
     @JsonDeserialize(using = EventTypeDeserializer::class)
     val children: MutableSet<Person> = mutableSetOf()

@@ -1,15 +1,16 @@
 package com.koldyr.genealogy.services
 
+import java.util.stream.Collectors.toList
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.FamilyEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonRepository
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.util.stream.Collectors.*
 
 /**
  * Description of class FamilyServiceImpl
@@ -62,18 +63,27 @@ open class FamilyServiceImpl(
     }
 
     @Transactional
-    override fun update(familyId: Int, family: Family) {
+    override fun update(familyId: Int, family: FamilyDTO) {
         val persisted: Family = familyRepository.findById(familyId)
             .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
 
-        persisted.husband = family.husband
-        persisted.wife = family.wife
+        if (family.husband != null) {
+            persisted.husband = personRepository.findById(family.husband!!).orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '${family.husband}' is not found") }
+        }
+        if (family.wife != null) {
+            persisted.wife = personRepository.findById(family.wife!!).orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '${family.wife}' is not found") }
+        }
 
-        persisted.children.clear()
-        persisted.children.addAll(family.children)
+        if (family.children != null) {
+            persisted.children.clear()
+            family.children!!.forEach {
+                val child = personRepository.findById(it).orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '${it}' is not found") }
+                persisted.children.add(child)
+            }
+        }
 
         persisted.events.clear()
-        persisted.events.addAll(family.events)
+//        persisted.events.addAll(family.events)
 
         familyRepository.save(persisted);
     }
