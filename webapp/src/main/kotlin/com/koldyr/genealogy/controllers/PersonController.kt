@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.RestController
 import java.net.URI
 
 /**
- * Description of class GenealogyController
+ * Description of class PersonController
  * @created: 2021-09-25
  */
 @RestController
-@RequestMapping("/api/genealogy/person/")
+@RequestMapping("/api/genealogy/person")
 class PersonController(private val personService: PersonService) {
 
     @GetMapping
@@ -34,20 +34,20 @@ class PersonController(private val personService: PersonService) {
         return created(uri).build()
     }
 
-    @PutMapping("{personId}")
+    @PutMapping("/{personId}")
     fun update(@PathVariable personId: Int, @RequestBody person: Person) = personService.update(personId, person)
 
-    @GetMapping("{personId}")
+    @GetMapping("/{personId}")
     fun personById(@PathVariable personId: Int): Person = personService.findById(personId)
     
-    @DeleteMapping("{personId}")
+    @DeleteMapping("/{personId}")
     fun delete(@PathVariable personId: Int): ResponseEntity<Unit> {
         personService.delete(personId)
         
         return noContent().build()
     }
 
-    @PostMapping("{personId}/event")
+    @PostMapping("/{personId}/event")
     fun createEvent(@PathVariable personId: Int, @RequestBody event: PersonEvent): ResponseEntity<Unit> {
         val eventId = personService.createEvent(personId, event)
 
@@ -55,16 +55,16 @@ class PersonController(private val personService: PersonService) {
         return created(uri).build()
     }
 
-    @GetMapping("{personId}/event/{eventId}")
+    @GetMapping("/{personId}/event/{eventId}")
     fun personEvent(@PathVariable personId: Int, @PathVariable eventId: Int): PersonEvent {
         val person = personService.findById(personId)
         return person.events.first { event -> event.id === eventId }
     }
 
-    @GetMapping("{personId}/event")
+    @GetMapping("/{personId}/event")
     fun events(@PathVariable personId: Int): Collection<PersonEvent> = personService.findEvents(personId)
 
-    @DeleteMapping("person/{personId}/event/{eventId}")
+    @DeleteMapping("/{personId}/event/{eventId}")
     fun deleteEvent(@PathVariable personId: Int, @PathVariable eventId: Int): ResponseEntity<Unit> {
         personService.deleteEvent(personId, eventId)
         

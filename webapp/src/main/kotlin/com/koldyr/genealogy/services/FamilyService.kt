@@ -21,6 +21,7 @@ interface FamilyService {
     fun findEvents(familyId: Int): Collection<FamilyEvent>
 
     fun createChild(familyId: Int, child: Person): Int
+    fun addChild(familyId: Int, childId: Int)
     fun findChildren(familyId: Int): Collection<Person>
     fun deleteChild(familyId: Int, childId: Int)
 }

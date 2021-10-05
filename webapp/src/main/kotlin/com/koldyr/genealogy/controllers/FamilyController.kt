@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.*
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -25,10 +26,10 @@ import java.net.URI
 @RequestMapping("/api/genealogy/family")
 class FamilyController(private val familyService: FamilyService) {
 
-    @GetMapping("/")
+    @GetMapping
     fun families(): Collection<FamilyDTO> = familyService.findAll()
 
-    @PostMapping("/")
+    @PostMapping
     fun create(@RequestBody family: FamilyDTO): ResponseEntity<Unit> {
         val familyId = familyService.create(family)
         
@@ -68,8 +69,16 @@ class FamilyController(private val familyService: FamilyService) {
     }
 
     @PostMapping("/{familyId}/children")
-    fun addChild(@PathVariable familyId: Int, @RequestBody child: Person): ResponseEntity<Unit> {
+    fun createChild(@PathVariable familyId: Int, @RequestBody child: Person): ResponseEntity<Unit> {
         val childId = familyService.createChild(familyId, child)
+
+        val uri = URI.create("/api/genealogy/person/$childId")
+        return created(uri).build()
+    }
+
+    @PatchMapping("/{familyId}/children/{childId}")
+    fun addChild(@PathVariable familyId: Int, @PathVariable childId: Int): ResponseEntity<Unit> {
+        familyService.addChild(familyId, childId)
 
         val uri = URI.create("/api/genealogy/person/$childId")
         return created(uri).build()

@@ -113,6 +113,22 @@ open class FamilyServiceImpl(
         return saved.id!!
     }
 
+    @Transactional
+    override fun addChild(familyId: Int, childId: Int) {
+        val family = familyRepository.findById(familyId)
+                .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
+
+        val child = personRepository.findById(childId)
+                .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$childId' is not found") }
+
+        if (family.children.contains(child)) {
+            throw ResponseStatusException(INTERNAL_SERVER_ERROR, "Child with id '$childId' already in family '$familyId'")
+        }
+        family.children.add(child)
+
+        familyRepository.save(family)
+    }
+
     override fun findChildren(familyId: Int): Collection<Person> {
         val family = familyRepository.findById(familyId)
             .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
