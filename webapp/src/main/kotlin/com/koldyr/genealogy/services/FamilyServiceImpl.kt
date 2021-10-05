@@ -69,9 +69,11 @@ open class FamilyServiceImpl(
 
         if (family.husband != null) {
             persisted.husband = personRepository.findById(family.husband!!).orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '${family.husband}' is not found") }
+            persisted.husband!!.familyId = persisted.id
         }
         if (family.wife != null) {
             persisted.wife = personRepository.findById(family.wife!!).orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '${family.wife}' is not found") }
+            persisted.wife!!.familyId = persisted.id
         }
 
         if (family.children != null) {
