@@ -10,14 +10,14 @@
         <version>2.0-SNAPSHOT</version>
     </parent>
 
-    <artifactId>desktop</artifactId>
+    <artifactId>genealogy-desktop</artifactId>
     <packaging>jar</packaging>
     <name>Genealogy Desktop</name>
 
     <dependencies>
         <dependency>
             <groupId>com.koldyr.genealogy</groupId>
-            <artifactId>model</artifactId>
+            <artifactId>genealogy-model</artifactId>
             <version>2.0-SNAPSHOT</version>
         </dependency>
     </dependencies>

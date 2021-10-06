@@ -9,7 +9,7 @@
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>model</artifactId>
+    <artifactId>genealogy-model</artifactId>
     <packaging>jar</packaging>
 
     <name>Genealogy Model</name>
@@ -19,7 +19,6 @@
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
             <version>2.2.3</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>
