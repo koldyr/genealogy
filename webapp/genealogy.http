@@ -1,0 +1,116 @@
+GET http://localhost:8080/api/genealogy/person
+
+###
+GET http://localhost:8080/api/genealogy/person/6
+Accept: application/json
+
+### Create Person
+POST http://localhost:8080/api/genealogy/person
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": {
+    "first": "p5_name",
+    "middle": "p5_middle",
+    "last": "p5_last"
+  },
+  "gender": "MALE",
+  "place": "p5_place",
+  "occupation": "p5_occup",
+  "note": "p5_note"
+}
+
+### Update PErson
+PUT http://localhost:8080/api/genealogy/person/4
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": {
+    "first": "p5_name",
+    "middle": "p5_middle",
+    "last": "p5_last"
+  },
+  "gender": "FEMALE",
+  "place": "p5_place",
+  "occupation": "p5_occup",
+  "note": "p5_note"
+}
+
+### Delete Person
+DELETE http://localhost:8080/api/genealogy/person/1
+
+### Create Person Event
+POST http://localhost:8080/api/genealogy/person/2/event
+Content-Type: application/json
+Accept: application/json
+
+{
+  "type": "OCCU",
+  "date": "2021-09-22",
+  "place": "Minsk, Belarus",
+  "note": "Test event2"
+}
+
+### Get Person Event
+GET http://localhost:8080/api/genealogy/person/1/event
+Accept: application/json
+
+### Get Families
+GET http://localhost:8080/api/genealogy/family
+Accept: application/json
+
+### Get Family
+GET http://localhost:8080/api/genealogy/family/1
+Accept: application/json
+
+### Create Family
+POST http://localhost:8080/api/genealogy/family
+Content-Type: application/json
+Accept: application/json
+
+{
+  "husband": 1,
+  "wife": 2
+}
+
+### Update Family
+POST http://localhost:8080/api/genealogy/family/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "husband": 1,
+  "wife": 2
+}
+
+### Delete Family
+POST http://localhost:8080/api/genealogy/family/1
+
+### Create Child in Family
+POST http://localhost:8080/api/genealogy/family/1/children
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": {
+    "first": "p5_name",
+    "middle": "p5_middle",
+    "last": "p5_last"
+  },
+  "gender": "FEMALE",
+  "place": "p5_place",
+  "occupation": "p5_occup",
+  "note": "p5_note"
+}
+
+### Add Child to Family
+PATCH http://localhost:8080/api/genealogy/family/1/children/5
+Accept: application/json
+
+###
+GET http://localhost:8080/api/genealogy/family/1/children
+Accept: application/json
+
+
