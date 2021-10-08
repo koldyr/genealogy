@@ -3,6 +3,7 @@ package com.koldyr.genealogy.services
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.persistence.PersonRepository
+import ma.glasnost.orika.MapperFacade
 import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
@@ -12,8 +13,8 @@ import org.springframework.web.server.ResponseStatusException
  * @created: 2021-09-28
  */
 open class PersonServiceImpl(
-    private val personRepository: PersonRepository
-) : PersonService {
+        private val personRepository: PersonRepository,
+        private val mapper: MapperFacade) : PersonService {
 
     override fun findAll(): List<Person> = personRepository.findAll()
     
@@ -24,20 +25,15 @@ open class PersonServiceImpl(
     }
 
     override fun findById(personId: Int): Person {
-        return personRepository.findById(personId)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$personId' is not found") }
+        return find(personId)
     }
 
     @Transactional
     override fun update(personId: Int, person: Person) {
-        val persisted: Person = personRepository.findById(personId)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$personId' is not found") }
+        val persisted = find(personId)
 
-        persisted.name = person.name
-        persisted.note = person.note
-        persisted.occupation = person.occupation
-        persisted.place = person.place
-        persisted.gender = person.gender
+        person.id = persisted.id
+        mapper.map(person, persisted)
 
         personRepository.save(persisted);
     }
@@ -47,8 +43,7 @@ open class PersonServiceImpl(
 
     @Transactional
     override fun createEvent(personId: Int, event: PersonEvent): Int {
-        val person: Person = personRepository.findById(personId)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$personId' is not found") }
+        val person = find(personId)
         person.addEvent(event)
 
         personRepository.save(person)
@@ -59,9 +54,13 @@ open class PersonServiceImpl(
 
     @Transactional
     override fun deleteEvent(personId: Int, eventId: Int) {
-        val person = personRepository.findById(personId)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$personId' is not found") }
+        val person = find(personId)
         person.removeEvent(eventId)
         personRepository.save(person)
+    }
+
+    private fun find(personId: Int): Person {
+        return personRepository.findById(personId)
+                .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$personId' is not found") }
     }
 }

@@ -20,7 +20,7 @@ import java.net.URI
  * @created: 2021-09-25
  */
 @RestController
-@RequestMapping("/api/genealogy/person")
+@RequestMapping("/api/genealogy/persons")
 class PersonController(private val personService: PersonService) {
 
     @GetMapping
@@ -30,7 +30,7 @@ class PersonController(private val personService: PersonService) {
     fun create(@RequestBody person: Person): ResponseEntity<String> {
         val personId: Int = personService.create(person)
         
-        val uri = URI.create("/api/genealogy/person/$personId")
+        val uri = URI.create("/api/genealogy/persons/$personId")
         return created(uri).build()
     }
 
@@ -47,24 +47,18 @@ class PersonController(private val personService: PersonService) {
         return noContent().build()
     }
 
-    @PostMapping("/{personId}/event")
+    @PostMapping("/{personId}/events")
     fun createEvent(@PathVariable personId: Int, @RequestBody event: PersonEvent): ResponseEntity<Unit> {
         val eventId = personService.createEvent(personId, event)
 
-        val uri = URI.create("/api/genealogy/person/$personId/event/$eventId")
+        val uri = URI.create("/api/genealogy/persons/$personId/events/$eventId")
         return created(uri).build()
     }
-
-    @GetMapping("/{personId}/event/{eventId}")
-    fun personEvent(@PathVariable personId: Int, @PathVariable eventId: Int): PersonEvent {
-        val person = personService.findById(personId)
-        return person.events.first { event -> event.id === eventId }
-    }
-
-    @GetMapping("/{personId}/event")
+    
+    @GetMapping("/{personId}/events")
     fun events(@PathVariable personId: Int): Collection<PersonEvent> = personService.findEvents(personId)
 
-    @DeleteMapping("/{personId}/event/{eventId}")
+    @DeleteMapping("/{personId}/events/{eventId}")
     fun deleteEvent(@PathVariable personId: Int, @PathVariable eventId: Int): ResponseEntity<Unit> {
         personService.deleteEvent(personId, eventId)
         
