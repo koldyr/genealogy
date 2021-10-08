@@ -1,7 +1,7 @@
 GET http://localhost:8080/api/genealogy/persons
 
 ###
-GET http://localhost:8080/api/genealogy/persons/4
+GET http://localhost:8080/api/genealogy/persons/1
 Accept: application/json
 
 ### Create Person
@@ -47,10 +47,10 @@ Content-Type: application/json
 Accept: application/json
 
 {
-  "type": "BIRT",
-  "date": "2000-09-22",
-  "place": "Minsk, Belarus",
-  "note": "p1 BIRT"
+  "type": "EDUC",
+  "date": "1982-09-22",
+  "place": "Baranovichi, Belarus",
+  "note": "p1 EDUC"
 }
 
 ### Get Person Events
@@ -58,5 +58,5 @@ GET http://localhost:8080/api/genealogy/persons/1/events
 Accept: application/json
 
 ### Delete Person Event
-DELETE http://localhost:8080/api/genealogy/persons/1/events/1
+DELETE http://localhost:8080/api/genealogy/persons/1/events/10
 Accept: application/json

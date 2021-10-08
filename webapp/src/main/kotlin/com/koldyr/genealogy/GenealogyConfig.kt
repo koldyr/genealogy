@@ -14,7 +14,6 @@ import com.koldyr.genealogy.services.FamilyServiceImpl
 import com.koldyr.genealogy.services.PersonService
 import com.koldyr.genealogy.services.PersonServiceImpl
 import ma.glasnost.orika.MapperFacade
-import ma.glasnost.orika.MapperFactory
 import ma.glasnost.orika.impl.DefaultMapperFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
@@ -51,7 +50,7 @@ open class GenealogyConfig {
 
     @Bean
     open fun mapper(): MapperFacade {
-        val mapperFactory: MapperFactory = DefaultMapperFactory.Builder().build()
+        val mapperFactory = DefaultMapperFactory.Builder().build()
 
         mapperFactory.classMap(Family::class.java, FamilyDTO::class.java)
                 .byDefault()

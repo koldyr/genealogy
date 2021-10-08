@@ -50,20 +50,24 @@ Accept: application/json
 PATCH http://localhost:8080/api/genealogy/families/1/children/5
 Accept: application/json
 
+### Delete Child from Family
+DELETE http://localhost:8080/api/genealogy/families/1/children/5
+Accept: application/json
+
 ###
 GET http://localhost:8080/api/genealogy/families/1/children
 Accept: application/json
 
 ### Create Family Event
-POST http://localhost:8080/api/genealogy/families/2/events
+POST http://localhost:8080/api/genealogy/families/1/events
 Content-Type: application/json
 Accept: application/json
 
 {
-  "type": "OCCU",
-  "date": "2021-09-22",
+  "type": "ENGA",
+  "date": "2000-08-22",
   "place": "Minsk, Belarus",
-  "note": "Test event2"
+  "note": "f1 Engagement event"
 }
 
 ### Get Family Events
@@ -71,6 +75,6 @@ GET http://localhost:8080/api/genealogy/families/1/events
 Accept: application/json
 
 ### Delete Family Event
-DELETE http://localhost:8080/api/genealogy/families/1/events/1
+DELETE http://localhost:8080/api/genealogy/families/1/events/6
 Accept: application/json
 
