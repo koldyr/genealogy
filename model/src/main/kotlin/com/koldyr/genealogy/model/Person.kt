@@ -45,7 +45,7 @@ class Person() : Cloneable {
     ])
     var name: PersonNames? = null
 
-    @OneToMany(mappedBy = "person",cascade = [ALL], fetch = EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "person", cascade = [ALL], fetch = EAGER, orphanRemoval = true)
     var events: MutableSet<PersonEvent> = mutableSetOf()
 
     var place: String? = null

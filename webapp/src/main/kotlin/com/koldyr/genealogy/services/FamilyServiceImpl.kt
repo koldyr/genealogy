@@ -1,12 +1,13 @@
 package com.koldyr.genealogy.services
 
-import java.util.stream.Collectors.toList
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.FamilyEvent
 import com.koldyr.genealogy.model.Person
+import com.koldyr.genealogy.persistence.FamilyEventRepository
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonRepository
+import ma.glasnost.orika.MapperFacade
 import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.transaction.annotation.Transactional
@@ -18,13 +19,13 @@ import org.springframework.web.server.ResponseStatusException
  */
 open class FamilyServiceImpl(
     private val familyRepository: FamilyRepository,
-    private val personRepository: PersonRepository
+    private val personRepository: PersonRepository,
+    private val familyEventRepository: FamilyEventRepository,
+    private val mapper: MapperFacade
 ) : FamilyService {
 
     override fun findAll(): List<FamilyDTO> {
-        return familyRepository.findAll().stream()
-            .map(this::mapFamily)
-            .collect(toList())
+        return familyRepository.findAll().map(this::mapFamily)
     }
 
     @Transactional
@@ -64,28 +65,10 @@ open class FamilyServiceImpl(
 
     @Transactional
     override fun update(familyId: Int, family: FamilyDTO) {
-        val persisted: Family = familyRepository.findById(familyId)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
+        val persisted = find(familyId)
 
-        if (family.husband != null) {
-            persisted.husband = personRepository.findById(family.husband!!).orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '${family.husband}' is not found") }
-            persisted.husband!!.familyId = persisted.id
-        }
-        if (family.wife != null) {
-            persisted.wife = personRepository.findById(family.wife!!).orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '${family.wife}' is not found") }
-            persisted.wife!!.familyId = persisted.id
-        }
-
-        if (family.children != null) {
-            persisted.children.clear()
-            family.children!!.forEach {
-                val child = personRepository.findById(it).orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '${it}' is not found") }
-                persisted.children.add(child)
-            }
-        }
-
-        persisted.events.clear()
-//        persisted.events.addAll(family.events)
+        family.id = persisted.id
+        mapper.map(family, persisted)
 
         familyRepository.save(persisted);
     }
@@ -95,28 +78,32 @@ open class FamilyServiceImpl(
 
     @Transactional
     override fun createEvent(familyId: Int, event: FamilyEvent): Int {
-        val family: Family = familyRepository.findById(familyId)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
+        val family = find(familyId)
+        
+        event.id = null
         family.addEvent(event)
 
+        familyEventRepository.save(event)
         familyRepository.save(family)
+
         return event.id!!
     }
 
     @Transactional
     override fun deleteEvent(familyId: Int, eventId: Int) {
-        val family = familyRepository.findById(familyId)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
+        val family = find(familyId)
+
         family.removeEvent(eventId)
         familyRepository.save(family)
+
+        familyEventRepository.deleteById(eventId)
     }
 
     override fun findEvents(familyId: Int): Collection<FamilyEvent> = familyRepository.findEvents(familyId)
 
     @Transactional
     override fun createChild(familyId: Int, child: Person): Int {
-        val family = familyRepository.findById(familyId)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
+        val family = find(familyId)
 
         val saved = personRepository.save(child)
         family.children.add(saved)
@@ -127,8 +114,7 @@ open class FamilyServiceImpl(
 
     @Transactional
     override fun addChild(familyId: Int, childId: Int) {
-        val family = familyRepository.findById(familyId)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
+        val family = find(familyId)
 
         val child = personRepository.findById(childId)
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$childId' is not found") }
@@ -141,32 +127,20 @@ open class FamilyServiceImpl(
         familyRepository.save(family)
     }
 
-    override fun findChildren(familyId: Int): Collection<Person> {
-        val family = familyRepository.findById(familyId)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
-        return family.children
-    }
+    override fun findChildren(familyId: Int): Collection<Person> = find(familyId).children
 
     @Transactional
     override fun deleteChild(familyId: Int, childId: Int) {
-        val family = familyRepository.findById(familyId)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
+        val family = find(familyId)
         family.children.removeIf { it.id == childId }
 
         familyRepository.save(family)
     }
 
+    private fun find(familyId: Int): Family = familyRepository.findById(familyId)
+            .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
+
     private fun mapFamily(entity: Family): FamilyDTO {
-        val dto = FamilyDTO(entity.id!!)
-        dto.husband = entity.husband?.id
-        dto.wife = entity.wife?.id
-
-        val children: MutableList<Int> = entity.children.stream().map(Person::id).collect(toList())
-        dto.children = children.toList()
-
-        val events: MutableList<Int> = entity.events.stream().map(FamilyEvent::id).collect(toList())
-        dto.events = events.toList()
-
-        return dto
+        return mapper.map(entity, FamilyDTO::class.java)
     }
 }

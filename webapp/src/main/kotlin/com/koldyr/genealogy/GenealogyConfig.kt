@@ -1,0 +1,69 @@
+package com.koldyr.genealogy
+
+import com.koldyr.genealogy.dto.FamilyDTO
+import com.koldyr.genealogy.mapper.FamilyEventConverter
+import com.koldyr.genealogy.mapper.PersonConverter
+import com.koldyr.genealogy.model.Family
+import com.koldyr.genealogy.model.Person
+import com.koldyr.genealogy.persistence.FamilyEventRepository
+import com.koldyr.genealogy.persistence.FamilyRepository
+import com.koldyr.genealogy.persistence.PersonEventRepository
+import com.koldyr.genealogy.persistence.PersonRepository
+import com.koldyr.genealogy.services.FamilyService
+import com.koldyr.genealogy.services.FamilyServiceImpl
+import com.koldyr.genealogy.services.PersonService
+import com.koldyr.genealogy.services.PersonServiceImpl
+import ma.glasnost.orika.MapperFacade
+import ma.glasnost.orika.impl.DefaultMapperFactory
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+
+/**
+ * Description of class GenealogyConfig
+ * @created: 2021-09-28
+ */
+@Configuration
+open class GenealogyConfig {
+
+    @Autowired
+    lateinit var personRepository: PersonRepository
+
+    @Autowired
+    lateinit var familyRepository: FamilyRepository
+
+    @Autowired
+    lateinit var familyEventRepository: FamilyEventRepository
+
+    @Autowired
+    lateinit var personEventRepository: PersonEventRepository
+
+    @Bean
+    open fun personService(mapper: MapperFacade): PersonService {
+        return PersonServiceImpl(personRepository, personEventRepository, mapper)
+    }
+
+    @Bean
+    open fun familyService(mapper: MapperFacade): FamilyService {
+        return FamilyServiceImpl(familyRepository, personRepository, familyEventRepository, mapper)
+    }
+
+    @Bean
+    open fun mapper(): MapperFacade {
+        val mapperFactory = DefaultMapperFactory.Builder().build()
+
+        mapperFactory.classMap(Family::class.java, FamilyDTO::class.java)
+                .byDefault()
+                .register()
+        mapperFactory.classMap(Person::class.java, Person::class.java)
+                .exclude("events")
+                .byDefault()
+                .register()
+
+        val converterFactory = mapperFactory.converterFactory
+        converterFactory.registerConverter(PersonConverter(personRepository))
+        converterFactory.registerConverter(FamilyEventConverter(familyEventRepository))
+
+        return mapperFactory.mapperFacade
+    }
+}
