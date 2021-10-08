@@ -4,10 +4,12 @@ import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.FamilyEvent
 import com.koldyr.genealogy.model.Person
+import com.koldyr.genealogy.persistence.FamilyEventRepository
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import ma.glasnost.orika.MapperFacade
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 
@@ -16,9 +18,11 @@ import org.springframework.web.server.ResponseStatusException
  * @created: 2021-09-28
  */
 open class FamilyServiceImpl(
-        private val familyRepository: FamilyRepository,
-        private val personRepository: PersonRepository,
-        private val mapper: MapperFacade) : FamilyService {
+    private val familyRepository: FamilyRepository,
+    private val personRepository: PersonRepository,
+    private val familyEventRepository: FamilyEventRepository,
+    private val mapper: MapperFacade
+) : FamilyService {
 
     override fun findAll(): List<FamilyDTO> {
         return familyRepository.findAll().map(this::mapFamily)
@@ -75,17 +79,24 @@ open class FamilyServiceImpl(
     @Transactional
     override fun createEvent(familyId: Int, event: FamilyEvent): Int {
         val family = find(familyId)
+        
+        event.id = null
         family.addEvent(event)
 
+        familyEventRepository.save(event)
         familyRepository.save(family)
+
         return event.id!!
     }
 
     @Transactional
     override fun deleteEvent(familyId: Int, eventId: Int) {
         val family = find(familyId)
+
         family.removeEvent(eventId)
         familyRepository.save(family)
+
+        familyEventRepository.deleteById(eventId)
     }
 
     override fun findEvents(familyId: Int): Collection<FamilyEvent> = familyRepository.findEvents(familyId)

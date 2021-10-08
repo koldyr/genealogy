@@ -7,6 +7,7 @@ import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.persistence.FamilyEventRepository
 import com.koldyr.genealogy.persistence.FamilyRepository
+import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import com.koldyr.genealogy.services.FamilyService
 import com.koldyr.genealogy.services.FamilyServiceImpl
@@ -35,14 +36,17 @@ open class GenealogyConfig {
     @Autowired
     lateinit var familyEventRepository: FamilyEventRepository
 
+    @Autowired
+    lateinit var personEventRepository: PersonEventRepository
+
     @Bean
     open fun personService(mapper: MapperFacade): PersonService {
-        return PersonServiceImpl(personRepository, mapper)
+        return PersonServiceImpl(personRepository, personEventRepository, mapper)
     }
 
     @Bean
     open fun familyService(mapper: MapperFacade): FamilyService {
-        return FamilyServiceImpl(familyRepository, personRepository, mapper)
+        return FamilyServiceImpl(familyRepository, personRepository, familyEventRepository, mapper)
     }
 
     @Bean

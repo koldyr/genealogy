@@ -2,9 +2,10 @@ package com.koldyr.genealogy.services
 
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
+import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import ma.glasnost.orika.MapperFacade
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 
@@ -13,11 +14,12 @@ import org.springframework.web.server.ResponseStatusException
  * @created: 2021-09-28
  */
 open class PersonServiceImpl(
-        private val personRepository: PersonRepository,
-        private val mapper: MapperFacade) : PersonService {
+    private val personRepository: PersonRepository,
+    private val personEventRepository: PersonEventRepository,
+    private val mapper: MapperFacade) : PersonService {
 
     override fun findAll(): List<Person> = personRepository.findAll()
-    
+
     @Transactional
     override fun create(person: Person): Int {
         val saved = personRepository.save(person)
@@ -43,10 +45,14 @@ open class PersonServiceImpl(
 
     @Transactional
     override fun createEvent(personId: Int, event: PersonEvent): Int {
+        event.id = null
+
         val person = find(personId)
         person.addEvent(event)
 
+        personEventRepository.save(event)
         personRepository.save(person)
+        
         return event.id!!
     }
 
@@ -56,6 +62,8 @@ open class PersonServiceImpl(
     override fun deleteEvent(personId: Int, eventId: Int) {
         val person = find(personId)
         person.removeEvent(eventId)
+
+        personEventRepository.deleteById(eventId)
         personRepository.save(person)
     }
 
