@@ -1,5 +1,7 @@
 package com.koldyr.genealogy.model
 
+import java.time.LocalDate
+import java.util.function.Predicate
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
@@ -7,15 +9,13 @@ import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateSerializer
 import com.koldyr.genealogy.handlers.EventTypeDeserializer
 import com.koldyr.genealogy.handlers.EventTypeSerializer
 import com.koldyr.genealogy.model.converter.EventTypeConverter
-import java.time.LocalDate
-import java.util.function.Predicate
 import javax.persistence.Basic
 import javax.persistence.Column
 import javax.persistence.Convert
-import javax.persistence.EnumType.*
+import javax.persistence.EnumType.STRING
 import javax.persistence.Enumerated
 import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType.*
+import javax.persistence.GenerationType.SEQUENCE
 import javax.persistence.Id
 import javax.persistence.MappedSuperclass
 import javax.persistence.SequenceGenerator
@@ -94,4 +94,32 @@ open class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
         event.note = this.note
         return event
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as LifeEvent
+
+        if (id != other.id) return false
+        if (type != other.type) return false
+        if (prefix != other.prefix) return false
+        if (date != other.date) return false
+        if (place != other.place) return false
+        if (note != other.note) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = id ?: 0
+        result = 31 * result + type.hashCode()
+        result = 31 * result + (prefix?.hashCode() ?: 0)
+        result = 31 * result + (date?.hashCode() ?: 0)
+        result = 31 * result + (place?.hashCode() ?: 0)
+        result = 31 * result + (note?.hashCode() ?: 0)
+        return result
+    }
+
+
 }

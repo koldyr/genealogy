@@ -15,6 +15,6 @@ class EventTypeSerializer : StdSerializer<EventType>(EventType::class.java) {
         if (value == null) {
             gen.writeNull()
         }
-        gen.writeNumber(value?.getCode()!!)
+        gen.writeString(value?.getCode()!!)
     }
 }

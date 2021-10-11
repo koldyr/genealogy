@@ -32,4 +32,26 @@ class PersonNames(): Cloneable {
     public override fun clone(): PersonNames {
         return super.clone() as PersonNames
     }
+
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as PersonNames
+
+        if (first != other.first) return false
+        if (middle != other.middle) return false
+        if (last != other.last) return false
+        if (maiden != other.maiden) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = first?.hashCode() ?: 0
+        result = 31 * result + (middle?.hashCode() ?: 0)
+        result = 31 * result + (last?.hashCode() ?: 0)
+        result = 31 * result + (maiden?.hashCode() ?: 0)
+        return result
+    }
 }
