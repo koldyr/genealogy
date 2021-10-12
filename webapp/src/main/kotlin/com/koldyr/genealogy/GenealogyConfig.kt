@@ -21,6 +21,12 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import springfox.documentation.builders.PathSelectors
+import springfox.documentation.builders.RequestHandlerSelectors
+import springfox.documentation.service.ApiInfo
+import springfox.documentation.service.VendorExtension
+import springfox.documentation.spi.DocumentationType.*
+import springfox.documentation.spring.web.plugins.Docket
 
 
 /**
@@ -80,5 +86,24 @@ open class GenealogyConfig {
                         .allowedMethods(HttpMethod.GET.name, HttpMethod.HEAD.name, HttpMethod.POST.name, HttpMethod.PUT.name, HttpMethod.DELETE.name)
             }
         }
+    }
+    
+    @Bean
+    open fun api(): Docket {
+        return Docket(SWAGGER_2)
+                .apiInfo(apiInfo())
+                .select()
+                .apis(RequestHandlerSelectors.any())
+                .paths(PathSelectors.any())
+                .build()
+    }
+
+    private fun apiInfo(): ApiInfo {
+        val title = "Genealogy"
+        val description = "RESTfull back end for Genealogy SPA"
+        val vendorExtensions: List<VendorExtension<*>> = mutableListOf()
+        val termsOfServiceUrl = "http://koldyr.com/genealogy/tos"
+        val licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
+        return ApiInfo(title, description, "2.0", termsOfServiceUrl, null, "Apache 2.0", licenseUrl, vendorExtensions)
     }
 }
