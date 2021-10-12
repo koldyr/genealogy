@@ -8,10 +8,10 @@ import com.koldyr.genealogy.persistence.FamilyEventRepository
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import ma.glasnost.orika.MapperFacade
-import org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR
-import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
+import java.util.Objects.*
 
 /**
  * Description of class FamilyServiceImpl
@@ -30,30 +30,26 @@ open class FamilyServiceImpl(
 
     @Transactional
     override fun create(family: FamilyDTO): Int {
-        val newFamily = Family()
+        val newFamily = mapper.map(family, Family::class.java)
 
-        if (family.husband != null) {
-            val husband = personRepository.findById(family.husband!!)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '${family.husband}' is not found") }
-            newFamily.husband = husband
+        if (nonNull(newFamily.husband) && nonNull(newFamily.husband?.familyId)) {
+            throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.husband}' already in family ${newFamily.husband?.familyId}")
         }
-
-        if (family.wife != null) {
-            val wife = personRepository.findById(family.wife!!)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '${family.wife}' is not found") }
-            newFamily.wife = wife
-        }
-
-        if (family.children != null && family.children!!.size > 0) {
-            family.children!!.stream()
-                .map {
-                    personRepository.findById(it)
-                        .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '${it}' is not found") }
-                }
-                .forEach { newFamily.children.add(it) }
+        if (nonNull(newFamily.wife) && nonNull(newFamily.wife?.familyId)) {
+            throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' already in family ${newFamily.wife?.familyId}")
         }
 
         val saved = familyRepository.save(newFamily)
+
+        if (nonNull(newFamily.husband)) {
+            newFamily.husband?.familyId = saved.id
+            personRepository.save(newFamily.husband!!)
+        }
+        if (nonNull(newFamily.wife)) {
+            newFamily.wife?.familyId = saved.id
+            personRepository.save(newFamily.wife!!)
+        }
+
         return saved.id!!
     }
 

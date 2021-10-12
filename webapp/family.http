@@ -1,13 +1,13 @@
 ### Get Families
-GET http://localhost:8080/api/genealogy/families
+GET http://localhost/api/genealogy/families
 Accept: application/json
 
 ### Get Family
-GET http://localhost:8080/api/genealogy/families/1
+GET http://localhost/api/genealogy/families/1
 Accept: application/json
 
 ### Create Family
-POST http://localhost:8080/api/genealogy/families
+POST http://localhost/api/genealogy/families
 Content-Type: application/json
 Accept: application/json
 
@@ -17,7 +17,7 @@ Accept: application/json
 }
 
 ### Update Family
-POST http://localhost:8080/api/genealogy/families/1
+POST http://localhost/api/genealogy/families/1
 Content-Type: application/json
 Accept: application/json
 
@@ -27,10 +27,10 @@ Accept: application/json
 }
 
 ### Delete Family
-POST http://localhost:8080/api/genealogy/families/1
+POST http://localhost/api/genealogy/families/1
 
 ### Create Child in Family
-POST http://localhost:8080/api/genealogy/families/1/children
+POST http://localhost/api/genealogy/families/1/children
 Content-Type: application/json
 Accept: application/json
 
@@ -47,19 +47,19 @@ Accept: application/json
 }
 
 ### Add Child to Family
-PATCH http://localhost:8080/api/genealogy/families/1/children/5
+PATCH http://localhost/api/genealogy/families/1/children/5
 Accept: application/json
 
 ### Delete Child from Family
-DELETE http://localhost:8080/api/genealogy/families/1/children/5
+DELETE http://localhost/api/genealogy/families/1/children/5
 Accept: application/json
 
 ###
-GET http://localhost:8080/api/genealogy/families/1/children
+GET http://localhost/api/genealogy/families/1/children
 Accept: application/json
 
 ### Create Family Event
-POST http://localhost:8080/api/genealogy/families/1/events
+POST http://localhost/api/genealogy/families/1/events
 Content-Type: application/json
 Accept: application/json
 
@@ -71,10 +71,10 @@ Accept: application/json
 }
 
 ### Get Family Events
-GET http://localhost:8080/api/genealogy/families/1/events
+GET http://localhost/api/genealogy/families/1/events
 Accept: application/json
 
 ### Delete Family Event
-DELETE http://localhost:8080/api/genealogy/families/1/events/6
+DELETE http://localhost/api/genealogy/families/1/events/6
 Accept: application/json
 

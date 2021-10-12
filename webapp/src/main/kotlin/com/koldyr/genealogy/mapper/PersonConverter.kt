@@ -19,7 +19,7 @@ class PersonConverter(private val personRepository: PersonRepository) : Bidirect
             return null
         }
         return personRepository.findById(personId)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$personId' is not found") }
+                .orElseThrow { ResponseStatusException(BAD_REQUEST, "Person with id '$personId' is not found") }
     }
 
     override fun convertFrom(person: Person?, type: Type<Int>?, context: MappingContext?): Int? {

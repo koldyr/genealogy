@@ -94,7 +94,7 @@ open class GenealogyConfig {
                 .apiInfo(apiInfo())
                 .select()
                 .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.any())
+                .paths(PathSelectors.ant("/api/genealogy/**"))
                 .build()
     }
 
