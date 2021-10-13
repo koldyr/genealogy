@@ -1,17 +1,19 @@
 package com.koldyr.genealogy.services
 
+import java.util.Objects.nonNull
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.FamilyEvent
+import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.persistence.FamilyEventRepository
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import ma.glasnost.orika.MapperFacade
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.util.Objects.*
 
 /**
  * Description of class FamilyServiceImpl
@@ -30,27 +32,39 @@ open class FamilyServiceImpl(
 
     @Transactional
     override fun create(family: FamilyDTO): Int {
+        family.id = null
         val newFamily = mapper.map(family, Family::class.java)
 
-        if (nonNull(newFamily.husband) && nonNull(newFamily.husband?.familyId)) {
-            throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.husband}' already in family ${newFamily.husband?.familyId}")
-        }
-        if (nonNull(newFamily.wife) && nonNull(newFamily.wife?.familyId)) {
-            throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' already in family ${newFamily.wife?.familyId}")
+        if (nonNull(newFamily.husband)) {
+            if (nonNull(newFamily.husband?.familyId)) {
+                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.husband}' already in family ${newFamily.husband?.familyId}")
+            }
+            if (newFamily.husband?.gender == Gender.FEMALE) {
+                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.husband}' is woman and con not be husband")
+            }
         }
 
-        val saved = familyRepository.save(newFamily)
+        if (nonNull(newFamily.wife)) {
+            if (nonNull(newFamily.wife?.familyId)) {
+                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' already in family ${newFamily.wife?.familyId}")
+            }
+            if (newFamily.wife?.gender == Gender.MALE) {
+                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' is man and con not be wife")
+            }
+        }
+
+        familyRepository.save(newFamily)
 
         if (nonNull(newFamily.husband)) {
-            newFamily.husband?.familyId = saved.id
+            newFamily.husband?.familyId = newFamily.id
             personRepository.save(newFamily.husband!!)
         }
         if (nonNull(newFamily.wife)) {
-            newFamily.wife?.familyId = saved.id
+            newFamily.wife?.familyId = newFamily.id
             personRepository.save(newFamily.wife!!)
         }
 
-        return saved.id!!
+        return newFamily.id!!
     }
 
     override fun findById(familyId: Int): FamilyDTO {
@@ -101,6 +115,7 @@ open class FamilyServiceImpl(
     override fun createChild(familyId: Int, child: Person): Int {
         val family = find(familyId)
 
+        child.id = null
         val saved = personRepository.save(child)
         family.children.add(saved)
 
@@ -115,8 +130,12 @@ open class FamilyServiceImpl(
         val child = personRepository.findById(childId)
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$childId' is not found") }
 
-        if (family.children.contains(child)) {
-            throw ResponseStatusException(INTERNAL_SERVER_ERROR, "Child with id '$childId' already in family '$familyId'")
+        val childFamily = familyRepository.findChildFamily(childId)
+        if (childFamily.isPresent) {
+            if (childFamily.get().id == familyId) {
+                throw ResponseStatusException(BAD_REQUEST, "Child with id '$childId' already in family '$familyId'")
+            }
+            throw ResponseStatusException(BAD_REQUEST, "Child with id '$childId' already in family '${childFamily.get().id}'")
         }
         family.children.add(child)
 
