@@ -50,7 +50,7 @@ open class GenealogyConfig {
 
     @Bean
     open fun personService(mapper: MapperFacade): PersonService {
-        return PersonServiceImpl(personRepository, personEventRepository, mapper)
+        return PersonServiceImpl(personRepository, personEventRepository, familyRepository, mapper)
     }
 
     @Bean

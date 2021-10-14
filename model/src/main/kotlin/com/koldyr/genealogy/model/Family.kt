@@ -6,15 +6,12 @@ import com.koldyr.genealogy.handlers.ChildrenDeserializer
 import com.koldyr.genealogy.handlers.ChildrenSerializer
 import com.koldyr.genealogy.handlers.PersonIdDeserializer
 import com.koldyr.genealogy.handlers.PersonIdSerializer
-import javax.persistence.CascadeType.ALL
-import javax.persistence.CascadeType.MERGE
-import javax.persistence.CascadeType.PERSIST
-import javax.persistence.CascadeType.REFRESH
+import javax.persistence.CascadeType.*
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType.EAGER
+import javax.persistence.FetchType.*
 import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType.SEQUENCE
+import javax.persistence.GenerationType.*
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.OneToMany
@@ -72,6 +69,16 @@ class Family() {
         if (event != null) {
             events.remove(event)
             event.family = null
+        }
+    }
+
+    fun removePerson(person: Person) {
+        if (husband != null && husband!!.equals(person)) {
+            husband = null
+        } else if (wife != null && wife!!.equals(person)) {
+            wife = null
+        } else {
+            children.remove(person)
         }
     }
 }
