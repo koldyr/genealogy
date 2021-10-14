@@ -1,6 +1,5 @@
 package com.koldyr.genealogy.services
 
-import java.util.Objects.nonNull
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.FamilyEvent
@@ -10,10 +9,10 @@ import com.koldyr.genealogy.persistence.FamilyEventRepository
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import ma.glasnost.orika.MapperFacade
-import org.springframework.http.HttpStatus.BAD_REQUEST
-import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
+import java.util.Objects.*
 
 /**
  * Description of class FamilyServiceImpl
@@ -84,7 +83,21 @@ open class FamilyServiceImpl(
     }
 
     @Transactional
-    override fun delete(familyId: Int) = familyRepository.deleteById(familyId)
+    override fun delete(familyId: Int) {
+        val family = find(familyId)
+
+        if (nonNull(family.wife)) {
+            family.wife!!.familyId = null
+            personRepository.save(family.wife!!)
+        }
+
+        if (nonNull(family.husband)) {
+            family.husband!!.familyId = null
+            personRepository.save(family.husband!!)
+        }
+
+        familyRepository.deleteById(familyId)
+    }
 
     @Transactional
     override fun createEvent(familyId: Int, event: FamilyEvent): Int {

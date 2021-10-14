@@ -27,7 +27,7 @@ Accept: application/json
 }
 
 ### Delete Family
-POST http://localhost/api/genealogy/families/1
+DELETE http://localhost/api/genealogy/families/2
 
 ### Create Child in Family
 POST http://localhost/api/genealogy/families/1/children
