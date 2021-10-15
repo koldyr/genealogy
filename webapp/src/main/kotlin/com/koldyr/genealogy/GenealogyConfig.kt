@@ -13,6 +13,10 @@ import com.koldyr.genealogy.services.FamilyService
 import com.koldyr.genealogy.services.FamilyServiceImpl
 import com.koldyr.genealogy.services.PersonService
 import com.koldyr.genealogy.services.PersonServiceImpl
+import io.swagger.v3.oas.models.Components
+import io.swagger.v3.oas.models.OpenAPI
+import io.swagger.v3.oas.models.info.Info
+import io.swagger.v3.oas.models.info.License
 import ma.glasnost.orika.MapperFacade
 import ma.glasnost.orika.impl.DefaultMapperFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,12 +25,6 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import springfox.documentation.builders.PathSelectors
-import springfox.documentation.builders.RequestHandlerSelectors
-import springfox.documentation.service.ApiInfo
-import springfox.documentation.service.VendorExtension
-import springfox.documentation.spi.DocumentationType.*
-import springfox.documentation.spring.web.plugins.Docket
 
 
 /**
@@ -87,23 +85,22 @@ open class GenealogyConfig {
             }
         }
     }
-    
+
     @Bean
-    open fun api(): Docket {
-        return Docket(SWAGGER_2)
-                .apiInfo(apiInfo())
-                .select()
-                .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.ant("/api/genealogy/**"))
-                .build()
+    open fun api(): OpenAPI {
+        return OpenAPI()
+                .components(Components())
+                .info(apiInfo())
     }
 
-    private fun apiInfo(): ApiInfo {
-        val title = "Genealogy"
-        val description = "RESTfull back end for Genealogy SPA"
-        val vendorExtensions: List<VendorExtension<*>> = mutableListOf()
-        val termsOfServiceUrl = "http://koldyr.com/genealogy/tos"
-        val licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
-        return ApiInfo(title, description, "2.0", termsOfServiceUrl, null, "Apache 2.0", licenseUrl, vendorExtensions)
+    private fun apiInfo(): Info {
+        val license = License()
+                .name("Apache 2.0")
+                .url("http://www.apache.org/licenses/LICENSE-2.0")
+        return Info()
+                .title("Genealogy")
+                .description("RESTfull back end for Genealogy SPA")
+                .termsOfService("http://koldyr.com/genealogy/tos")
+                .license(license)
     }
 }

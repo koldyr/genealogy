@@ -4,6 +4,7 @@ import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.FamilyEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.services.FamilyService
+import org.springframework.http.MediaType.*
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.*
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -25,21 +26,21 @@ import java.net.URI
 @RequestMapping("/api/genealogy/families")
 class FamilyController(private val familyService: FamilyService) {
 
-    @GetMapping
+    @GetMapping(produces = [APPLICATION_JSON_VALUE])
     fun families(): Collection<FamilyDTO> = familyService.findAll()
 
-    @PostMapping
+    @PostMapping(consumes = [APPLICATION_JSON_VALUE])
     fun create(@RequestBody family: FamilyDTO): ResponseEntity<Unit> {
         val familyId = familyService.create(family)
-        
+
         val uri = URI.create("/api/genealogy/families/${familyId}")
         return created(uri).build()
     }
 
-    @GetMapping("/{familyId}")
+    @GetMapping("/{familyId}", produces = [APPLICATION_JSON_VALUE])
     fun familyById(@PathVariable familyId: Int): FamilyDTO = familyService.findById(familyId)
 
-    @PutMapping("/{familyId}")
+    @PutMapping("/{familyId}", consumes = [APPLICATION_JSON_VALUE])
     fun update(@PathVariable familyId: Int, @RequestBody family: FamilyDTO) = familyService.update(familyId, family)
 
     @DeleteMapping("/{familyId}")
@@ -49,15 +50,15 @@ class FamilyController(private val familyService: FamilyService) {
         return noContent().build()
     }
 
-    @PostMapping("/{familyId}/events")
+    @PostMapping("/{familyId}/events", consumes = [APPLICATION_JSON_VALUE])
     fun createEvent(@PathVariable familyId: Int, @RequestBody event: FamilyEvent): ResponseEntity<Unit> {
         val eventId = familyService.createEvent(familyId, event)
 
         val uri = URI.create("/api/genealogy/families/$familyId/events/$eventId")
         return created(uri).build()
     }
-    
-    @GetMapping("/{familyId}/events")
+
+    @GetMapping("/{familyId}/events", produces = [APPLICATION_JSON_VALUE])
     fun events(@PathVariable familyId: Int): Collection<FamilyEvent> = familyService.findEvents(familyId)
 
     @DeleteMapping("/{familyId}/events/{eventId}")
@@ -66,8 +67,8 @@ class FamilyController(private val familyService: FamilyService) {
 
         return noContent().build()
     }
-    
-    @PostMapping("/{familyId}/children")
+
+    @PostMapping("/{familyId}/children", consumes = [APPLICATION_JSON_VALUE])
     fun createChild(@PathVariable familyId: Int, @RequestBody child: Person): ResponseEntity<Unit> {
         val childId = familyService.createChild(familyId, child)
 
@@ -83,7 +84,7 @@ class FamilyController(private val familyService: FamilyService) {
         return created(uri).build()
     }
 
-    @GetMapping("/{familyId}/children")
+    @GetMapping("/{familyId}/children", produces = [APPLICATION_JSON_VALUE])
     fun children(@PathVariable familyId: Int): Collection<Person> = familyService.findChildren(familyId)
 
     @DeleteMapping("/{familyId}/children/{childId}")
