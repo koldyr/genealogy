@@ -1,11 +1,13 @@
 package com.koldyr.genealogy.controllers
 
+import java.net.URI
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.services.PersonService
-import org.springframework.http.MediaType.*
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.*
+import org.springframework.http.ResponseEntity.created
+import org.springframework.http.ResponseEntity.noContent
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -14,7 +16,6 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.net.URI
 
 /**
  * Description of class PersonController
@@ -22,7 +23,7 @@ import java.net.URI
  */
 @RestController
 @RequestMapping("/api/genealogy/persons")
-class PersonController(private val personService: PersonService) {
+open class PersonController(private val personService: PersonService) {
 
     @GetMapping(produces = [APPLICATION_JSON_VALUE])
     fun persons(): Collection<Person> = personService.findAll()
