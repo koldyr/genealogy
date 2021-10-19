@@ -15,17 +15,20 @@ import org.springframework.stereotype.Component
 @Component
 open class LoggerAspect {
 
-    @Around("controllerMethod()")
-    fun logControllerCall(pjp: ProceedingJoinPoint) {
+    @Around("controllerMethods()")
+    open fun logControllerCall(pjp: ProceedingJoinPoint): Any {
         val logger = LoggerFactory.getLogger(pjp.target.javaClass.name)
         logger.trace("START {}", pjp.signature.name)
+
+        val startTime = System.currentTimeMillis()
         try {
-            pjp.proceed()
+            return pjp.proceed()
         } finally {
-            logger.trace("FINISH {}", pjp.signature.name)
+            val time = System.currentTimeMillis() - startTime
+            logger.trace("FINISH {} in {}", pjp.signature.name, time)
         }
     }
 
     @Pointcut("@within(org.springframework.web.bind.annotation.RestController)")
-    fun controllerMethod() {}
+    open fun controllerMethods() {}
 }
