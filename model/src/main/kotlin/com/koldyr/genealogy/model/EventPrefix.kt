@@ -10,7 +10,8 @@ enum class EventPrefix(
     None("-"), Before("BEF"), About("ABT"), After("AFT");
 
     companion object {
-        fun parse(value: String): EventPrefix? {
+        fun parse(value: String?): EventPrefix? {
+            if (value == null) return null
             for (prefix in values()) {
                 if (value.contains(prefix.code)) {
                     return prefix
