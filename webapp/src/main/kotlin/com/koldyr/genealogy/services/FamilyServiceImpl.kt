@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.services
 
+import java.util.Objects.nonNull
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.FamilyEvent
@@ -9,10 +10,10 @@ import com.koldyr.genealogy.persistence.FamilyEventRepository
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import ma.glasnost.orika.MapperFacade
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.util.Objects.*
 
 /**
  * Description of class FamilyServiceImpl
@@ -143,7 +144,7 @@ open class FamilyServiceImpl(
         val child = personRepository.findById(childId)
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$childId' is not found") }
 
-        val childFamily = familyRepository.findChildFamily(childId)
+        val childFamily = familyRepository.findChild(childId)
         if (childFamily.isPresent) {
             if (childFamily.get().id == familyId) {
                 throw ResponseStatusException(BAD_REQUEST, "Child with id '$childId' already in family '$familyId'")
@@ -155,7 +156,7 @@ open class FamilyServiceImpl(
         familyRepository.save(family)
     }
 
-    override fun findChildren(familyId: Int): Collection<Person> = find(familyId).children
+    override fun findChildren(familyId: Int): Collection<Person> = familyRepository.findChildren(familyId)
 
     @Transactional
     override fun deleteChild(familyId: Int, childId: Int) {

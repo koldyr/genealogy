@@ -1,15 +1,15 @@
 package com.koldyr.genealogy.services
 
+import java.util.Objects.nonNull
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import ma.glasnost.orika.MapperFacade
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.util.Objects.*
 
 /**
  * Description of class PersonServiceImpl
@@ -50,7 +50,7 @@ open class PersonServiceImpl(
         val family = if (nonNull(person.familyId)) {
             familyRepository.findById(person.familyId!!)
         } else {
-            familyRepository.findChildFamily(person.id!!)
+            familyRepository.findChild(person.id!!)
         }
         family.ifPresent {
             it.removePerson(person)
