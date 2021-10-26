@@ -3,7 +3,13 @@ package com.koldyr.genealogy.context
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.koldyr.genealogy.Genealogy
 import com.koldyr.genealogy.dto.FamilyDTO
-import com.koldyr.genealogy.model.*
+import com.koldyr.genealogy.model.EventPrefix
+import com.koldyr.genealogy.model.EventType
+import com.koldyr.genealogy.model.Gender
+import com.koldyr.genealogy.model.Person
+import com.koldyr.genealogy.model.PersonEvent
+import com.koldyr.genealogy.model.PersonNames
+import org.apache.commons.lang3.RandomStringUtils
 import org.hamcrest.Matchers
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -48,10 +54,9 @@ open class ContextLoadTest {
         return PersonEvent(EventType.Birth, EventPrefix.About, LocalDate.now(),
                 createRandomWord(), createRandomWord())
     }
+
     protected fun getLastIdFromLocation(location: String): Int {
-        val regex = Regex("[\\d]")
-        val match = regex.find(location)
-        //val id = location.subSequence(location.lastIndexOf("/") + 1, location.length)
+        val match = Regex("(\\d+)$").find(location)
         return Integer.parseInt(match!!.groups.last()!!.value)
     }
 
@@ -117,10 +122,6 @@ open class ContextLoadTest {
     }
 
     protected fun createRandomWord(): String {
-        var word: String = ""
-        for (i in 3..(3..10).random()) {
-            word += ('a'..'z').random().toString()
-        }
-        return word;
+        return RandomStringUtils.randomAscii(10);
     }
 }

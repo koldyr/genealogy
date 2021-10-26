@@ -13,7 +13,6 @@ import org.springframework.test.web.servlet.put
  * Description of class PersonControllerTest
  * @created: 2021-10-23
  */
-
 class PersonControllerTest : ContextLoadTest() {
 
     private fun getUpdatePersonModel(person: Person): Person {
@@ -78,7 +77,6 @@ class PersonControllerTest : ContextLoadTest() {
                     status { isNotFound() }
                     status { reason("Person with id '${personModel.id}' is not found") }
                 }
-
     }
 
     @Test
@@ -132,6 +130,5 @@ class PersonControllerTest : ContextLoadTest() {
                     status { isNotFound() }
                     status { reason("Event with id '${personEvent.id}' is not found") }
                 }
-
     }
 }
