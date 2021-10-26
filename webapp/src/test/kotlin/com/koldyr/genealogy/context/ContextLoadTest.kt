@@ -48,10 +48,11 @@ open class ContextLoadTest {
         return PersonEvent(EventType.Birth, EventPrefix.About, LocalDate.now(),
                 createRandomWord(), createRandomWord())
     }
-
-    protected fun getIdFromLocation(location: String): Int {
-        val id = location.subSequence(location.lastIndexOf("/") + 1, location.length)
-        return Integer.parseInt(id as String?)
+    protected fun getLastIdFromLocation(location: String): Int {
+        val regex = Regex("[\\d]")
+        val match = regex.find(location)
+        //val id = location.subSequence(location.lastIndexOf("/") + 1, location.length)
+        return Integer.parseInt(match!!.groups.last()!!.value)
     }
 
     protected fun createPerson(gender: Gender): Person {
@@ -67,7 +68,7 @@ open class ContextLoadTest {
                     header { exists(HttpHeaders.LOCATION) }
                     header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+")) }
                 }.andReturn().response.getHeader(HttpHeaders.LOCATION)
-        personModel.id = getIdFromLocation(location)
+        personModel.id = getLastIdFromLocation(location)
         return personModel
     }
 
@@ -84,7 +85,7 @@ open class ContextLoadTest {
                     header { exists(HttpHeaders.LOCATION) }
                     header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+/events/[\\d]+")) }
                 }.andReturn().response.getHeader(HttpHeaders.LOCATION)
-        personEvent.id = getIdFromLocation(location)
+        personEvent.id = getLastIdFromLocation(location)
         return personEvent
 
     }
@@ -109,7 +110,7 @@ open class ContextLoadTest {
                     header { exists(HttpHeaders.LOCATION) }
                     header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/families/[\\d]+")) }
                 }.andReturn().response.getHeader(HttpHeaders.LOCATION)
-        familyDTO.id = getIdFromLocation(location)
+        familyDTO.id = getLastIdFromLocation(location)
         familyDTO.children = mutableListOf()
         familyDTO.events = mutableListOf()
         return familyDTO

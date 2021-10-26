@@ -76,18 +76,21 @@ class PersonControllerTest : ContextLoadTest() {
                 .andDo { print() }
                 .andExpect {
                     status { isNotFound() }
+                    status { reason("Person with id '${personModel.id}' is not found") }
                 }
 
     }
 
     @Test
     fun events() {
-        mockMvc.get("/api/genealogy/persons/${(99999..999999).random()}/events") {
+        val randomId :Int = (99999..999999).random()
+        mockMvc.get("/api/genealogy/persons/$randomId/events") {
             accept = MediaType.APPLICATION_JSON
         }
                 .andDo { print() }
                 .andExpect {
                     status { isNotFound() }
+                    status { reason("Person with id '$randomId' is not found") }
                 }
 
         val person = createPerson(Gender.FEMALE)
@@ -127,7 +130,7 @@ class PersonControllerTest : ContextLoadTest() {
                 .andDo { print() }
                 .andExpect {
                     status { isNotFound() }
-
+                    status { reason("Event with id '${personEvent.id}' is not found") }
                 }
 
     }
