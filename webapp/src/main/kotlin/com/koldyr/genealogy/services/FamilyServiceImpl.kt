@@ -1,6 +1,5 @@
 package com.koldyr.genealogy.services
 
-import java.util.Objects.nonNull
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.FamilyEvent
@@ -14,6 +13,7 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
+import java.util.Objects.nonNull
 
 /**
  * Description of class FamilyServiceImpl
@@ -123,7 +123,10 @@ open class FamilyServiceImpl(
         familyEventRepository.deleteById(eventId)
     }
 
-    override fun findEvents(familyId: Int): Collection<FamilyEvent> = familyRepository.findEvents(familyId)
+    override fun findEvents(familyId: Int): Collection<FamilyEvent> {
+        find(familyId)
+        return familyRepository.findEvents(familyId)
+    }
 
     @Transactional
     override fun createChild(familyId: Int, child: Person): Int {
@@ -156,7 +159,10 @@ open class FamilyServiceImpl(
         familyRepository.save(family)
     }
 
-    override fun findChildren(familyId: Int): Collection<Person> = familyRepository.findChildren(familyId)
+    override fun findChildren(familyId: Int): Collection<Person> {
+        find(familyId)
+        return familyRepository.findChildren(familyId)
+    }
 
     @Transactional
     override fun deleteChild(familyId: Int, childId: Int) {
