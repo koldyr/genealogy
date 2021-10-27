@@ -6,10 +6,10 @@ import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import ma.glasnost.orika.MapperFacade
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import java.util.Objects.*
+import java.util.Objects.nonNull
 
 /**
  * Description of class PersonServiceImpl
@@ -30,12 +30,12 @@ open class PersonServiceImpl(
     }
 
     override fun findById(personId: Int): Person {
-        return find(personId)
+        return findPerson(personId)
     }
 
     @Transactional
     override fun update(personId: Int, person: Person) {
-        val persisted = find(personId)
+        val persisted = findPerson(personId)
 
         person.id = persisted.id
         mapper.map(person, persisted)
@@ -45,12 +45,12 @@ open class PersonServiceImpl(
 
     @Transactional
     override fun delete(personId: Int) {
-        val person = find(personId)
+        val person = findPerson(personId)
 
         val family = if (nonNull(person.familyId)) {
             familyRepository.findById(person.familyId!!)
         } else {
-            familyRepository.findChildFamily(person.id!!)
+            familyRepository.findChild(person.id!!)
         }
         family.ifPresent {
             it.removePerson(person)
@@ -64,28 +64,37 @@ open class PersonServiceImpl(
     override fun createEvent(personId: Int, event: PersonEvent): Int {
         event.id = null
 
-        val person = find(personId)
+        val person = findPerson(personId)
         person.addEvent(event)
 
         personEventRepository.save(event)
         personRepository.save(person)
-        
+
         return event.id!!
     }
 
-    override fun findEvents(personId: Int): Collection<PersonEvent> = personRepository.findEvents(personId)
+    override fun findEvents(personId: Int): Collection<PersonEvent> {
+        findPerson(personId)
+        return personRepository.findEvents(personId)
+    }
 
     @Transactional
     override fun deleteEvent(personId: Int, eventId: Int) {
-        val person = find(personId)
+        val person = findPerson(personId)
+        findPersonEvent(personId)
         person.removeEvent(eventId)
 
         personEventRepository.deleteById(eventId)
         personRepository.save(person)
     }
 
-    private fun find(personId: Int): Person {
+    private fun findPerson(personId: Int): Person {
         return personRepository.findById(personId)
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$personId' is not found") }
+    }
+
+    private fun findPersonEvent(personEventId: Int): PersonEvent {
+        return personEventRepository.findById(personEventId)
+                .orElseThrow { ResponseStatusException(NOT_FOUND, "Event with id '$personEventId' is not found") }
     }
 }
