@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
+import java.util.Objects.isNull
 import java.util.Objects.nonNull
 
 /**
@@ -35,12 +36,16 @@ open class FamilyServiceImpl(
         family.id = null
         val newFamily = mapper.map(family, Family::class.java)
 
+        if (isNull(newFamily.husband) && isNull(newFamily.wife)) {
+            throw ResponseStatusException(BAD_REQUEST, "husband or wife must be is not empty")
+        }
+
         if (nonNull(newFamily.husband)) {
             if (nonNull(newFamily.husband?.familyId)) {
                 throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.husband}' already in family ${newFamily.husband?.familyId}")
             }
             if (newFamily.husband?.gender == Gender.FEMALE) {
-                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.husband}' is woman and con not be husband")
+                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.husband}' is woman and can not be husband")
             }
         }
 
@@ -49,7 +54,7 @@ open class FamilyServiceImpl(
                 throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' already in family ${newFamily.wife?.familyId}")
             }
             if (newFamily.wife?.gender == Gender.MALE) {
-                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' is man and con not be wife")
+                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' is man and can not be wife")
             }
         }
 
@@ -79,6 +84,24 @@ open class FamilyServiceImpl(
 
         family.id = persisted.id
         mapper.map(family, persisted)
+
+        if (nonNull(persisted.husband)) {
+            if (nonNull(persisted.husband?.familyId) && persisted.husband!!.familyId != persisted.id) {
+                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.husband}' already in family ${persisted.husband?.familyId}")
+            }
+            if (persisted.husband?.gender == Gender.FEMALE) {
+                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.husband}' is woman and can not be husband")
+            }
+        }
+
+        if (nonNull(persisted.wife)) {
+            if (nonNull(persisted.wife?.familyId) && persisted.wife!!.familyId != persisted.id) {
+                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' already in family ${persisted.wife?.familyId}")
+            }
+            if (persisted.wife?.gender == Gender.MALE) {
+                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' is man and can not be wife")
+            }
+        }
 
         familyRepository.save(persisted);
     }
@@ -167,6 +190,9 @@ open class FamilyServiceImpl(
     @Transactional
     override fun deleteChild(familyId: Int, childId: Int) {
         val family = find(familyId)
+        if (family.children.none { it.id ==childId }) {
+            throw ResponseStatusException(BAD_REQUEST, "Child with id '${childId}' is not found in family")
+        }
         family.children.removeIf { it.id == childId }
 
         familyRepository.save(family)

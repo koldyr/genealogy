@@ -3,12 +3,7 @@ package com.koldyr.genealogy.context
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.koldyr.genealogy.Genealogy
 import com.koldyr.genealogy.dto.FamilyDTO
-import com.koldyr.genealogy.model.EventPrefix
-import com.koldyr.genealogy.model.EventType
-import com.koldyr.genealogy.model.Gender
-import com.koldyr.genealogy.model.Person
-import com.koldyr.genealogy.model.PersonEvent
-import com.koldyr.genealogy.model.PersonNames
+import com.koldyr.genealogy.model.*
 import org.apache.commons.lang3.RandomStringUtils
 import org.hamcrest.Matchers
 import org.junit.runner.RunWith
@@ -21,6 +16,7 @@ import org.springframework.test.annotation.IfProfileValue
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.patch
 import org.springframework.test.web.servlet.post
 import java.time.LocalDate
 
@@ -55,7 +51,12 @@ open class ContextLoadTest {
                 createRandomWord(), createRandomWord())
     }
 
-    protected fun getLastIdFromLocation(location: String): Int {
+    private fun createFamilyEventModel(): FamilyEvent {
+        return FamilyEvent(EventType.Birth, EventPrefix.About, LocalDate.now(),
+                createRandomWord(), createRandomWord());
+    }
+
+    private fun getLastIdFromLocation(location: String): Int {
         val match = Regex("(\\d+)$").find(location)
         return Integer.parseInt(match!!.groups.last()!!.value)
     }
@@ -121,7 +122,56 @@ open class ContextLoadTest {
         return familyDTO
     }
 
+    protected fun createFamilyEvent(familyDTO: FamilyDTO): FamilyEvent {
+        val familyEvent = createFamilyEventModel()
+        val location = mockMvc.post("/api/genealogy/families/${familyDTO.id}/events") {
+            content = mapper.writeValueAsString(familyEvent)
+            accept = MediaType.APPLICATION_JSON
+            contentType = MediaType.APPLICATION_JSON
+        }
+                .andDo { print() }
+                .andExpect {
+                    status { isCreated() }
+                    header { exists(HttpHeaders.LOCATION) }
+                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/families/[\\d]+/events/[\\d]+")) }
+                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
+        familyEvent.id = getLastIdFromLocation(location)
+        return familyEvent
+    }
+
+    protected fun createChildOnFamily(familyDTO: FamilyDTO): Person {
+        val person = createPerson(Gender.MALE)
+        val location = mockMvc.post("/api/genealogy/families/${familyDTO.id}/children") {
+            content = mapper.writeValueAsString(person)
+            accept = MediaType.APPLICATION_JSON
+            contentType = MediaType.APPLICATION_JSON
+        }
+                .andDo { print() }
+                .andExpect {
+                    status { isCreated() }
+                    header { exists(HttpHeaders.LOCATION) }
+                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+")) }
+                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
+        person.id = getLastIdFromLocation(location)
+        return person
+    }
+
+    protected fun patchChildOnFamilyWithId(familyDTO: FamilyDTO): Person {
+        val person = createPerson(Gender.MALE)
+        val location = mockMvc.patch("/api/genealogy/families/${familyDTO.id}/children/${person.id}") {
+            accept = MediaType.APPLICATION_JSON
+        }
+                .andDo { print() }
+                .andExpect {
+                    status { isCreated() }
+                    header { exists(HttpHeaders.LOCATION) }
+                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+")) }
+                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
+        person.id = getLastIdFromLocation(location)
+        return person
+    }
+
     protected fun createRandomWord(): String {
-        return RandomStringUtils.randomAscii(10);
+        return RandomStringUtils.randomAlphabetic(2, 10);
     }
 }
