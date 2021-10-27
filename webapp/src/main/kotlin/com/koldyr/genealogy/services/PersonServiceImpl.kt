@@ -81,7 +81,7 @@ open class PersonServiceImpl(
     @Transactional
     override fun deleteEvent(personId: Int, eventId: Int) {
         val person = findPerson(personId)
-        findPersonEvent(personId)
+        findPersonEvent(eventId)
         person.removeEvent(eventId)
 
         personEventRepository.deleteById(eventId)
