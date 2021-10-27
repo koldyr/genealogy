@@ -25,7 +25,7 @@ import java.time.LocalDate
 @AutoConfigureMockMvc
 @TestPropertySource(properties = ["spring.config.location = classpath:application-test.yaml"])
 @IfProfileValue(name = "spring.profiles.active", values = ["int-test"])
-open class ContextLoadTest {
+abstract class ContextLoadTest {
     @Autowired
     lateinit var mockMvc: MockMvc
 
