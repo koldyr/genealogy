@@ -53,6 +53,18 @@ CREATE TABLE IF NOT EXISTS T_FAMILY_EVENT
 
 create sequence SEQ_EVENT start with 1;
 
+
+CREATE TABLE IF NOT EXISTS T_USER
+(
+    USER_ID INTEGER not null,
+    EMAIL VARCHAR(100) not null,
+    PASSWORD VARCHAR(32) not null,
+    NAME VARCHAR(32) not null,
+    SURNAME VARCHAR(32) not null
+);
+
+create sequence SEQ_USER start with 1;
+
 alter table T_PERSON
     add constraint PK_PERSON PRIMARY KEY (PERSON_ID);
 alter table T_PERSON

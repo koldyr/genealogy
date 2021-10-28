@@ -5,14 +5,8 @@ import com.koldyr.genealogy.mapper.FamilyEventConverter
 import com.koldyr.genealogy.mapper.PersonConverter
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.Person
-import com.koldyr.genealogy.persistence.FamilyEventRepository
-import com.koldyr.genealogy.persistence.FamilyRepository
-import com.koldyr.genealogy.persistence.PersonEventRepository
-import com.koldyr.genealogy.persistence.PersonRepository
-import com.koldyr.genealogy.services.FamilyService
-import com.koldyr.genealogy.services.FamilyServiceImpl
-import com.koldyr.genealogy.services.PersonService
-import com.koldyr.genealogy.services.PersonServiceImpl
+import com.koldyr.genealogy.persistence.*
+import com.koldyr.genealogy.services.*
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
@@ -23,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 
@@ -46,6 +41,9 @@ open class GenealogyConfig {
     @Autowired
     lateinit var personEventRepository: PersonEventRepository
 
+    @Autowired
+    lateinit var userRepository: UserRepository
+
     @Bean
     open fun personService(mapper: MapperFacade): PersonService {
         return PersonServiceImpl(personRepository, personEventRepository, familyRepository, mapper)
@@ -54,6 +52,16 @@ open class GenealogyConfig {
     @Bean
     open fun familyService(mapper: MapperFacade): FamilyService {
         return FamilyServiceImpl(familyRepository, personRepository, familyEventRepository, mapper)
+    }
+
+    @Bean
+    open fun userService(bCryptPasswordEncoder: BCryptPasswordEncoder): UserService {
+        return UserServiceImpl(userRepository, bCryptPasswordEncoder)
+    }
+
+    @Bean
+    open fun authenticationUserDetailsService(userService: UserService) : AuthenticationUserDetailsService {
+        return AuthenticationUserDetailsService(userService)
     }
 
     @Bean
@@ -102,5 +110,10 @@ open class GenealogyConfig {
                 .description("RESTfull back end for Genealogy SPA")
                 .termsOfService("http://koldyr.com/genealogy/tos")
                 .license(license)
+    }
+
+    @Bean
+    open fun bCryptPasswordEncoder(): BCryptPasswordEncoder? {
+        return BCryptPasswordEncoder()
     }
 }
