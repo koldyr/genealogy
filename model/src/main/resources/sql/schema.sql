@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS T_USER
 (
     USER_ID INTEGER not null,
     EMAIL VARCHAR(100) not null,
-    PASSWORD VARCHAR(32) not null,
+    PASSWORD VARCHAR(256) not null,
     NAME VARCHAR(32) not null,
     SURNAME VARCHAR(32) not null
 );

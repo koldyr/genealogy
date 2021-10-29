@@ -2,6 +2,9 @@ package com.koldyr.genealogy.security
 
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
+import com.koldyr.genealogy.security.AuthenticationConfigConstant.HEADER_STRING
+import com.koldyr.genealogy.security.AuthenticationConfigConstant.TOKEN_PREFIX
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
@@ -13,11 +16,15 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 
-class JWTAuthorizationFilter(authenticationManager: AuthenticationManager?) : BasicAuthenticationFilter(authenticationManager) {
+open class JWTAuthorizationFilter(authenticationManager: AuthenticationManager?) : BasicAuthenticationFilter(authenticationManager) {
+
+    @Value("\${security.secret}")
+    private lateinit var secret: String
+
     @Throws(IOException::class, ServletException::class)
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
-        val header = request.getHeader("Authorization")
-        if (header == null || !header.startsWith("Bearer ")) {
+        val header = request.getHeader(HEADER_STRING)
+        if (header == null || !header.startsWith(TOKEN_PREFIX)) {
             chain.doFilter(request, response)
             return
         }
@@ -27,12 +34,11 @@ class JWTAuthorizationFilter(authenticationManager: AuthenticationManager?) : Ba
     }
 
     private fun getAuthentication(request: HttpServletRequest): UsernamePasswordAuthenticationToken? {
-        val token = request.getHeader("Authorization")
+        val token = request.getHeader(HEADER_STRING)
         if (token != null) {
-            // parse the token.
-            val user: String = JWT.require(Algorithm.HMAC512("Java_to_Dev_Secret".toByteArray()))
+            val user: String = JWT.require(Algorithm.HMAC512(secret.toByteArray()))
                     .build()
-                    .verify(token.replace("Bearer ", ""))
+                    .verify(token.replace(TOKEN_PREFIX, ""))
                     .getSubject()
             return UsernamePasswordAuthenticationToken(user, null, ArrayList())
         }

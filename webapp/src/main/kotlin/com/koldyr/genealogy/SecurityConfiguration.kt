@@ -4,7 +4,9 @@ import com.koldyr.genealogy.security.JWTAuthenticationFilter
 import com.koldyr.genealogy.security.JWTAuthorizationFilter
 import com.koldyr.genealogy.services.AuthenticationUserDetailsService
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.HttpMethod
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
@@ -16,6 +18,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 
 
 @EnableWebSecurity
+@Configuration
 open class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     @Autowired
     lateinit var bCryptPasswordEncoder: BCryptPasswordEncoder
@@ -23,8 +26,29 @@ open class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     @Autowired
     lateinit var authenticationUserDetailsService: AuthenticationUserDetailsService
 
+
     override fun configure(web : WebSecurity) {
-        web.ignoring().antMatchers("/api/user")
+        web.ignoring().antMatchers("/api/user/registration")
+    }
+
+    @Bean
+    open fun jwtAuthenticationFilter() : JWTAuthenticationFilter {
+        val loginAuthenticationFilter = JWTAuthenticationFilter()
+        loginAuthenticationFilter.setAuthenticationManager(authenticationManagerBean())
+        loginAuthenticationFilter.setFilterProcessesUrl("/api/user/login")
+        return loginAuthenticationFilter
+    }
+
+    @Bean
+    @Throws(java.lang.Exception::class)
+     override fun authenticationManagerBean(): AuthenticationManager {
+        return super.authenticationManagerBean()
+    }
+
+    @Bean
+    open fun jwtAuthorizationFilter() : JWTAuthorizationFilter {
+        val jwtAuthorizationFilter = JWTAuthorizationFilter(authenticationManagerBean())
+        return jwtAuthorizationFilter;
     }
 
     @Throws(Exception::class)
@@ -34,11 +58,10 @@ open class SecurityConfiguration : WebSecurityConfigurerAdapter() {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/user").permitAll()
                 .antMatchers("/api/**").authenticated()
                 .and()
-                .addFilter(JWTAuthenticationFilter(authenticationManager()))
-                .addFilter(JWTAuthorizationFilter(authenticationManager()))
+                .addFilter(jwtAuthenticationFilter())
+                .addFilter(jwtAuthorizationFilter())
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
     }
 

@@ -3,7 +3,9 @@ package com.koldyr.genealogy.security
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.springframework.security.authentication.AuthenticationManager
+import com.koldyr.genealogy.security.AuthenticationConfigConstant.HEADER_STRING
+import com.koldyr.genealogy.security.AuthenticationConfigConstant.TOKEN_PREFIX
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
@@ -17,9 +19,16 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 
-class JWTAuthenticationFilter(
-         authenticationManager : AuthenticationManager
-) : UsernamePasswordAuthenticationFilter() {
+class JWTAuthenticationFilter() : UsernamePasswordAuthenticationFilter() {
+
+
+    @Value("\${security.secret}")
+    private lateinit var secret: String
+
+    @Value("\${security.token.exp}")
+    private lateinit var expiration: String
+
+
     @Throws(AuthenticationException::class)
     override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse?): Authentication? {
         return try {
@@ -37,11 +46,11 @@ class JWTAuthenticationFilter(
     }
 
     @Throws(IOException::class, ServletException::class)
-    override fun successfulAuthentication(request: HttpServletRequest?, response: HttpServletResponse, chain: FilterChain?, auth: Authentication) {
+    override fun successfulAuthentication(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain, auth: Authentication) {
         val token: String = JWT.create()
                 .withSubject((auth.getPrincipal() as User).getUsername())
-                .withExpiresAt(Date(System.currentTimeMillis() + 864000))
-                .sign(Algorithm.HMAC512("Java_to_Dev_Secret".toByteArray()))
-        response.addHeader("Authorization", "Bearer $token")
+                .withExpiresAt(Date(System.currentTimeMillis() + expiration.toInt()))
+                .sign(Algorithm.HMAC512(secret.toByteArray()))
+        response.addHeader(HEADER_STRING, TOKEN_PREFIX + token)
     }
 }
