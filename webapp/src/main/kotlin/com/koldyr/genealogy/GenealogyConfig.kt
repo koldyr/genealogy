@@ -97,13 +97,16 @@ open class GenealogyConfig {
     }
 
 
+    annotation class Secured
+    annotation class UnSecured
+
     @Bean
     open fun serviceApiSecured(): Docket? {
         return Docket(DocumentationType.SWAGGER_2)
                 .groupName("secured")
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.koldyr.genealogy.controllers.secured"))
+                .apis(RequestHandlerSelectors.withClassAnnotation(Secured::class.java))
                 .build()
                 .useDefaultResponseMessages(false)
                 .enableUrlTemplating(false)
@@ -117,7 +120,7 @@ open class GenealogyConfig {
                 .groupName("login")
                 .apiInfo(apiInfo())
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("com.koldyr.genealogy.controllers.unsecured"))
+                .apis(RequestHandlerSelectors.withClassAnnotation(UnSecured::class.java))
                 .build()
                 .useDefaultResponseMessages(false)
                 .enableUrlTemplating(false)

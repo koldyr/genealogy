@@ -1,5 +1,6 @@
-package com.koldyr.genealogy.controllers.secured
+package com.koldyr.genealogy.controllers
 
+import com.koldyr.genealogy.GenealogyConfig
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.FamilyEvent
 import com.koldyr.genealogy.model.Person
@@ -17,6 +18,7 @@ import java.net.URI
  */
 @RestController
 @RequestMapping("/api/genealogy/families")
+@GenealogyConfig.Secured
 class FamilyController(private val familyService: FamilyService) {
 
     @GetMapping(produces = [APPLICATION_JSON_VALUE])

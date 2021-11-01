@@ -6,6 +6,7 @@ import com.koldyr.genealogy.services.AuthenticationUserDetailsService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -15,6 +16,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.web.authentication.AuthenticationFailureHandler
 
 
 @EnableWebSecurity
@@ -36,6 +38,7 @@ open class SecurityConfiguration : WebSecurityConfigurerAdapter() {
         val loginAuthenticationFilter = JWTAuthenticationFilter()
         loginAuthenticationFilter.setAuthenticationManager(authenticationManagerBean())
         loginAuthenticationFilter.setFilterProcessesUrl("/api/user/login")
+        loginAuthenticationFilter.setAuthenticationFailureHandler(authenticationFailureHandle())
         return loginAuthenticationFilter
     }
 
@@ -51,6 +54,12 @@ open class SecurityConfiguration : WebSecurityConfigurerAdapter() {
         return jwtAuthorizationFilter;
     }
 
+    @Bean
+    open fun authenticationFailureHandle(): AuthenticationFailureHandler {
+        return AuthenticationFailureHandler { request, response, ex ->
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), "username or password invalid")
+        }
+    }
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
         http
