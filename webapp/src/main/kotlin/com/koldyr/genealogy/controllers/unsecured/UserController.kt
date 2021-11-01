@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.controllers.unsecured
 
+import com.koldyr.genealogy.model.Credentials
 import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.services.UserService
 import org.springframework.http.ResponseEntity
@@ -21,7 +22,7 @@ class UserController(private val userService: UserService) {
     }
 
     @PostMapping("/login")
-    fun login(@RequestBody user: User) : ResponseEntity<User> {
-        return ResponseEntity.ok().body(userService.readUserByEmail(user.email!!))
+    fun login(@RequestBody credentials: Credentials) : ResponseEntity<Unit> {
+        return ResponseEntity.ok().build();
     }
 }

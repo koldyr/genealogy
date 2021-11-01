@@ -32,11 +32,11 @@ class JWTAuthenticationFilter() : UsernamePasswordAuthenticationFilter() {
     @Throws(AuthenticationException::class)
     override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse?): Authentication? {
         return try {
-            val creds: com.koldyr.genealogy.model.User = ObjectMapper()
-                    .readValue(request.inputStream, com.koldyr.genealogy.model.User::class.java)
+            val creds: com.koldyr.genealogy.model.Credentials = ObjectMapper()
+                    .readValue(request.inputStream, com.koldyr.genealogy.model.Credentials::class.java)
             authenticationManager.authenticate(
                     UsernamePasswordAuthenticationToken(
-                            creds.email,
+                            creds.username,
                             creds.password,
                             ArrayList())
             )
