@@ -1,23 +1,16 @@
 package com.koldyr.genealogy.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.koldyr.genealogy.handlers.ChildrenDeserializer
 import com.koldyr.genealogy.handlers.ChildrenSerializer
 import com.koldyr.genealogy.handlers.PersonIdDeserializer
 import com.koldyr.genealogy.handlers.PersonIdSerializer
+import javax.persistence.*
 import javax.persistence.CascadeType.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.FetchType.*
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType.*
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.OneToMany
-import javax.persistence.OneToOne
-import javax.persistence.SequenceGenerator
-import javax.persistence.Table
+import javax.persistence.FetchType.EAGER
+import javax.persistence.GenerationType.SEQUENCE
 
 /**
  * Description of class Family
@@ -52,6 +45,11 @@ class Family() {
 
     @OneToMany(mappedBy = "family",cascade = [ALL], fetch = EAGER, orphanRemoval = true)
     val events: MutableSet<FamilyEvent> = mutableSetOf()
+
+    @JoinColumn(name = "USER_ID")
+    @ManyToOne
+    @JsonIgnore
+    var user: User? = null
 
     var note: String? = null
 

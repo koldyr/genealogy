@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.koldyr.genealogy.Genealogy
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.*
+import com.koldyr.genealogy.persistence.FamilyRepository
+import com.koldyr.genealogy.persistence.PersonEventRepository
+import com.koldyr.genealogy.persistence.PersonRepository
 import com.koldyr.genealogy.persistence.UserRepository
 import org.apache.commons.lang3.RandomStringUtils
 import org.hamcrest.Matchers
@@ -36,6 +39,18 @@ abstract class ContextLoadTest {
 
     @Autowired
     lateinit var userRepository: UserRepository
+
+    @Autowired
+    lateinit var personRepository: PersonRepository
+
+    @Autowired
+    lateinit var familyRepository: FamilyRepository
+
+    @Autowired
+    lateinit var personEventRepository: PersonEventRepository
+
+    @Autowired
+    lateinit var familyEventRepository: PersonEventRepository
 
     protected fun createPersonModel(gender: Gender): Person {
         val person = Person()
@@ -78,6 +93,10 @@ abstract class ContextLoadTest {
 
     @After
     open fun deleteUser () {
+        personEventRepository.deleteAll()
+        familyEventRepository.deleteAll()
+        familyRepository.deleteAll()
+        personRepository.deleteAll()
         userRepository.deleteAll()
     }
 

@@ -3,6 +3,7 @@ package com.koldyr.genealogy.services
 import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.persistence.UserRepository
 import org.springframework.http.HttpStatus
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.server.ResponseStatusException
 import java.util.*
@@ -24,6 +25,11 @@ open class UserServiceImpl(
 
     override fun readUserByEmail(email: String): User {
         return userRepository.findByEmail(email).orElseThrow{ EntityNotFoundException() }
+    }
+
+    override fun currentUser(): User {
+        val username : String = SecurityContextHolder.getContext().authentication.principal.toString()
+        return readUserByEmail(username)
     }
 
 }

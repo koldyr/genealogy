@@ -24,11 +24,12 @@ open class FamilyServiceImpl(
     private val familyRepository: FamilyRepository,
     private val personRepository: PersonRepository,
     private val familyEventRepository: FamilyEventRepository,
-    private val mapper: MapperFacade
+    private val mapper: MapperFacade,
+    private val userService: UserService
 ) : FamilyService {
 
     override fun findAll(): List<FamilyDTO> {
-        return familyRepository.findAll().map(this::mapFamily)
+        return familyRepository.findAllByUser(userService.currentUser()).map(this::mapFamily)
     }
 
     @Transactional
@@ -57,6 +58,8 @@ open class FamilyServiceImpl(
                 throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' is man and can not be wife")
             }
         }
+
+        newFamily.user = userService.currentUser()
 
         familyRepository.save(newFamily)
 

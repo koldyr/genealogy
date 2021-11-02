@@ -67,7 +67,7 @@ open class SecurityConfiguration : WebSecurityConfigurerAdapter() {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/genealogy/**").authenticated()
+                .antMatchers("/api/**").authenticated()
                 .and()
                 .addFilter(jwtAuthenticationFilter())
                 .addFilter(jwtAuthorizationFilter())

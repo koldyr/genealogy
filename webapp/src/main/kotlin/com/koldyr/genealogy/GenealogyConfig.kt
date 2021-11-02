@@ -48,12 +48,12 @@ open class GenealogyConfig {
 
     @Bean
     open fun personService(mapper: MapperFacade): PersonService {
-        return PersonServiceImpl(personRepository, personEventRepository, familyRepository, mapper)
+        return PersonServiceImpl(personRepository, personEventRepository, familyRepository, mapper, userService(BCryptPasswordEncoder()))
     }
 
     @Bean
     open fun familyService(mapper: MapperFacade): FamilyService {
-        return FamilyServiceImpl(familyRepository, personRepository, familyEventRepository, mapper)
+        return FamilyServiceImpl(familyRepository, personRepository, familyEventRepository, mapper, userService(BCryptPasswordEncoder()))
     }
 
     @Bean
