@@ -57,7 +57,7 @@ open class SecurityConfiguration : WebSecurityConfigurerAdapter() {
     @Bean
     open fun authenticationFailureHandle(): AuthenticationFailureHandler {
         return AuthenticationFailureHandler { request, response, ex ->
-            response.sendError(HttpStatus.UNAUTHORIZED.value(), "username or password invalid")
+            response.sendError(HttpStatus.BAD_REQUEST.value(), "username or password invalid")
         }
     }
     @Throws(Exception::class)
@@ -67,7 +67,7 @@ open class SecurityConfiguration : WebSecurityConfigurerAdapter() {
                 .and()
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers("/api/**").authenticated()
+                .antMatchers("/api/genealogy/**").authenticated()
                 .and()
                 .addFilter(jwtAuthenticationFilter())
                 .addFilter(jwtAuthorizationFilter())

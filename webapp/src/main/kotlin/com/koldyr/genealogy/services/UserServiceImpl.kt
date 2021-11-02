@@ -2,7 +2,9 @@ package com.koldyr.genealogy.services
 
 import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.persistence.UserRepository
+import org.springframework.http.HttpStatus
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.web.server.ResponseStatusException
 import java.util.*
 import javax.persistence.EntityNotFoundException
 
@@ -13,7 +15,7 @@ open class UserServiceImpl(
     override fun createUser(userCred: User) {
         val user : Optional<User>? = userCred.email?.let { userRepository.findByEmail(it) }
         if (user?.isPresent == true) {
-            throw RuntimeException("User already registered. Please use different email.")
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "User already registered. Please use different email.")
         }
 
         userCred.password = bCryptPasswordEncoder.encode(userCred.password)

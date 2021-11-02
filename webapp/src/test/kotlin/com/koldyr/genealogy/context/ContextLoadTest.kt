@@ -4,8 +4,11 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.koldyr.genealogy.Genealogy
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.*
+import com.koldyr.genealogy.persistence.UserRepository
 import org.apache.commons.lang3.RandomStringUtils
 import org.hamcrest.Matchers
+import org.junit.After
+import org.junit.Before
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -16,7 +19,6 @@ import org.springframework.test.annotation.IfProfileValue
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.patch
 import org.springframework.test.web.servlet.post
 import java.time.LocalDate
 
@@ -32,7 +34,10 @@ abstract class ContextLoadTest {
     @Autowired
     lateinit var mapper: ObjectMapper
 
-    private fun createPersonModel(gender: Gender): Person {
+    @Autowired
+    lateinit var userRepository: UserRepository
+
+    protected fun createPersonModel(gender: Gender): Person {
         val person = Person()
         person.name = PersonNames()
         person.name?.first = createRandomWord()
@@ -46,17 +51,65 @@ abstract class ContextLoadTest {
         return person
     }
 
-    private fun createPersonEventModel(): PersonEvent {
+    protected fun createUser() : User {
+        val user = User()
+        user.password = "1111"
+        user.email = "yan@gmail.com"
+        user.name = "Yan"
+        user.surName = "Efimov"
+        return user
+    }
+
+    @Before
+    open fun loadUser () {
+        val user = createUser()
+        val location = mockMvc.post("/api/user/registration") {
+            content = mapper.writeValueAsString(user)
+            contentType = MediaType.APPLICATION_JSON
+            accept = MediaType.APPLICATION_JSON
+        }
+                .andDo { print() }
+                .andExpect {
+                    status { isCreated() }
+                    header { exists(HttpHeaders.LOCATION) }
+                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/user/login")) }
+                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
+    }
+
+    @After
+    open fun deleteUser () {
+        userRepository.deleteAll()
+    }
+
+    protected fun getBearerToken() : String {
+        val creds = Credentials()
+        creds.username = "yan@gmail.com"
+        creds.password = "1111"
+
+        val token = mockMvc.post("/api/user/login") {
+            content = mapper.writeValueAsString(creds)
+            contentType = MediaType.APPLICATION_JSON
+            accept = MediaType.APPLICATION_JSON
+        }
+                .andDo { print() }
+                .andExpect {
+                    status { isOk() }
+                    header { exists(HttpHeaders.AUTHORIZATION) }
+                }.andReturn().response.getHeader(HttpHeaders.AUTHORIZATION)
+        return token
+    }
+
+    protected fun createPersonEventModel(): PersonEvent {
         return PersonEvent(EventType.Birth, EventPrefix.About, LocalDate.now(),
                 createRandomWord(), createRandomWord())
     }
 
-    private fun createFamilyEventModel(): FamilyEvent {
+    protected fun createFamilyEventModel(): FamilyEvent {
         return FamilyEvent(EventType.Birth, EventPrefix.About, LocalDate.now(),
                 createRandomWord(), createRandomWord());
     }
 
-    private fun getLastIdFromLocation(location: String): Int {
+    protected fun getLastIdFromLocation(location: String): Int {
         val match = Regex("(\\d+)$").find(location)
         return Integer.parseInt(match!!.groups.last()!!.value)
     }
@@ -64,6 +117,7 @@ abstract class ContextLoadTest {
     protected fun createPerson(gender: Gender): Person {
         val personModel = createPersonModel(gender)
         val location = mockMvc.post("/api/genealogy/persons") {
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
             content = mapper.writeValueAsString(personModel)
             contentType = MediaType.APPLICATION_JSON
             accept = MediaType.APPLICATION_JSON
@@ -78,25 +132,7 @@ abstract class ContextLoadTest {
         return personModel
     }
 
-    protected fun createPersonEvent(id: Int): PersonEvent {
-        val personEvent = createPersonEventModel()
-        val location = mockMvc.post("/api/genealogy/persons/$id/events") {
-            content = mapper.writeValueAsString(personEvent)
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
-        }
-                .andDo { print() }
-                .andExpect {
-                    status { isCreated() }
-                    header { exists(HttpHeaders.LOCATION) }
-                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+/events/[\\d]+")) }
-                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
-        personEvent.id = getLastIdFromLocation(location)
-        return personEvent
-
-    }
-
-    private fun createSuccessFamilyModel() : FamilyDTO {
+    protected fun createSuccessFamilyModel() : FamilyDTO {
         val familyDTO = FamilyDTO()
         familyDTO.wife = createPerson(Gender.FEMALE).id
         familyDTO.husband = createPerson(Gender.MALE).id
@@ -109,6 +145,7 @@ abstract class ContextLoadTest {
             content = mapper.writeValueAsString(familyDTO)
             accept = MediaType.APPLICATION_JSON
             contentType = MediaType.APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
@@ -120,55 +157,6 @@ abstract class ContextLoadTest {
         familyDTO.children = mutableListOf()
         familyDTO.events = mutableListOf()
         return familyDTO
-    }
-
-    protected fun createFamilyEvent(familyDTO: FamilyDTO): FamilyEvent {
-        val familyEvent = createFamilyEventModel()
-        val location = mockMvc.post("/api/genealogy/families/${familyDTO.id}/events") {
-            content = mapper.writeValueAsString(familyEvent)
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
-        }
-                .andDo { print() }
-                .andExpect {
-                    status { isCreated() }
-                    header { exists(HttpHeaders.LOCATION) }
-                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/families/[\\d]+/events/[\\d]+")) }
-                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
-        familyEvent.id = getLastIdFromLocation(location)
-        return familyEvent
-    }
-
-    protected fun createChildOnFamily(familyDTO: FamilyDTO): Person {
-        val person = createPerson(Gender.MALE)
-        val location = mockMvc.post("/api/genealogy/families/${familyDTO.id}/children") {
-            content = mapper.writeValueAsString(person)
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
-        }
-                .andDo { print() }
-                .andExpect {
-                    status { isCreated() }
-                    header { exists(HttpHeaders.LOCATION) }
-                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+")) }
-                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
-        person.id = getLastIdFromLocation(location)
-        return person
-    }
-
-    protected fun patchChildOnFamilyWithId(familyDTO: FamilyDTO): Person {
-        val person = createPerson(Gender.MALE)
-        val location = mockMvc.patch("/api/genealogy/families/${familyDTO.id}/children/${person.id}") {
-            accept = MediaType.APPLICATION_JSON
-        }
-                .andDo { print() }
-                .andExpect {
-                    status { isCreated() }
-                    header { exists(HttpHeaders.LOCATION) }
-                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+")) }
-                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
-        person.id = getLastIdFromLocation(location)
-        return person
     }
 
     protected fun createRandomWord(): String {
