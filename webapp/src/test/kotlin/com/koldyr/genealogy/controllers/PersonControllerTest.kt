@@ -19,9 +19,9 @@ import org.springframework.test.web.servlet.put
 class PersonControllerTest : ContextLoadTest() {
 
     private fun getUpdatePersonModel(person: Person): Person {
-        person.name?.first = createRandomWord()
-        person.name?.last = createRandomWord()
-        person.name?.middle = createRandomWord()
+        person.name!!.first = createRandomWord()
+        person.name!!.last = createRandomWord()
+        person.name!!.middle = createRandomWord()
         person.gender = Gender.FEMALE
         person.place = createRandomWord()
         person.occupation = createRandomWord()
@@ -134,7 +134,7 @@ class PersonControllerTest : ContextLoadTest() {
                 .andExpect {
                     status { isOk() }
                     content { contentType(MediaType.APPLICATION_JSON) }
-                    content { json(mapper.writeValueAsString(mutableListOf(personEvent))) }
+                    content { json(mapper.writeValueAsString(listOf(personEvent))) }
                 }
 
         mockMvc.delete("/api/genealogy/persons/${person.id}/events/${personEvent.id}") {

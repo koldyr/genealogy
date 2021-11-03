@@ -7,10 +7,19 @@ import com.koldyr.genealogy.handlers.ChildrenDeserializer
 import com.koldyr.genealogy.handlers.ChildrenSerializer
 import com.koldyr.genealogy.handlers.PersonIdDeserializer
 import com.koldyr.genealogy.handlers.PersonIdSerializer
-import javax.persistence.*
 import javax.persistence.CascadeType.*
+import javax.persistence.Column
+import javax.persistence.Entity
 import javax.persistence.FetchType.EAGER
+import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.SEQUENCE
+import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
+import javax.persistence.OneToMany
+import javax.persistence.OneToOne
+import javax.persistence.SequenceGenerator
+import javax.persistence.Table
 
 /**
  * Description of class Family
@@ -46,7 +55,7 @@ class Family() {
     @OneToMany(mappedBy = "family",cascade = [ALL], fetch = EAGER, orphanRemoval = true)
     val events: MutableSet<FamilyEvent> = mutableSetOf()
 
-    @JoinColumn(name = "USER_ID")
+    @JoinColumn(name = "USER_ID", nullable = false)
     @ManyToOne
     @JsonIgnore
     var user: User? = null

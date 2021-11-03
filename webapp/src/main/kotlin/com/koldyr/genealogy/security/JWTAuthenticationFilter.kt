@@ -3,15 +3,17 @@ package com.koldyr.genealogy.security
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.koldyr.genealogy.security.AuthenticationConfigConstant.HEADER_STRING
-import com.koldyr.genealogy.security.AuthenticationConfigConstant.TOKEN_PREFIX
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import java.io.IOException
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.util.*
 import javax.servlet.FilterChain
 import javax.servlet.ServletException
@@ -19,7 +21,7 @@ import javax.servlet.http.HttpServletRequest
 import javax.servlet.http.HttpServletResponse
 
 
-class JWTAuthenticationFilter() : UsernamePasswordAuthenticationFilter() {
+class JWTAuthenticationFilter : UsernamePasswordAuthenticationFilter() {
 
 
     @Value("\${security.secret}")
@@ -28,17 +30,20 @@ class JWTAuthenticationFilter() : UsernamePasswordAuthenticationFilter() {
     @Value("\${security.token.exp}")
     private lateinit var expiration: String
 
+    @Autowired
+    private lateinit var mapper: ObjectMapper
+
 
     @Throws(AuthenticationException::class)
-    override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse?): Authentication? {
+    override fun attemptAuthentication(request: HttpServletRequest, response: HttpServletResponse): Authentication {
         return try {
-            val creds: com.koldyr.genealogy.model.Credentials = ObjectMapper()
+            val credentials: com.koldyr.genealogy.model.Credentials = mapper
                     .readValue(request.inputStream, com.koldyr.genealogy.model.Credentials::class.java)
             authenticationManager.authenticate(
                     UsernamePasswordAuthenticationToken(
-                            creds.username,
-                            creds.password,
-                            ArrayList())
+                            credentials.username,
+                            credentials.password,
+                            listOf())
             )
         } catch (e: IOException) {
             throw RuntimeException(e)
@@ -47,10 +52,14 @@ class JWTAuthenticationFilter() : UsernamePasswordAuthenticationFilter() {
 
     @Throws(IOException::class, ServletException::class)
     override fun successfulAuthentication(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain, auth: Authentication) {
+        val username = (auth.principal as User).username
+        val tokenLive = LocalDateTime.now().plusDays(expiration.toLong())
+        val algorithmForSign = Algorithm.HMAC512(secret.toByteArray())
         val token: String = JWT.create()
-                .withSubject((auth.getPrincipal() as User).getUsername())
-                .withExpiresAt(Date(System.currentTimeMillis() + expiration.toInt()))
-                .sign(Algorithm.HMAC512(secret.toByteArray()))
-        response.addHeader(HEADER_STRING, TOKEN_PREFIX + token)
+                .withSubject(username)
+                .withExpiresAt(Date.from(tokenLive.atZone(ZoneId.systemDefault()).toInstant()))
+                .sign(algorithmForSign)
+        response.addHeader(HttpHeaders.AUTHORIZATION, "Bearer $token")
+        System.currentTimeMillis()
     }
 }

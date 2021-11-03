@@ -6,9 +6,12 @@ import com.koldyr.genealogy.model.Gender
 import org.hamcrest.Matchers
 import org.junit.Test
 import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
 import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.web.servlet.*
+import org.springframework.test.web.servlet.delete
+import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.patch
+import org.springframework.test.web.servlet.post
+import org.springframework.test.web.servlet.put
 
 class FamilyControllerTest : ContextLoadTest() {
 
@@ -26,13 +29,13 @@ class FamilyControllerTest : ContextLoadTest() {
         val familyDto = createFamily()
 
         mockMvc.get("/api/genealogy/families/${familyDto.id}") {
-            accept = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
             header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
                     status { isOk() }
-                    content { contentType(MediaType.APPLICATION_JSON) }
+                    content { contentType(APPLICATION_JSON) }
                     content { json(mapper.writeValueAsString(familyDto)) }
                 }
 
@@ -40,8 +43,8 @@ class FamilyControllerTest : ContextLoadTest() {
 
         mockMvc.put("/api/genealogy/families/${familyDto.id}") {
             content = mapper.writeValueAsString(familyDto)
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
             header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
@@ -50,21 +53,21 @@ class FamilyControllerTest : ContextLoadTest() {
                 }
 
         mockMvc.get("/api/genealogy/families/${familyDto.id}") {
-            accept = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
             header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
                     status { isOk() }
-                    content { contentType(MediaType.APPLICATION_JSON) }
+                    content { contentType(APPLICATION_JSON) }
                     content { json(mapper.writeValueAsString(familyDto)) }
                 }
 
         familyDto.wife = createPerson(Gender.MALE).id
         mockMvc.put("/api/genealogy/families/${familyDto.id}") {
             content = mapper.writeValueAsString(familyDto)
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
             header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
@@ -83,7 +86,7 @@ class FamilyControllerTest : ContextLoadTest() {
                 }
 
         mockMvc.get("/api/genealogy/families/${familyDto.id}") {
-            accept = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
             header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
@@ -94,8 +97,8 @@ class FamilyControllerTest : ContextLoadTest() {
 
         mockMvc.post("/api/genealogy/families") {
             content = mapper.writeValueAsString(FamilyDTO())
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
             header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
@@ -123,8 +126,8 @@ class FamilyControllerTest : ContextLoadTest() {
         val familyEvent = createFamilyEventModel()
         val location = mockMvc.post("/api/genealogy/families/${familyDTO.id}/events") {
             content = mapper.writeValueAsString(familyEvent)
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
             header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
@@ -142,7 +145,7 @@ class FamilyControllerTest : ContextLoadTest() {
                 .andDo { print() }
                 .andExpect {
                     status { isOk() }
-                    content { json(mapper.writeValueAsString(mutableListOf(familyEvent))) }
+                    content { json(mapper.writeValueAsString(listOf(familyEvent))) }
 
                 }
 
@@ -185,8 +188,8 @@ class FamilyControllerTest : ContextLoadTest() {
         val child1 = createPersonModel(Gender.MALE)
         val childId1 = mockMvc.post("/api/genealogy/families/${familyDTO.id}/children") {
             content = mapper.writeValueAsString(child1)
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
             header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
@@ -200,7 +203,7 @@ class FamilyControllerTest : ContextLoadTest() {
 
         val child2 = createPerson(Gender.MALE)
         val childId2 = mockMvc.patch("/api/genealogy/families/${familyDTO.id}/children/${child2.id}") {
-            accept = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
             header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
@@ -218,7 +221,7 @@ class FamilyControllerTest : ContextLoadTest() {
                 .andDo { print() }
                 .andExpect {
                     status { isOk() }
-                    content { json(mapper.writeValueAsString(mutableListOf(child1, child2))) }
+                    content { json(mapper.writeValueAsString(listOf(child1, child2))) }
                 }
 
         mockMvc.delete("/api/genealogy/families/${familyDTO.id}/children/${child1.id}") {
@@ -247,7 +250,7 @@ class FamilyControllerTest : ContextLoadTest() {
                 .andDo { print() }
                 .andExpect {
                     status { isOk() }
-                    content { json(mapper.writeValueAsString(mutableListOf(child2))) }
+                    content { json(mapper.writeValueAsString(listOf(child2))) }
                 }
     }
 }

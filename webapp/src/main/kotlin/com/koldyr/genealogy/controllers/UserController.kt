@@ -1,8 +1,8 @@
 package com.koldyr.genealogy.controllers
 
-import com.koldyr.genealogy.GenealogyConfig
 import com.koldyr.genealogy.model.Credentials
 import com.koldyr.genealogy.model.User
+import com.koldyr.genealogy.security.UnSecured
 import com.koldyr.genealogy.services.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
@@ -13,7 +13,7 @@ import java.net.URI
 
 @RestController
 @RequestMapping("/api/user")
-@GenealogyConfig.UnSecured
+@UnSecured
 class UserController(private val userService: UserService) {
 
     @PostMapping("/registration")

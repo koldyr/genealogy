@@ -13,14 +13,18 @@ open class UserServiceImpl(
         private val userRepository: UserRepository,
         private val bCryptPasswordEncoder: BCryptPasswordEncoder) : UserService {
 
-    override fun createUser(userCred: User) {
-        val user : Optional<User>? = userCred.email?.let { userRepository.findByEmail(it) }
-        if (user?.isPresent == true) {
+    override fun createUser(userModel: User) {
+        if (userModel.email.isBlank() || userModel.password.isBlank() || userModel.name.isBlank() || userModel.surName.isBlank()) {
+            throw ResponseStatusException(HttpStatus.BAD_REQUEST, "invalid data")
+        }
+        val user : Optional<User> = userRepository.findByEmail(userModel.email)
+        if (user.isPresent) {
             throw ResponseStatusException(HttpStatus.BAD_REQUEST, "User already registered. Please use different email.")
         }
 
-        userCred.password = bCryptPasswordEncoder.encode(userCred.password)
-        userRepository.save(userCred)
+        userModel.id = null
+        userModel.password = bCryptPasswordEncoder.encode(userModel.password)
+        userRepository.save(userModel)
     }
 
     override fun readUserByEmail(email: String): User {

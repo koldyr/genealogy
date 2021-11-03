@@ -1,25 +1,33 @@
 package com.koldyr.genealogy.model
 
-import javax.persistence.*
+
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.SequenceGenerator
+import javax.persistence.Table
+
 
 @Entity
 @Table(name = "T_USER")
 @SequenceGenerator(name = "userIds", sequenceName = "SEQ_USER", allocationSize = 1)
 class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "FamilyIds")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "userIds")
     @Column(name = "USER_ID")
-    var id: Int ?= null
+    var id: Int? = null
 
-    @Column(name = "EMAIL")
-    var email: String ?= null
+    @Column(name = "EMAIL", nullable = false, unique = true)
+    var email: String = ""
 
-    @Column(name = "PASSWORD")
-    var password: String ?= null
+    @Column(name = "PASSWORD", nullable = false)
+    var password: String = ""
 
-    @Column(name = "NAME")
-    var name: String ?= null
+    @Column(name = "NAME", nullable = false)
+    var name: String = ""
 
-    @Column(name = "SURNAME")
-    var surName: String ?= null
+    @Column(name = "SURNAME", nullable = false)
+    var surName: String = ""
 }

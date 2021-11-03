@@ -40,6 +40,7 @@ open class PersonServiceImpl(
         val persisted = findPerson(personId)
 
         person.id = persisted.id
+        person.user = persisted.user
         mapper.map(person, persisted)
 
         personRepository.save(persisted);

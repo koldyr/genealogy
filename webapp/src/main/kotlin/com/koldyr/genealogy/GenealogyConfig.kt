@@ -5,8 +5,20 @@ import com.koldyr.genealogy.mapper.FamilyEventConverter
 import com.koldyr.genealogy.mapper.PersonConverter
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.Person
-import com.koldyr.genealogy.persistence.*
-import com.koldyr.genealogy.services.*
+import com.koldyr.genealogy.persistence.FamilyEventRepository
+import com.koldyr.genealogy.persistence.FamilyRepository
+import com.koldyr.genealogy.persistence.PersonEventRepository
+import com.koldyr.genealogy.persistence.PersonRepository
+import com.koldyr.genealogy.persistence.UserRepository
+import com.koldyr.genealogy.security.Secured
+import com.koldyr.genealogy.security.UnSecured
+import com.koldyr.genealogy.services.AuthenticationUserDetailsService
+import com.koldyr.genealogy.services.FamilyService
+import com.koldyr.genealogy.services.FamilyServiceImpl
+import com.koldyr.genealogy.services.PersonService
+import com.koldyr.genealogy.services.PersonServiceImpl
+import com.koldyr.genealogy.services.UserService
+import com.koldyr.genealogy.services.UserServiceImpl
 import ma.glasnost.orika.MapperFacade
 import ma.glasnost.orika.impl.DefaultMapperFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,11 +29,15 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import springfox.documentation.builders.RequestHandlerSelectors
-import springfox.documentation.service.*
+import springfox.documentation.service.ApiInfo
+import springfox.documentation.service.ApiKey
+import springfox.documentation.service.AuthorizationScope
+import springfox.documentation.service.SecurityReference
+import springfox.documentation.service.SecurityScheme
+import springfox.documentation.service.VendorExtension
 import springfox.documentation.spi.DocumentationType
 import springfox.documentation.spi.service.contexts.SecurityContext
 import springfox.documentation.spring.web.plugins.Docket
-import java.util.*
 
 
 /**
@@ -47,13 +63,13 @@ open class GenealogyConfig {
     lateinit var userRepository: UserRepository
 
     @Bean
-    open fun personService(mapper: MapperFacade): PersonService {
-        return PersonServiceImpl(personRepository, personEventRepository, familyRepository, mapper, userService(BCryptPasswordEncoder()))
+    open fun personService(mapper: MapperFacade, userService: UserService): PersonService {
+        return PersonServiceImpl(personRepository, personEventRepository, familyRepository, mapper, userService)
     }
 
     @Bean
-    open fun familyService(mapper: MapperFacade): FamilyService {
-        return FamilyServiceImpl(familyRepository, personRepository, familyEventRepository, mapper, userService(BCryptPasswordEncoder()))
+    open fun familyService(mapper: MapperFacade, userService: UserService): FamilyService {
+        return FamilyServiceImpl(familyRepository, personRepository, familyEventRepository, mapper, userService)
     }
 
     @Bean
@@ -91,17 +107,13 @@ open class GenealogyConfig {
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry.addMapping("/**")
                         .allowedOrigins("*")
-                        .allowedMethods(HttpMethod.GET.name, HttpMethod.HEAD.name, HttpMethod.POST.name, HttpMethod.PUT.name, HttpMethod.DELETE.name)
+                        .allowedMethods(HttpMethod.GET.name, HttpMethod.HEAD.name, HttpMethod.POST.name, HttpMethod.PUT.name, HttpMethod.DELETE.name, HttpMethod.PATCH.name)
             }
         }
     }
 
-
-    annotation class Secured
-    annotation class UnSecured
-
     @Bean
-    open fun serviceApiSecured(): Docket? {
+    open fun serviceApiSecured(): Docket {
         return Docket(DocumentationType.SWAGGER_2)
                 .groupName("secured")
                 .apiInfo(apiInfo())
@@ -110,12 +122,12 @@ open class GenealogyConfig {
                 .build()
                 .useDefaultResponseMessages(false)
                 .enableUrlTemplating(false)
-                .securitySchemes(mutableListOf(apiKey()) as List<SecurityScheme>?)
-                .securityContexts(Arrays.asList(securityContext()))
+                .securitySchemes(listOf(apiKey()) as List<SecurityScheme>)
+                .securityContexts(listOf(securityContext()))
     }
 
     @Bean
-    open fun serviceApiLogin(): Docket? {
+    open fun serviceApiLogin(): Docket {
         return Docket(DocumentationType.SWAGGER_2)
                 .groupName("login")
                 .apiInfo(apiInfo())
@@ -130,15 +142,15 @@ open class GenealogyConfig {
         return ApiKey("JWT", "Authorization", "header")
     }
 
-    private fun securityContext(): SecurityContext? {
+    private fun securityContext(): SecurityContext {
         return SecurityContext.builder().securityReferences(defaultAuth()).build()
     }
 
-    private fun defaultAuth(): List<SecurityReference?>? {
+    private fun defaultAuth(): List<SecurityReference> {
         val authorizationScope = AuthorizationScope("global", "accessEverything")
-        val authorizationScopes: Array<AuthorizationScope?> = arrayOfNulls<AuthorizationScope>(1)
+        val authorizationScopes: Array<AuthorizationScope?> = arrayOfNulls(1)
         authorizationScopes[0] = authorizationScope
-        return Arrays.asList(SecurityReference("JWT", authorizationScopes))
+        return listOf(SecurityReference("JWT", authorizationScopes))
     }
 
 

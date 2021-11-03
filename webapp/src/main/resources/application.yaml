@@ -13,7 +13,7 @@ spring:
 security:
   secret: kdskliojfsdl32r3hhkjdfdf
   token:
-    exp: 864000000 # 10 days
+    exp: 10 #days
 
 #    schema: classpath:sql/schema.sql
 #    initialization-mode: always

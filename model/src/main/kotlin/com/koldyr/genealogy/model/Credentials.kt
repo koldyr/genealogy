@@ -1,6 +1,10 @@
 package com.koldyr.genealogy.model
 
+import org.jetbrains.annotations.NotNull
+
 class Credentials {
-    var username :String ?= null
-    var password :String ?= null
+    @NotNull
+    lateinit var username: String
+    @NotNull
+    lateinit var password: String
 }

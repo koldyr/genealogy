@@ -4,10 +4,23 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.koldyr.genealogy.model.converter.GenderConverter
 import java.util.function.Predicate
-import javax.persistence.*
+import javax.persistence.AttributeOverride
+import javax.persistence.AttributeOverrides
+import javax.persistence.Basic
 import javax.persistence.CascadeType.ALL
+import javax.persistence.Column
+import javax.persistence.Convert
+import javax.persistence.Embedded
+import javax.persistence.Entity
 import javax.persistence.FetchType.EAGER
+import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.SEQUENCE
+import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
+import javax.persistence.OneToMany
+import javax.persistence.SequenceGenerator
+import javax.persistence.Table
 
 /**
  * Description of class Person
@@ -53,7 +66,7 @@ class Person() : Cloneable {
     @Column(name = "FAMILY_ID", nullable = true)
     var familyId: Int? = null
 
-    @JoinColumn(name = "USER_ID")
+    @JoinColumn(name = "USER_ID", nullable = false)
     @ManyToOne
     @JsonIgnore
     var user: User? = null

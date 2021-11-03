@@ -3,7 +3,15 @@ package com.koldyr.genealogy.context
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.koldyr.genealogy.Genealogy
 import com.koldyr.genealogy.dto.FamilyDTO
-import com.koldyr.genealogy.model.*
+import com.koldyr.genealogy.model.Credentials
+import com.koldyr.genealogy.model.EventPrefix
+import com.koldyr.genealogy.model.EventType
+import com.koldyr.genealogy.model.FamilyEvent
+import com.koldyr.genealogy.model.Gender
+import com.koldyr.genealogy.model.Person
+import com.koldyr.genealogy.model.PersonEvent
+import com.koldyr.genealogy.model.PersonNames
+import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
@@ -55,9 +63,9 @@ abstract class ContextLoadTest {
     protected fun createPersonModel(gender: Gender): Person {
         val person = Person()
         person.name = PersonNames()
-        person.name?.first = createRandomWord()
-        person.name?.middle = createRandomWord()
-        person.name?.last = createRandomWord()
+        person.name!!.first = createRandomWord()
+        person.name!!.middle = createRandomWord()
+        person.name!!.last = createRandomWord()
         person.gender = gender
         person.place = createRandomWord()
         person.occupation = createRandomWord()
@@ -78,7 +86,7 @@ abstract class ContextLoadTest {
     @Before
     open fun loadUser () {
         val user = createUser()
-        val location = mockMvc.post("/api/user/registration") {
+        mockMvc.post("/api/user/registration") {
             content = mapper.writeValueAsString(user)
             contentType = MediaType.APPLICATION_JSON
             accept = MediaType.APPLICATION_JSON
@@ -88,7 +96,7 @@ abstract class ContextLoadTest {
                     status { isCreated() }
                     header { exists(HttpHeaders.LOCATION) }
                     header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/user/login")) }
-                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
+                }
     }
 
     @After
@@ -101,12 +109,12 @@ abstract class ContextLoadTest {
     }
 
     protected fun getBearerToken() : String {
-        val creds = Credentials()
-        creds.username = "yan@gmail.com"
-        creds.password = "1111"
+        val credentials = Credentials()
+        credentials.username = "yan@gmail.com"
+        credentials.password = "1111"
 
         val token = mockMvc.post("/api/user/login") {
-            content = mapper.writeValueAsString(creds)
+            content = mapper.writeValueAsString(credentials)
             contentType = MediaType.APPLICATION_JSON
             accept = MediaType.APPLICATION_JSON
         }
@@ -173,8 +181,8 @@ abstract class ContextLoadTest {
                     header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/families/[\\d]+")) }
                 }.andReturn().response.getHeader(HttpHeaders.LOCATION)
         familyDTO.id = getLastIdFromLocation(location)
-        familyDTO.children = mutableListOf()
-        familyDTO.events = mutableListOf()
+        familyDTO.children = listOf()
+        familyDTO.events = listOf()
         return familyDTO
     }
 

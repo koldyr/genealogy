@@ -7,8 +7,8 @@ import org.springframework.security.core.userdetails.UserDetailsService
 class AuthenticationUserDetailsService(
         private val userService: UserService
 ) : UserDetailsService {
-    override fun loadUserByUsername(p0: String?): UserDetails {
-        val user : User = userService.readUserByEmail(p0!!)
-        return org.springframework.security.core.userdetails.User(user.email, user.password, emptyList())
+    override fun loadUserByUsername(email: String): UserDetails {
+        val user : User = userService.readUserByEmail(email)
+        return org.springframework.security.core.userdetails.User(user.email, user.password, listOf())
     }
 }

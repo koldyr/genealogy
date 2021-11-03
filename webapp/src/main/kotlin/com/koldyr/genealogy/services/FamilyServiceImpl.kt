@@ -159,6 +159,7 @@ open class FamilyServiceImpl(
         val family = find(familyId)
 
         child.id = null
+        child.user = userService.currentUser()
         val saved = personRepository.save(child)
         family.children.add(saved)
 
