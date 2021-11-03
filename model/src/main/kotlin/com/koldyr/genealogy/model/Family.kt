@@ -7,7 +7,10 @@ import com.koldyr.genealogy.handlers.ChildrenDeserializer
 import com.koldyr.genealogy.handlers.ChildrenSerializer
 import com.koldyr.genealogy.handlers.PersonIdDeserializer
 import com.koldyr.genealogy.handlers.PersonIdSerializer
-import javax.persistence.CascadeType.*
+import javax.persistence.CascadeType.ALL
+import javax.persistence.CascadeType.MERGE
+import javax.persistence.CascadeType.PERSIST
+import javax.persistence.CascadeType.REFRESH
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.FetchType.EAGER
@@ -58,7 +61,7 @@ class Family() {
     @JoinColumn(name = "USER_ID", nullable = false)
     @ManyToOne
     @JsonIgnore
-    var user: User? = null
+    lateinit var user: User
 
     var note: String? = null
 

@@ -35,7 +35,7 @@ import springfox.documentation.service.AuthorizationScope
 import springfox.documentation.service.SecurityReference
 import springfox.documentation.service.SecurityScheme
 import springfox.documentation.service.VendorExtension
-import springfox.documentation.spi.DocumentationType
+import springfox.documentation.spi.DocumentationType.SWAGGER_2
 import springfox.documentation.spi.service.contexts.SecurityContext
 import springfox.documentation.spring.web.plugins.Docket
 
@@ -114,7 +114,7 @@ open class GenealogyConfig {
 
     @Bean
     open fun serviceApiSecured(): Docket {
-        return Docket(DocumentationType.SWAGGER_2)
+        return Docket(SWAGGER_2)
                 .groupName("secured")
                 .apiInfo(apiInfo())
                 .select()
@@ -128,7 +128,7 @@ open class GenealogyConfig {
 
     @Bean
     open fun serviceApiLogin(): Docket {
-        return Docket(DocumentationType.SWAGGER_2)
+        return Docket(SWAGGER_2)
                 .groupName("login")
                 .apiInfo(apiInfo())
                 .select()
@@ -148,11 +148,9 @@ open class GenealogyConfig {
 
     private fun defaultAuth(): List<SecurityReference> {
         val authorizationScope = AuthorizationScope("global", "accessEverything")
-        val authorizationScopes: Array<AuthorizationScope?> = arrayOfNulls(1)
-        authorizationScopes[0] = authorizationScope
+        val authorizationScopes: Array<AuthorizationScope> = arrayOf(authorizationScope)
         return listOf(SecurityReference("JWT", authorizationScopes))
     }
-
 
     private fun apiInfo(): ApiInfo {
         val title = "Genealogy"
@@ -164,7 +162,7 @@ open class GenealogyConfig {
     }
 
     @Bean
-    open fun bCryptPasswordEncoder(): BCryptPasswordEncoder? {
+    open fun passwordEncoder(): BCryptPasswordEncoder {
         return BCryptPasswordEncoder()
     }
 }
