@@ -11,3 +11,7 @@ spring:
   jpa:
     show-sql: false
     generate-ddl: true
+security:
+  secret: kdskliojfsdl32r3hhkjdfdf
+  token:
+    exp: 10 #days

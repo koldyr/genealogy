@@ -3,11 +3,13 @@ package com.koldyr.genealogy.controllers
 import com.koldyr.genealogy.context.ContextLoadTest
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.Gender
+import org.hamcrest.Matchers
 import org.junit.Test
-import org.springframework.http.MediaType
+import org.springframework.http.HttpHeaders
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
+import org.springframework.test.web.servlet.patch
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 
@@ -17,6 +19,7 @@ class FamilyControllerTest : ContextLoadTest() {
     fun families() {
         mockMvc.get("/api/genealogy/families") {
             accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
@@ -26,12 +29,13 @@ class FamilyControllerTest : ContextLoadTest() {
         val familyDto = createFamily()
 
         mockMvc.get("/api/genealogy/families/${familyDto.id}") {
-            accept = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
                     status { isOk() }
-                    content { contentType(MediaType.APPLICATION_JSON) }
+                    content { contentType(APPLICATION_JSON) }
                     content { json(mapper.writeValueAsString(familyDto)) }
                 }
 
@@ -39,8 +43,9 @@ class FamilyControllerTest : ContextLoadTest() {
 
         mockMvc.put("/api/genealogy/families/${familyDto.id}") {
             content = mapper.writeValueAsString(familyDto)
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
@@ -48,20 +53,22 @@ class FamilyControllerTest : ContextLoadTest() {
                 }
 
         mockMvc.get("/api/genealogy/families/${familyDto.id}") {
-            accept = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
                     status { isOk() }
-                    content { contentType(MediaType.APPLICATION_JSON) }
+                    content { contentType(APPLICATION_JSON) }
                     content { json(mapper.writeValueAsString(familyDto)) }
                 }
 
         familyDto.wife = createPerson(Gender.MALE).id
         mockMvc.put("/api/genealogy/families/${familyDto.id}") {
             content = mapper.writeValueAsString(familyDto)
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
@@ -71,6 +78,7 @@ class FamilyControllerTest : ContextLoadTest() {
 
         mockMvc.delete("/api/genealogy/families/${familyDto.id}") {
             accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
@@ -78,7 +86,8 @@ class FamilyControllerTest : ContextLoadTest() {
                 }
 
         mockMvc.get("/api/genealogy/families/${familyDto.id}") {
-            accept = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
@@ -88,8 +97,9 @@ class FamilyControllerTest : ContextLoadTest() {
 
         mockMvc.post("/api/genealogy/families") {
             content = mapper.writeValueAsString(FamilyDTO())
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
@@ -104,6 +114,7 @@ class FamilyControllerTest : ContextLoadTest() {
         val randomId :Int = (99999..999999).random()
         mockMvc.get("/api/genealogy/families/$randomId/events") {
             accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
@@ -112,20 +123,35 @@ class FamilyControllerTest : ContextLoadTest() {
                 }
 
         val familyDTO = createFamily()
-        val familyEvent = createFamilyEvent(familyDTO)
+        val familyEvent = createFamilyEventModel()
+        val location = mockMvc.post("/api/genealogy/families/${familyDTO.id}/events") {
+            content = mapper.writeValueAsString(familyEvent)
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+        }
+                .andDo { print() }
+                .andExpect {
+                    status { isCreated() }
+                    header { exists(HttpHeaders.LOCATION) }
+                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/families/[\\d]+/events/[\\d]+")) }
+                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
+        familyEvent.id = getLastIdFromLocation(location)
 
         mockMvc.get("/api/genealogy/families/${familyDTO.id}/events") {
             accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
                     status { isOk() }
-                    content { json(mapper.writeValueAsString(mutableListOf(familyEvent))) }
+                    content { json(mapper.writeValueAsString(listOf(familyEvent))) }
 
                 }
 
         mockMvc.delete("/api/genealogy/families/${familyDTO.id}/events/${familyEvent.id}") {
             accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
@@ -134,6 +160,7 @@ class FamilyControllerTest : ContextLoadTest() {
 
         mockMvc.get("/api/genealogy/families/${familyDTO.id}/events") {
             accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
@@ -148,6 +175,7 @@ class FamilyControllerTest : ContextLoadTest() {
         val randomId :Int = (99999..999999).random()
         mockMvc.get("/api/genealogy/families/$randomId/children") {
             accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
@@ -156,20 +184,49 @@ class FamilyControllerTest : ContextLoadTest() {
                 }
 
         val familyDTO = createFamily()
-        val child1 = createChildOnFamily(familyDTO)
-        val child2 = patchChildOnFamilyWithId(familyDTO)
+
+        val child1 = createPersonModel(Gender.MALE)
+        val childId1 = mockMvc.post("/api/genealogy/families/${familyDTO.id}/children") {
+            content = mapper.writeValueAsString(child1)
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+        }
+                .andDo { print() }
+                .andExpect {
+                    status { isCreated() }
+                    header { exists(HttpHeaders.LOCATION) }
+                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+")) }
+                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
+        child1.id = getLastIdFromLocation(childId1)
+
+
+        val child2 = createPerson(Gender.MALE)
+        val childId2 = mockMvc.patch("/api/genealogy/families/${familyDTO.id}/children/${child2.id}") {
+            accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+        }
+                .andDo { print() }
+                .andExpect {
+                    status { isCreated() }
+                    header { exists(HttpHeaders.LOCATION) }
+                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+")) }
+                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
+        child2.id = getLastIdFromLocation(childId2)
 
         mockMvc.get("/api/genealogy/families/${familyDTO.id}/children") {
             accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
                     status { isOk() }
-                    content { json(mapper.writeValueAsString(mutableListOf(child1, child2))) }
+                    content { json(mapper.writeValueAsString(listOf(child1, child2))) }
                 }
 
         mockMvc.delete("/api/genealogy/families/${familyDTO.id}/children/${child1.id}") {
             accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
@@ -178,6 +235,7 @@ class FamilyControllerTest : ContextLoadTest() {
 
         mockMvc.delete("/api/genealogy/families/${familyDTO.id}/children/${child1.id}") {
             accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
@@ -187,11 +245,12 @@ class FamilyControllerTest : ContextLoadTest() {
 
         mockMvc.get("/api/genealogy/families/${familyDTO.id}/children") {
             accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
         }
                 .andDo { print() }
                 .andExpect {
                     status { isOk() }
-                    content { json(mapper.writeValueAsString(mutableListOf(child2))) }
+                    content { json(mapper.writeValueAsString(listOf(child2))) }
                 }
     }
 }

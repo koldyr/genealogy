@@ -19,12 +19,14 @@ open class PersonServiceImpl(
         private val personRepository: PersonRepository,
         private val personEventRepository: PersonEventRepository,
         private val familyRepository: FamilyRepository,
-        private val mapper: MapperFacade) : PersonService {
+        private val mapper: MapperFacade,
+        private val userService: UserService) : PersonService {
 
-    override fun findAll(): List<Person> = personRepository.findAll()
+    override fun findAll(): List<Person> = personRepository.findAllByUser(userService.currentUser())
 
     @Transactional
     override fun create(person: Person): Int {
+        person.user = userService.currentUser()
         val saved = personRepository.save(person)
         return saved.id!!
     }
@@ -38,6 +40,7 @@ open class PersonServiceImpl(
         val persisted = findPerson(personId)
 
         person.id = persisted.id
+        person.user = persisted.user
         mapper.map(person, persisted)
 
         personRepository.save(persisted);

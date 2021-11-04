@@ -9,22 +9,35 @@ import com.koldyr.genealogy.persistence.FamilyEventRepository
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
+import com.koldyr.genealogy.persistence.UserRepository
+import com.koldyr.genealogy.security.Secured
+import com.koldyr.genealogy.security.UnSecured
+import com.koldyr.genealogy.services.AuthenticationUserDetailsService
 import com.koldyr.genealogy.services.FamilyService
 import com.koldyr.genealogy.services.FamilyServiceImpl
 import com.koldyr.genealogy.services.PersonService
 import com.koldyr.genealogy.services.PersonServiceImpl
-import io.swagger.v3.oas.models.Components
-import io.swagger.v3.oas.models.OpenAPI
-import io.swagger.v3.oas.models.info.Info
-import io.swagger.v3.oas.models.info.License
+import com.koldyr.genealogy.services.UserService
+import com.koldyr.genealogy.services.UserServiceImpl
 import ma.glasnost.orika.MapperFacade
 import ma.glasnost.orika.impl.DefaultMapperFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import springfox.documentation.builders.RequestHandlerSelectors
+import springfox.documentation.service.ApiInfo
+import springfox.documentation.service.ApiKey
+import springfox.documentation.service.AuthorizationScope
+import springfox.documentation.service.SecurityReference
+import springfox.documentation.service.SecurityScheme
+import springfox.documentation.service.VendorExtension
+import springfox.documentation.spi.DocumentationType.SWAGGER_2
+import springfox.documentation.spi.service.contexts.SecurityContext
+import springfox.documentation.spring.web.plugins.Docket
 
 
 /**
@@ -46,14 +59,27 @@ open class GenealogyConfig {
     @Autowired
     lateinit var personEventRepository: PersonEventRepository
 
+    @Autowired
+    lateinit var userRepository: UserRepository
+
     @Bean
-    open fun personService(mapper: MapperFacade): PersonService {
-        return PersonServiceImpl(personRepository, personEventRepository, familyRepository, mapper)
+    open fun personService(mapper: MapperFacade, userService: UserService): PersonService {
+        return PersonServiceImpl(personRepository, personEventRepository, familyRepository, mapper, userService)
     }
 
     @Bean
-    open fun familyService(mapper: MapperFacade): FamilyService {
-        return FamilyServiceImpl(familyRepository, personRepository, familyEventRepository, mapper)
+    open fun familyService(mapper: MapperFacade, userService: UserService): FamilyService {
+        return FamilyServiceImpl(familyRepository, personRepository, familyEventRepository, mapper, userService)
+    }
+
+    @Bean
+    open fun userService(bCryptPasswordEncoder: BCryptPasswordEncoder): UserService {
+        return UserServiceImpl(userRepository, bCryptPasswordEncoder)
+    }
+
+    @Bean
+    open fun authenticationUserDetailsService(userService: UserService) : AuthenticationUserDetailsService {
+        return AuthenticationUserDetailsService(userService)
     }
 
     @Bean
@@ -81,26 +107,62 @@ open class GenealogyConfig {
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry.addMapping("/**")
                         .allowedOrigins("*")
-                        .allowedMethods(HttpMethod.GET.name, HttpMethod.HEAD.name, HttpMethod.POST.name, HttpMethod.PUT.name, HttpMethod.DELETE.name)
+                        .allowedMethods(HttpMethod.GET.name, HttpMethod.HEAD.name, HttpMethod.POST.name, HttpMethod.PUT.name, HttpMethod.DELETE.name, HttpMethod.PATCH.name)
             }
         }
     }
 
     @Bean
-    open fun api(): OpenAPI {
-        return OpenAPI()
-                .components(Components())
-                .info(apiInfo())
+    open fun serviceApiSecured(): Docket {
+        return Docket(SWAGGER_2)
+                .groupName("secured")
+                .apiInfo(apiInfo())
+                .select()
+                .apis(RequestHandlerSelectors.withClassAnnotation(Secured::class.java))
+                .build()
+                .useDefaultResponseMessages(false)
+                .enableUrlTemplating(false)
+                .securitySchemes(listOf(apiKey()) as List<SecurityScheme>)
+                .securityContexts(listOf(securityContext()))
     }
 
-    private fun apiInfo(): Info {
-        val license = License()
-                .name("Apache 2.0")
-                .url("http://www.apache.org/licenses/LICENSE-2.0")
-        return Info()
-                .title("Genealogy")
-                .description("RESTfull back end for Genealogy SPA")
-                .termsOfService("http://koldyr.com/genealogy/tos")
-                .license(license)
+    @Bean
+    open fun serviceApiLogin(): Docket {
+        return Docket(SWAGGER_2)
+                .groupName("login")
+                .apiInfo(apiInfo())
+                .select()
+                .apis(RequestHandlerSelectors.withClassAnnotation(UnSecured::class.java))
+                .build()
+                .useDefaultResponseMessages(false)
+                .enableUrlTemplating(false)
+    }
+
+    private fun apiKey(): ApiKey {
+        return ApiKey("JWT", "Authorization", "header")
+    }
+
+    private fun securityContext(): SecurityContext {
+        return SecurityContext.builder().securityReferences(defaultAuth()).build()
+    }
+
+    private fun defaultAuth(): List<SecurityReference> {
+        val authorizationScope = AuthorizationScope("global", "accessEverything")
+        val authorizationScopes: Array<AuthorizationScope> = arrayOf(authorizationScope)
+        return listOf(SecurityReference("JWT", authorizationScopes))
+    }
+
+    private fun apiInfo(): ApiInfo {
+        val title = "Genealogy"
+        val description = "RESTfull back end for Genealogy SPA"
+        val vendorExtensions: List<VendorExtension<*>> = mutableListOf()
+        val termsOfServiceUrl = "http://koldyr.com/genealogy/tos"
+        val licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
+        return ApiInfo(title, description, "2.0", termsOfServiceUrl, null, "Apache 2.0", licenseUrl, vendorExtensions)
+    }
+
+    @Bean
+    open fun passwordEncoder(): BCryptPasswordEncoder {
+        return BCryptPasswordEncoder()
     }
 }
