@@ -16,9 +16,9 @@ open class UserServiceImpl(
         if (userModel.email.isBlank() || userModel.password.isBlank() || userModel.name.isBlank() || userModel.surName.isBlank()) {
             throw ResponseStatusException(BAD_REQUEST, "invalid data")
         }
-        userRepository.findByEmail(userModel.email)
-            .orElseThrow { ResponseStatusException(BAD_REQUEST, "User already registered. Please use different email.") }
-
+        if (userRepository.findByEmail(userModel.email).isPresent) {
+            throw ResponseStatusException(BAD_REQUEST, "User already registered. Please use different email.")
+        }
         userModel.id = null
         userModel.password = passwordEncoder.encode(userModel.password)
         userRepository.save(userModel)
