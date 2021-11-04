@@ -35,7 +35,7 @@ import springfox.documentation.service.AuthorizationScope
 import springfox.documentation.service.SecurityReference
 import springfox.documentation.service.SecurityScheme
 import springfox.documentation.service.VendorExtension
-import springfox.documentation.spi.DocumentationType.SWAGGER_2
+import springfox.documentation.spi.DocumentationType.*
 import springfox.documentation.spi.service.contexts.SecurityContext
 import springfox.documentation.spring.web.plugins.Docket
 
@@ -73,8 +73,8 @@ open class GenealogyConfig {
     }
 
     @Bean
-    open fun userService(bCryptPasswordEncoder: BCryptPasswordEncoder): UserService {
-        return UserServiceImpl(userRepository, bCryptPasswordEncoder)
+    open fun userService(passwordEncoder: BCryptPasswordEncoder): UserService {
+        return UserServiceImpl(userRepository, passwordEncoder)
     }
 
     @Bean
