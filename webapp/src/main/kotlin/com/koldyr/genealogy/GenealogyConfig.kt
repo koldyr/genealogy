@@ -26,6 +26,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.web.filter.CommonsRequestLoggingFilter
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import springfox.documentation.builders.RequestHandlerSelectors
@@ -35,7 +36,7 @@ import springfox.documentation.service.AuthorizationScope
 import springfox.documentation.service.SecurityReference
 import springfox.documentation.service.SecurityScheme
 import springfox.documentation.service.VendorExtension
-import springfox.documentation.spi.DocumentationType.*
+import springfox.documentation.spi.DocumentationType.SWAGGER_2
 import springfox.documentation.spi.service.contexts.SecurityContext
 import springfox.documentation.spring.web.plugins.Docket
 
@@ -136,6 +137,17 @@ open class GenealogyConfig {
                 .build()
                 .useDefaultResponseMessages(false)
                 .enableUrlTemplating(false)
+    }
+
+    @Bean
+    open fun commonsRequestLoggingFilter(): CommonsRequestLoggingFilter {
+        val filter = CommonsRequestLoggingFilter()
+        filter.setIncludeQueryString(true)
+        filter.setIncludePayload(true)
+        filter.setMaxPayloadLength(10000)
+        filter.setIncludeHeaders(false)
+        filter.setAfterMessagePrefix("REQUEST DATA : ")
+        return filter
     }
 
     private fun apiKey(): ApiKey {
