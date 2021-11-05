@@ -19,6 +19,7 @@ import com.koldyr.genealogy.services.PersonService
 import com.koldyr.genealogy.services.PersonServiceImpl
 import com.koldyr.genealogy.services.UserService
 import com.koldyr.genealogy.services.UserServiceImpl
+import com.koldyr.genealogy.utils.GenealogyLogger
 import ma.glasnost.orika.MapperFacade
 import ma.glasnost.orika.impl.DefaultMapperFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -26,7 +27,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpMethod
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.web.filter.CommonsRequestLoggingFilter
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import springfox.documentation.builders.RequestHandlerSelectors
@@ -140,8 +140,8 @@ open class GenealogyConfig {
     }
 
     @Bean
-    open fun commonsRequestLoggingFilter(): CommonsRequestLoggingFilter {
-        val filter = CommonsRequestLoggingFilter()
+    open fun commonsRequestLoggingFilter(): GenealogyLogger {
+        val filter = GenealogyLogger()
         filter.setIncludeQueryString(true)
         filter.setIncludePayload(true)
         filter.setMaxPayloadLength(10000)
