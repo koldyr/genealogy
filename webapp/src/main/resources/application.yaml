@@ -16,7 +16,6 @@ security:
     exp: 10 #days
 logging:
   level:
-    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG
     com.koldyr.genealogy.utils.GenealogyLogger: DEBUG
 
 #    schema: classpath:sql/schema.sql
