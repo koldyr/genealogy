@@ -24,6 +24,7 @@ import ma.glasnost.orika.impl.DefaultMapperFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.web.servlet.config.annotation.CorsRegistry
@@ -35,7 +36,7 @@ import springfox.documentation.service.AuthorizationScope
 import springfox.documentation.service.SecurityReference
 import springfox.documentation.service.SecurityScheme
 import springfox.documentation.service.VendorExtension
-import springfox.documentation.spi.DocumentationType.*
+import springfox.documentation.spi.DocumentationType.SWAGGER_2
 import springfox.documentation.spi.service.contexts.SecurityContext
 import springfox.documentation.spring.web.plugins.Docket
 
@@ -108,6 +109,7 @@ open class GenealogyConfig {
                 registry.addMapping("/**")
                         .allowedOrigins("*")
                         .allowedMethods(HttpMethod.GET.name, HttpMethod.HEAD.name, HttpMethod.POST.name, HttpMethod.PUT.name, HttpMethod.DELETE.name, HttpMethod.PATCH.name)
+                        .allowedHeaders(HttpHeaders.AUTHORIZATION)
             }
         }
     }
