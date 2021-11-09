@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/api/genealogy/families")
-open class FamilyController(private val familyService: FamilyService) {
+class FamilyController(private val familyService: FamilyService) {
 
     @GetMapping(produces = [APPLICATION_JSON_VALUE])
     fun families(): Collection<FamilyDTO> = familyService.findAll()

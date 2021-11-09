@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/api/genealogy/persons")
-open class PersonController(private val personService: PersonService) {
+class PersonController(private val personService: PersonService) {
 
     @GetMapping(produces = [APPLICATION_JSON_VALUE])
     fun persons(): Collection<Person> = personService.findAll()
