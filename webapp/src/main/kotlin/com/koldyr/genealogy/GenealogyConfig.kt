@@ -109,7 +109,7 @@ open class GenealogyConfig {
                 registry.addMapping("/**")
                         .allowedOrigins("*")
                         .allowedMethods(HttpMethod.GET.name, HttpMethod.HEAD.name, HttpMethod.POST.name, HttpMethod.PUT.name, HttpMethod.DELETE.name, HttpMethod.PATCH.name)
-                        .allowedHeaders(HttpHeaders.AUTHORIZATION)
+                        .exposedHeaders(HttpHeaders.AUTHORIZATION)
             }
         }
     }
