@@ -91,4 +91,10 @@ class Family() {
             children.remove(person)
         }
     }
+
+    override fun toString(): String {
+        return "Family(id=$id, husband=$husband, wife=$wife, children=$children, events=$events, user=$user, note=$note)"
+    }
+
+
 }

@@ -8,8 +8,7 @@ import com.koldyr.genealogy.security.Secured
 import com.koldyr.genealogy.services.FamilyService
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.created
-import org.springframework.http.ResponseEntity.noContent
+import org.springframework.http.ResponseEntity.*
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -44,7 +43,10 @@ class FamilyController(private val familyService: FamilyService) {
     fun familyById(@PathVariable familyId: Int): FamilyDTO = familyService.findById(familyId)
 
     @PutMapping("/{familyId}", consumes = [APPLICATION_JSON_VALUE])
-    fun update(@PathVariable familyId: Int, @RequestBody family: FamilyDTO) = familyService.update(familyId, family)
+    fun update(@PathVariable familyId: Int, @RequestBody family: FamilyDTO): ResponseEntity<Unit> {
+        familyService.update(familyId, family)
+        return ok().build()
+    }
 
     @DeleteMapping("/{familyId}")
     fun delete(@PathVariable familyId: Int): ResponseEntity<Unit> {

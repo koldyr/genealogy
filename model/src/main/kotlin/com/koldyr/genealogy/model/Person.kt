@@ -138,4 +138,8 @@ class Person() : Cloneable {
             event.person = null
         }
     }
+
+    override fun toString(): String {
+        return "Person(id=$id, name=$name, events=$events, place=$place, occupation=$occupation, note=$note, gender=$gender, parentFamilyId=$parentFamilyId, familyId=$familyId, user=$user)"
+    }
 }

@@ -7,8 +7,7 @@ import com.koldyr.genealogy.security.Secured
 import com.koldyr.genealogy.services.PersonService
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.created
-import org.springframework.http.ResponseEntity.noContent
+import org.springframework.http.ResponseEntity.*
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -39,7 +38,10 @@ class PersonController(private val personService: PersonService) {
     }
 
     @PutMapping("/{personId}")
-    fun update(@PathVariable personId: Int, @RequestBody person: Person) = personService.update(personId, person)
+    fun update(@PathVariable personId: Int, @RequestBody person: Person): ResponseEntity<Unit>{
+        personService.update(personId, person)
+        return ok().build()
+    }
 
     @GetMapping("/{personId}", produces = [APPLICATION_JSON_VALUE])
     fun personById(@PathVariable personId: Int): Person = personService.findById(personId)
