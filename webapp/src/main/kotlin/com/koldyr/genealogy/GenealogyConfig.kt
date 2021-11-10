@@ -28,6 +28,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import springfox.documentation.builders.RequestHandlerSelectors
@@ -48,7 +49,7 @@ import springfox.documentation.spring.web.plugins.Docket
  */
 @Configuration
 @EnableAspectJAutoProxy
-open class GenealogyConfig {
+class GenealogyConfig {
 
     @Autowired
     lateinit var personRepository: PersonRepository
@@ -66,27 +67,27 @@ open class GenealogyConfig {
     lateinit var userRepository: UserRepository
 
     @Bean
-    open fun personService(mapper: MapperFacade, userService: UserService): PersonService {
+    fun personService(mapper: MapperFacade, userService: UserService): PersonService {
         return PersonServiceImpl(personRepository, personEventRepository, familyRepository, mapper, userService)
     }
 
     @Bean
-    open fun familyService(mapper: MapperFacade, userService: UserService): FamilyService {
+    fun familyService(mapper: MapperFacade, userService: UserService): FamilyService {
         return FamilyServiceImpl(familyRepository, personRepository, familyEventRepository, mapper, userService)
     }
 
     @Bean
-    open fun userService(passwordEncoder: BCryptPasswordEncoder): UserService {
+    fun userService(passwordEncoder: PasswordEncoder): UserService {
         return UserServiceImpl(userRepository, passwordEncoder)
     }
 
     @Bean
-    open fun authenticationUserDetailsService(userService: UserService) : AuthenticationUserDetailsService {
+    fun authenticationUserDetailsService(userService: UserService) : AuthenticationUserDetailsService {
         return AuthenticationUserDetailsService(userService)
     }
 
     @Bean
-    open fun mapper(): MapperFacade {
+    fun mapper(): MapperFacade {
         val mapperFactory = DefaultMapperFactory.Builder().build()
 
         mapperFactory.classMap(Family::class.java, FamilyDTO::class.java)
@@ -105,7 +106,7 @@ open class GenealogyConfig {
     }
 
     @Bean
-    open fun corsConfigurer(): WebMvcConfigurer {
+    fun corsConfigurer(): WebMvcConfigurer {
         return object : WebMvcConfigurer {
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry.addMapping("/**")
@@ -117,7 +118,12 @@ open class GenealogyConfig {
     }
 
     @Bean
-    open fun serviceApiSecured(): Docket {
+    fun passwordEncoder(): PasswordEncoder {
+        return BCryptPasswordEncoder()
+    }
+
+    @Bean
+    fun serviceApiSecured(): Docket {
         return Docket(SWAGGER_2)
                 .groupName("secured")
                 .apiInfo(apiInfo())
@@ -131,7 +137,7 @@ open class GenealogyConfig {
     }
 
     @Bean
-    open fun serviceApiLogin(): Docket {
+    fun serviceApiLogin(): Docket {
         return Docket(SWAGGER_2)
                 .groupName("login")
                 .apiInfo(apiInfo())
@@ -163,10 +169,5 @@ open class GenealogyConfig {
         val termsOfServiceUrl = "http://koldyr.com/genealogy/tos"
         val licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
         return ApiInfo(title, description, "2.0", termsOfServiceUrl, null, "Apache 2.0", licenseUrl, vendorExtensions)
-    }
-
-    @Bean
-    open fun passwordEncoder(): BCryptPasswordEncoder {
-        return BCryptPasswordEncoder()
     }
 }

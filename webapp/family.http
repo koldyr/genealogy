@@ -1,13 +1,16 @@
 ### Get Families
 GET http://localhost/api/genealogy/families
+Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Get Family
 GET http://localhost/api/genealogy/families/1
+Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Create Family
 POST http://localhost/api/genealogy/families
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -18,6 +21,7 @@ Accept: application/json
 
 ### Update Family
 POST http://localhost/api/genealogy/families/1
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -28,9 +32,11 @@ Accept: application/json
 
 ### Delete Family
 DELETE http://localhost/api/genealogy/families/2
+Authorization: Bearer {{authToken}}
 
 ### Create Child in Family
 POST http://localhost/api/genealogy/families/1/children
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -48,18 +54,22 @@ Accept: application/json
 
 ### Add Child to Family
 PATCH http://localhost/api/genealogy/families/1/children/5
+Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Delete Child from Family
 DELETE http://localhost/api/genealogy/families/1/children/5
+Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ###
 GET http://localhost/api/genealogy/families/1/children
+Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Create Family Event
 POST http://localhost/api/genealogy/families/1/events
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -72,9 +82,11 @@ Accept: application/json
 
 ### Get Family Events
 GET http://localhost/api/genealogy/families/1/events
+Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Delete Family Event
 DELETE http://localhost/api/genealogy/families/1/events/6
+Authorization: Bearer {{authToken}}
 Accept: application/json
 

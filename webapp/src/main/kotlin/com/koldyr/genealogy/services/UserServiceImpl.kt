@@ -4,13 +4,13 @@ import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.persistence.UserRepository
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.security.core.context.SecurityContextHolder
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.server.ResponseStatusException
 import javax.persistence.EntityNotFoundException
 
 open class UserServiceImpl(
         private val userRepository: UserRepository,
-        private val passwordEncoder: BCryptPasswordEncoder) : UserService {
+        private val passwordEncoder: PasswordEncoder) : UserService {
 
     override fun createUser(userModel: User) {
         if (userModel.email.isBlank() || userModel.password.isBlank() || userModel.name.isBlank() || userModel.surName.isBlank()) {

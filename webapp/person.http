@@ -1,11 +1,23 @@
+POST http://localhost/api/user/login
+Content-Type: application/json
+
+{
+  "username": "me@koldyr.com",
+  "password": "koldyr"
+}
+
+###
 GET http://localhost/api/genealogy/persons
+Authorization: Bearer {{authToken}}
 
 ###
 GET http://localhost/api/genealogy/persons/1
+Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Create Person
 POST http://localhost/api/genealogy/persons
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -23,6 +35,7 @@ Accept: application/json
 
 ### Update Person
 PUT http://localhost/api/genealogy/persons/33
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -43,6 +56,7 @@ DELETE http://localhost/api/genealogy/persons/33
 
 ### Create Person Event
 POST http://localhost/api/genealogy/persons/1/events
+Authorization: Bearer {{authToken}}
 Content-Type: application/json
 Accept: application/json
 
@@ -55,8 +69,10 @@ Accept: application/json
 
 ### Get Person Events
 GET http://localhost/api/genealogy/persons/1/events
+Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Delete Person Event
 DELETE http://localhost/api/genealogy/persons/1/events/10
+Authorization: Bearer {{authToken}}
 Accept: application/json

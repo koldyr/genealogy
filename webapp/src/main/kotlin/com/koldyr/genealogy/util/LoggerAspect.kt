@@ -1,11 +1,14 @@
 package com.koldyr.genealogy.util
 
+import org.apache.commons.lang3.StringUtils.EMPTY
+import org.aspectj.lang.JoinPoint
 import org.aspectj.lang.ProceedingJoinPoint
 import org.aspectj.lang.annotation.Around
 import org.aspectj.lang.annotation.Aspect
 import org.aspectj.lang.annotation.Pointcut
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
+import java.util.StringJoiner
 
 /**
  * Description of class LoggerAspect
@@ -13,12 +16,14 @@ import org.springframework.stereotype.Component
  */
 @Aspect
 @Component
-open class LoggerAspect {
+class LoggerAspect {
+
+    private val COLLECTION_LIMIT: Int = 3
 
     @Around("controllerMethods()")
-    open fun logControllerCall(pjp: ProceedingJoinPoint): Any {
+    fun logControllerCall(pjp: ProceedingJoinPoint): Any {
         val logger = LoggerFactory.getLogger(pjp.target.javaClass.name)
-        logger.trace("START {}", pjp.signature.name)
+        logger.trace("START {}({})", pjp.signature.name, getParams(pjp))
 
         val startTime = System.currentTimeMillis()
         try {
@@ -30,5 +35,32 @@ open class LoggerAspect {
     }
 
     @Pointcut("@within(org.springframework.web.bind.annotation.RestController)")
-    open fun controllerMethods() {}
+    fun controllerMethods() {}
+
+    private fun getParams(pjp: JoinPoint): String {
+        if (pjp.args.size > 0) {
+            val joiner = StringJoiner(", ")
+            for (param in pjp.args) {
+                if (param is Collection<*>) {
+                    val size = param.size
+                    if (size < COLLECTION_LIMIT) {
+                        joiner.add(param.toString())
+                    } else {
+                        joiner.add(param.javaClass.simpleName + '#' + size)
+                    }
+                } else if (param is Map<*, *>) {
+                    val size = param.size
+                    if (size < COLLECTION_LIMIT) {
+                        joiner.add(param.toString())
+                    } else {
+                        joiner.add(param.javaClass.simpleName + '#' + size)
+                    }
+                } else {
+                    joiner.add(param?.toString() ?: EMPTY)
+                }
+            }
+            return joiner.toString()
+        }
+        return EMPTY
+    }
 }
