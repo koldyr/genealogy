@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.controllers
 
+import java.net.URI
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.security.Secured
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.net.URI
 
 /**
  * Description of class PersonController

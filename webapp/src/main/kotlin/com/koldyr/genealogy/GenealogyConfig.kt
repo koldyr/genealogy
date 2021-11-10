@@ -24,6 +24,7 @@ import ma.glasnost.orika.impl.DefaultMapperFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
@@ -46,6 +47,7 @@ import springfox.documentation.spring.web.plugins.Docket
  * @created: 2021-09-28
  */
 @Configuration
+@EnableAspectJAutoProxy
 open class GenealogyConfig {
 
     @Autowired

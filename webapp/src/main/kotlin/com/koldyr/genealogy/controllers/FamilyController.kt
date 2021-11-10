@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.controllers
 
+import java.net.URI
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.FamilyEvent
 import com.koldyr.genealogy.model.Person
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.net.URI
 
 /**
  * Description of class FamilyController
