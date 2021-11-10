@@ -1,12 +1,5 @@
 package com.koldyr.genealogy.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.koldyr.genealogy.handlers.ChildrenDeserializer
-import com.koldyr.genealogy.handlers.ChildrenSerializer
-import com.koldyr.genealogy.handlers.PersonIdDeserializer
-import com.koldyr.genealogy.handlers.PersonIdSerializer
 import javax.persistence.CascadeType.ALL
 import javax.persistence.CascadeType.MERGE
 import javax.persistence.CascadeType.PERSIST
@@ -23,6 +16,13 @@ import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.koldyr.genealogy.handlers.ChildrenDeserializer
+import com.koldyr.genealogy.handlers.ChildrenSerializer
+import com.koldyr.genealogy.handlers.PersonIdDeserializer
+import com.koldyr.genealogy.handlers.PersonIdSerializer
 
 /**
  * Description of class Family
@@ -93,8 +93,6 @@ class Family() {
     }
 
     override fun toString(): String {
-        return "Family(id=$id, husband=$husband, wife=$wife, children=$children, events=$events, user=$user, note=$note)"
+        return "Family(id=$id, husband=$husband, wife=$wife, children=${children.size}, note=$note)"
     }
-
-
 }

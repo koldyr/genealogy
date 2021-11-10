@@ -54,4 +54,8 @@ class PersonNames(): Cloneable {
         result = 31 * result + (maiden?.hashCode() ?: 0)
         return result
     }
+
+    override fun toString(): String {
+        return "PersonNames(first=$first, last=$last)"
+    }
 }

@@ -1,8 +1,5 @@
 package com.koldyr.genealogy.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.annotation.JsonPropertyOrder
-import com.koldyr.genealogy.model.converter.GenderConverter
 import java.util.function.Predicate
 import javax.persistence.AttributeOverride
 import javax.persistence.AttributeOverrides
@@ -21,6 +18,9 @@ import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.annotation.JsonPropertyOrder
+import com.koldyr.genealogy.model.converter.GenderConverter
 
 /**
  * Description of class Person
@@ -140,6 +140,6 @@ class Person() : Cloneable {
     }
 
     override fun toString(): String {
-        return "Person(id=$id, name=$name, events=$events, place=$place, occupation=$occupation, note=$note, gender=$gender, parentFamilyId=$parentFamilyId, familyId=$familyId, user=$user)"
+        return "Person(id=$id, name=$name, place=$place, occupation=$occupation, note=$note, gender=$gender)"
     }
 }
