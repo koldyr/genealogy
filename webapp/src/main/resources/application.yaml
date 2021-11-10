@@ -10,6 +10,11 @@ spring:
     password: sa
   jpa:
     show-sql: true
+security:
+  secret: kdskliojfsdl32r3hhkjdfdf
+  token:
+    exp: 10 #days
+
 #    schema: classpath:sql/schema.sql
 #    initialization-mode: always
 

@@ -18,14 +18,14 @@ enum class EventType(
     companion object {
         fun isEvent(value: String): Boolean {
             for (type in values()) {
-                if (value.endsWith(type.code)) return true
+                if (value.endsWith(type.code) || (value.endsWith(type.name))) return true
             }
             return false
         }
 
         fun parse(value: String): EventType {
             for (type in values()) {
-                if (value.endsWith(type.code)) return type
+                if (value.endsWith(type.code) || (value.endsWith(type.name))) return type
             }
             return Birth
         }

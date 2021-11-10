@@ -3,6 +3,7 @@ package com.koldyr.genealogy.controllers
 import java.net.URI
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
+import com.koldyr.genealogy.security.Secured
 import com.koldyr.genealogy.services.PersonService
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/api/genealogy/persons")
+@Secured
 class PersonController(private val personService: PersonService) {
 
     @GetMapping(produces = [APPLICATION_JSON_VALUE])

@@ -4,6 +4,7 @@ import java.net.URI
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.FamilyEvent
 import com.koldyr.genealogy.model.Person
+import com.koldyr.genealogy.security.Secured
 import com.koldyr.genealogy.services.FamilyService
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController
  */
 @RestController
 @RequestMapping("/api/genealogy/families")
+@Secured
 class FamilyController(private val familyService: FamilyService) {
 
     @GetMapping(produces = [APPLICATION_JSON_VALUE])
