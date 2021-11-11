@@ -38,7 +38,7 @@ class UserControllerTest : ContextLoadTest() {
         }
                 .andDo { print() }
                 .andExpect {
-                    status { isBadRequest() }
+                    status { isUnauthorized() }
                     status { reason("username or password invalid") }
                 }
     }

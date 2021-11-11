@@ -32,11 +32,7 @@ open class UserServiceImpl(
     @Value("\${security.token.exp}")
     private lateinit var expiration: String
 
-    private val algorithm: Algorithm
-
-    init {
-        algorithm = Algorithm.HMAC512(secret.toByteArray())
-    }
+    private val algorithm: Algorithm = Algorithm.HMAC512(secret.toByteArray())
 
     override fun createUser(userModel: User) {
         if (userModel.email.isBlank() || userModel.password.isBlank() || userModel.name.isBlank() || userModel.surName.isBlank()) {
