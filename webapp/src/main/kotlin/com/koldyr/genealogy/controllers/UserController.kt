@@ -4,6 +4,7 @@ import com.koldyr.genealogy.model.Credentials
 import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.security.UnSecured
 import com.koldyr.genealogy.services.UserService
+import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
@@ -25,6 +26,6 @@ class UserController(private val userService: UserService) {
 
     @PostMapping("/login")
     fun login(@RequestBody credentials: Credentials) : ResponseEntity<Unit> {
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().header(HttpHeaders.AUTHORIZATION, userService.login(credentials)).build()
     }
 }
