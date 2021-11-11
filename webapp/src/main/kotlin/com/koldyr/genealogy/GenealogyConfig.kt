@@ -22,6 +22,7 @@ import com.koldyr.genealogy.services.UserServiceImpl
 import ma.glasnost.orika.MapperFacade
 import ma.glasnost.orika.impl.DefaultMapperFactory
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy
@@ -66,6 +67,9 @@ class GenealogyConfig {
     @Autowired
     lateinit var userRepository: UserRepository
 
+    @Value("\${security.secret}")
+    private lateinit var secret: String
+
     @Bean
     fun personService(mapper: MapperFacade, userService: UserService): PersonService {
         return PersonServiceImpl(personRepository, personEventRepository, familyRepository, mapper, userService)
@@ -78,7 +82,7 @@ class GenealogyConfig {
 
     @Bean
     fun userService(passwordEncoder: PasswordEncoder): UserService {
-        return UserServiceImpl(userRepository, passwordEncoder)
+        return UserServiceImpl(userRepository, passwordEncoder, secret)
     }
 
     @Bean
