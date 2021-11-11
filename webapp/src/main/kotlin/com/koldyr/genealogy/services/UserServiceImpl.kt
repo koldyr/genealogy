@@ -8,31 +8,29 @@ import com.koldyr.genealogy.persistence.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.DisabledException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.server.ResponseStatusException
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.*
+import java.util.Date
 import javax.persistence.EntityNotFoundException
-
 
 open class UserServiceImpl(
         private val userRepository: UserRepository,
         private val passwordEncoder: PasswordEncoder,
-        private val secret : String) : UserService {
+        secret: String) : UserService {
 
     @Autowired
     lateinit var authenticationManager: AuthenticationManager
 
     @Value("\${security.token.exp}")
     private lateinit var expiration: String
-
 
     private val algorithm: Algorithm
 
@@ -54,27 +52,28 @@ open class UserServiceImpl(
 
     override fun readUserByEmail(email: String): User {
         return userRepository.findByEmail(email)
-            .orElseThrow{ EntityNotFoundException() }
+                .orElseThrow { EntityNotFoundException() }
     }
 
     override fun currentUser(): User {
-        val username : String = SecurityContextHolder.getContext().authentication.principal.toString()
+        val username: String = SecurityContextHolder.getContext().authentication.principal.toString()
         return readUserByEmail(username)
     }
 
     override fun login(credentials: Credentials): String {
         try {
-            val authenticationToken = UsernamePasswordAuthenticationToken(credentials.username, credentials.password, listOf())
-            return "Bearer " + generateToken(authenticationManager.authenticate(authenticationToken), credentials.username)
-        } catch (e : DisabledException) {
-            throw ResponseStatusException(BAD_REQUEST, "username or password invalid")
-        } catch (e : BadCredentialsException) {
-            throw ResponseStatusException(BAD_REQUEST, "username or password invalid")
+            val token = UsernamePasswordAuthenticationToken(credentials.username, credentials.password, listOf())
+            authenticationManager.authenticate(token)
+            
+            return "Bearer " + generateToken(credentials.username)
+        } catch (e: DisabledException) {
+            throw ResponseStatusException(UNAUTHORIZED, "user is disabled")
+        } catch (e: BadCredentialsException) {
+            throw ResponseStatusException(UNAUTHORIZED, "username or password invalid")
         }
     }
 
-    private fun generateToken(auth : Authentication, username : String) : String{
-        val username = (auth.principal as org.springframework.security.core.userdetails.User).username
+    private fun generateToken(username: String): String {
         val tokenLive = LocalDateTime.now().plusDays(expiration.toLong())
         return JWT.create()
                 .withSubject(username)
