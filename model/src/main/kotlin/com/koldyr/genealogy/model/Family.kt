@@ -1,5 +1,12 @@
 package com.koldyr.genealogy.model
 
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.koldyr.genealogy.handlers.ChildrenDeserializer
+import com.koldyr.genealogy.handlers.ChildrenSerializer
+import com.koldyr.genealogy.handlers.PersonIdDeserializer
+import com.koldyr.genealogy.handlers.PersonIdSerializer
 import javax.persistence.CascadeType.ALL
 import javax.persistence.CascadeType.MERGE
 import javax.persistence.CascadeType.PERSIST
@@ -16,13 +23,6 @@ import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.koldyr.genealogy.handlers.ChildrenDeserializer
-import com.koldyr.genealogy.handlers.ChildrenSerializer
-import com.koldyr.genealogy.handlers.PersonIdDeserializer
-import com.koldyr.genealogy.handlers.PersonIdSerializer
 
 /**
  * Description of class Family
@@ -69,6 +69,11 @@ class Family() {
         this.id = id
     }
 
+    fun addChild(child: Person) {
+        children.add(child)
+        child.parentFamilyId = id
+    }
+
     fun addEvent(event: FamilyEvent) {
         events.add(event)
         event.family = this
@@ -83,9 +88,9 @@ class Family() {
     }
 
     fun removePerson(person: Person) {
-        if (husband != null && husband!!.equals(person)) {
+        if (husband != null && husband!! == person) {
             husband = null
-        } else if (wife != null && wife!!.equals(person)) {
+        } else if (wife != null && wife!! == person) {
             wife = null
         } else {
             children.remove(person)

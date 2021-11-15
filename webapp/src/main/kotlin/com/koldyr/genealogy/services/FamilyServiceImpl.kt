@@ -60,7 +60,6 @@ open class FamilyServiceImpl(
         }
 
         newFamily.user = userService.currentUser()
-
         familyRepository.save(newFamily)
 
         if (nonNull(newFamily.husband)) {
@@ -71,6 +70,9 @@ open class FamilyServiceImpl(
             newFamily.wife?.familyId = newFamily.id
             personRepository.save(newFamily.wife!!)
         }
+
+        newFamily.children.forEach { it.parentFamilyId = newFamily.id }
+        familyRepository.save(newFamily)
 
         return newFamily.id!!
     }
@@ -160,9 +162,11 @@ open class FamilyServiceImpl(
 
         child.id = null
         child.user = userService.currentUser()
-        val saved = personRepository.save(child)
-        family.children.add(saved)
+        child.familyId = null
+        child.parentFamilyId = familyId
+        family.addChild(child)
 
+        val saved = personRepository.save(child)
         familyRepository.save(family)
         return saved.id!!
     }
@@ -174,15 +178,17 @@ open class FamilyServiceImpl(
         val child = personRepository.findById(childId)
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$childId' is not found") }
 
-        val childFamily = familyRepository.findChild(childId)
+        val childFamily = familyRepository.findChildFamily(childId)
         if (childFamily.isPresent) {
             if (childFamily.get().id == familyId) {
                 throw ResponseStatusException(BAD_REQUEST, "Child with id '$childId' already in family '$familyId'")
             }
             throw ResponseStatusException(BAD_REQUEST, "Child with id '$childId' already in family '${childFamily.get().id}'")
         }
-        family.children.add(child)
 
+        family.addChild(child)
+
+        personRepository.save(child)
         familyRepository.save(family)
     }
 

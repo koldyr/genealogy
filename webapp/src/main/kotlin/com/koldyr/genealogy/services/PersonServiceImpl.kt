@@ -53,7 +53,7 @@ open class PersonServiceImpl(
         val family = if (nonNull(person.familyId)) {
             familyRepository.findById(person.familyId!!)
         } else {
-            familyRepository.findChild(person.id!!)
+            familyRepository.findChildFamily(person.id!!)
         }
         family.ifPresent {
             it.removePerson(person)
