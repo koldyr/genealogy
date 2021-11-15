@@ -6,6 +6,7 @@ import com.koldyr.genealogy.model.Gender
 import org.hamcrest.Matchers
 import org.junit.Test
 import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpHeaders.LOCATION
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
@@ -133,9 +134,9 @@ class FamilyControllerTest : ContextLoadTest() {
                 .andDo { print() }
                 .andExpect {
                     status { isCreated() }
-                    header { exists(HttpHeaders.LOCATION) }
-                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/families/[\\d]+/events/[\\d]+")) }
-                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
+                    header { exists(LOCATION) }
+                    header { string(LOCATION, Matchers.matchesRegex("/api/genealogy/families/[\\d]+/events/[\\d]+")) }
+                }.andReturn().response.getHeader(LOCATION)
         familyEvent.id = getLastIdFromLocation(location)
 
         mockMvc.get("/api/genealogy/families/${familyDTO.id}/events") {
@@ -195,11 +196,11 @@ class FamilyControllerTest : ContextLoadTest() {
                 .andDo { print() }
                 .andExpect {
                     status { isCreated() }
-                    header { exists(HttpHeaders.LOCATION) }
-                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+")) }
-                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
-        child1.id = getLastIdFromLocation(childId1)
-
+                    header { exists(LOCATION) }
+                    header { string(LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+")) }
+                }.andReturn().response.getHeader(LOCATION)
+        child1.id = getLastIdFromLocation(childId1!!)
+        child1.parentFamilyId = familyDTO.id
 
         val child2 = createPerson(Gender.MALE)
         val childId2 = mockMvc.patch("/api/genealogy/families/${familyDTO.id}/children/${child2.id}") {
@@ -209,10 +210,11 @@ class FamilyControllerTest : ContextLoadTest() {
                 .andDo { print() }
                 .andExpect {
                     status { isCreated() }
-                    header { exists(HttpHeaders.LOCATION) }
-                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+")) }
-                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
-        child2.id = getLastIdFromLocation(childId2)
+                    header { exists(LOCATION) }
+                    header { string(LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+")) }
+                }.andReturn().response.getHeader(LOCATION)
+        child2.id = getLastIdFromLocation(childId2!!)
+        child2.parentFamilyId = familyDTO.id
 
         mockMvc.get("/api/genealogy/families/${familyDTO.id}/children") {
             accept = APPLICATION_JSON

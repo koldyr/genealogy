@@ -164,9 +164,9 @@ open class FamilyServiceImpl(
         child.user = userService.currentUser()
         child.familyId = null
         child.parentFamilyId = familyId
-        family.addChild(child)
-
         val saved = personRepository.save(child)
+
+        family.addChild(child)
         familyRepository.save(family)
         return saved.id!!
     }
@@ -186,9 +186,9 @@ open class FamilyServiceImpl(
             throw ResponseStatusException(BAD_REQUEST, "Child with id '$childId' already in family '${childFamily.get().id}'")
         }
 
-        family.addChild(child)
-
         personRepository.save(child)
+
+        family.addChild(child)
         familyRepository.save(family)
     }
 
