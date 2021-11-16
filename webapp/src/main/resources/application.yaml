@@ -10,6 +10,12 @@ spring:
     password: sa
   jpa:
     show-sql: false
+    properties:
+      hibernate:
+        jdbc:
+          batch_size: 10
+          order_inserts: true
+          order_updates: true
 security:
   secret: kdskliojfsdl32r3hhkjdfdf
   token:

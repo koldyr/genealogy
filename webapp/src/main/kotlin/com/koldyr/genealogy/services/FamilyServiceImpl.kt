@@ -125,6 +125,11 @@ open class FamilyServiceImpl(
             personRepository.save(family.husband!!)
         }
 
+        family.children.forEach { child ->
+            child.parentFamilyId = null
+            personRepository.save(child)
+        }
+
         familyRepository.deleteById(familyId)
     }
 
