@@ -1,6 +1,5 @@
 package com.koldyr.genealogy.model
 
-
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.GeneratedValue
@@ -8,7 +7,6 @@ import javax.persistence.GenerationType
 import javax.persistence.Id
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
-
 
 @Entity
 @Table(name = "T_USER")
@@ -30,4 +28,8 @@ class User {
 
     @Column(name = "SURNAME", nullable = false)
     var surName: String = ""
+
+    override fun toString(): String {
+        return "User(id=$id, email='$email', password='***', name='$name', surName='$surName')"
+    }
 }

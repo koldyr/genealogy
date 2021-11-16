@@ -9,7 +9,7 @@ spring:
     username: sa
     password: sa
   jpa:
-    show-sql: true
+    show-sql: false
 security:
   secret: kdskliojfsdl32r3hhkjdfdf
   token:

@@ -16,7 +16,7 @@ import javax.persistence.Basic
 import javax.persistence.Column
 import javax.persistence.Convert
 import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType.*
+import javax.persistence.GenerationType.SEQUENCE
 import javax.persistence.Id
 import javax.persistence.MappedSuperclass
 import javax.persistence.SequenceGenerator
@@ -124,5 +124,7 @@ open class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
         return result
     }
 
-
+    override fun toString(): String {
+        return "LifeEvent(id=$id, type=$type, prefix=$prefix, date=$date, place=$place)"
+    }
 }

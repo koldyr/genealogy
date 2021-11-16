@@ -1,4 +1,4 @@
-package com.koldyr.genealogy.context
+package com.koldyr.genealogy.controllers
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.koldyr.genealogy.Genealogy
@@ -16,16 +16,17 @@ import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import com.koldyr.genealogy.persistence.UserRepository
-import org.apache.commons.lang3.RandomStringUtils
-import org.hamcrest.Matchers
+import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
+import org.hamcrest.Matchers.matchesRegex
 import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpHeaders
-import org.springframework.http.MediaType
+import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.HttpHeaders.LOCATION
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.annotation.IfProfileValue
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit4.SpringRunner
@@ -38,7 +39,8 @@ import java.time.LocalDate
 @AutoConfigureMockMvc
 @TestPropertySource(properties = ["spring.config.location = classpath:application-test.yaml"])
 @IfProfileValue(name = "spring.profiles.active", values = ["int-test"])
-abstract class ContextLoadTest {
+abstract class BaseControllerTest {
+
     @Autowired
     lateinit var mockMvc: MockMvc
 
@@ -62,10 +64,7 @@ abstract class ContextLoadTest {
 
     protected fun createPersonModel(gender: Gender): Person {
         val person = Person()
-        person.name = PersonNames()
-        person.name!!.first = createRandomWord()
-        person.name!!.middle = createRandomWord()
-        person.name!!.last = createRandomWord()
+        person.name = PersonNames(createRandomWord(), createRandomWord(), createRandomWord(), null)
         person.gender = gender
         person.place = createRandomWord()
         person.occupation = createRandomWord()
@@ -74,7 +73,7 @@ abstract class ContextLoadTest {
         return person
     }
 
-    protected fun createUser() : User {
+    protected fun createUser(): User {
         val user = User()
         user.password = "1111"
         user.email = "yan@gmail.com"
@@ -84,23 +83,22 @@ abstract class ContextLoadTest {
     }
 
     @Before
-    open fun loadUser () {
+    fun loadUser() {
         val user = createUser()
         mockMvc.post("/api/user/registration") {
             content = mapper.writeValueAsString(user)
-            contentType = MediaType.APPLICATION_JSON
-            accept = MediaType.APPLICATION_JSON
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
         }
-                .andDo { print() }
-                .andExpect {
-                    status { isCreated() }
-                    header { exists(HttpHeaders.LOCATION) }
-                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/user/login")) }
-                }
+            .andExpect {
+                status { isCreated() }
+                header { exists(LOCATION) }
+                header { string(LOCATION, matchesRegex("/api/user/login")) }
+            }
     }
 
     @After
-    open fun deleteUser () {
+    fun deleteUser() {
         personEventRepository.deleteAll()
         familyEventRepository.deleteAll()
         familyRepository.deleteAll()
@@ -108,21 +106,20 @@ abstract class ContextLoadTest {
         userRepository.deleteAll()
     }
 
-    protected fun getBearerToken() : String {
+    protected fun getBearerToken(): String {
         val credentials = Credentials()
         credentials.username = "yan@gmail.com"
         credentials.password = "1111"
 
         val token = mockMvc.post("/api/user/login") {
             content = mapper.writeValueAsString(credentials)
-            contentType = MediaType.APPLICATION_JSON
-            accept = MediaType.APPLICATION_JSON
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
         }
-                .andDo { print() }
-                .andExpect {
-                    status { isOk() }
-                    header { exists(HttpHeaders.AUTHORIZATION) }
-                }.andReturn().response.getHeader(HttpHeaders.AUTHORIZATION)
+            .andExpect {
+                status { isOk() }
+                header { exists(AUTHORIZATION) }
+            }.andReturn().response.getHeader(AUTHORIZATION)
         return token
     }
 
@@ -144,22 +141,21 @@ abstract class ContextLoadTest {
     protected fun createPerson(gender: Gender): Person {
         val personModel = createPersonModel(gender)
         val location = mockMvc.post("/api/genealogy/persons") {
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
             content = mapper.writeValueAsString(personModel)
-            contentType = MediaType.APPLICATION_JSON
-            accept = MediaType.APPLICATION_JSON
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
         }
-                .andDo { print() }
-                .andExpect {
-                    status { isCreated() }
-                    header { exists(HttpHeaders.LOCATION) }
-                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+")) }
-                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
+            .andExpect {
+                status { isCreated() }
+                header { exists(LOCATION) }
+                header { string(LOCATION, matchesRegex("/api/genealogy/persons/[\\d]+")) }
+            }.andReturn().response.getHeader(LOCATION)
         personModel.id = getLastIdFromLocation(location)
         return personModel
     }
 
-    protected fun createSuccessFamilyModel() : FamilyDTO {
+    protected fun createSuccessFamilyModel(): FamilyDTO {
         val familyDTO = FamilyDTO()
         familyDTO.wife = createPerson(Gender.FEMALE).id
         familyDTO.husband = createPerson(Gender.MALE).id
@@ -170,16 +166,15 @@ abstract class ContextLoadTest {
         val familyDTO = createSuccessFamilyModel()
         val location = mockMvc.post("/api/genealogy/families") {
             content = mapper.writeValueAsString(familyDTO)
-            accept = MediaType.APPLICATION_JSON
-            contentType = MediaType.APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            accept = APPLICATION_JSON
+            contentType = APPLICATION_JSON
+            header(AUTHORIZATION, getBearerToken())
         }
-                .andDo { print() }
-                .andExpect {
-                    status { isCreated() }
-                    header { exists(HttpHeaders.LOCATION) }
-                    header { string(HttpHeaders.LOCATION, Matchers.matchesRegex("/api/genealogy/families/[\\d]+")) }
-                }.andReturn().response.getHeader(HttpHeaders.LOCATION)
+            .andExpect {
+                status { isCreated() }
+                header { exists(LOCATION) }
+                header { string(LOCATION, matchesRegex("/api/genealogy/families/[\\d]+")) }
+            }.andReturn().response.getHeader(LOCATION)
         familyDTO.id = getLastIdFromLocation(location)
         familyDTO.children = listOf()
         familyDTO.events = listOf()
@@ -187,6 +182,6 @@ abstract class ContextLoadTest {
     }
 
     protected fun createRandomWord(): String {
-        return RandomStringUtils.randomAlphabetic(2, 10);
+        return randomAlphabetic(10);
     }
 }

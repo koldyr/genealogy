@@ -10,4 +10,8 @@ class FamilyDTO {
     var wife: Int? = null
     var children: Collection<Int>? = null
     var events: Collection<Int>? = null
+
+    override fun toString(): String {
+        return "FamilyDTO(id=$id, husband=$husband, wife=$wife, children=$children, events=$events)"
+    }
 }
