@@ -118,19 +118,25 @@ open class FamilyServiceImpl(
         if (nonNull(family.wife)) {
             family.wife!!.familyId = null
             personRepository.save(family.wife!!)
+            family.wife = null
         }
 
         if (nonNull(family.husband)) {
             family.husband!!.familyId = null
             personRepository.save(family.husband!!)
+            family.husband = null
         }
 
-        family.children.forEach { child ->
+        val children: MutableIterator<Person> = family.children.iterator()
+        while (children.hasNext()) {
+            val child = children.next()
             child.parentFamilyId = null
             personRepository.save(child)
+            children.remove()
         }
 
-        familyRepository.deleteById(familyId)
+        familyRepository.save(family)
+        familyRepository.delete(family)
     }
 
     @Transactional

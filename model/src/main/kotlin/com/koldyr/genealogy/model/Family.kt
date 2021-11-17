@@ -18,6 +18,7 @@ import javax.persistence.GeneratedValue
 import javax.persistence.GenerationType.SEQUENCE
 import javax.persistence.Id
 import javax.persistence.JoinColumn
+import javax.persistence.JoinTable
 import javax.persistence.ManyToOne
 import javax.persistence.OneToMany
 import javax.persistence.OneToOne
@@ -50,7 +51,12 @@ class Family() {
     @JsonDeserialize(using = PersonIdDeserializer::class)
     var wife: Person? = null
 
-    @OneToMany(targetEntity = Person::class, cascade = [PERSIST, MERGE, REFRESH])
+    @OneToMany(cascade = [PERSIST, MERGE, REFRESH])
+    @JoinTable(
+            name = "T_CHILDREN",
+            joinColumns = [JoinColumn(name = "family_id", referencedColumnName = "family_id")],
+            inverseJoinColumns = [JoinColumn(name = "person_id", referencedColumnName = "person_id")]
+    )
     @JsonSerialize(using = ChildrenSerializer::class)
     @JsonDeserialize(using = ChildrenDeserializer::class)
     val children: MutableSet<Person> = mutableSetOf()

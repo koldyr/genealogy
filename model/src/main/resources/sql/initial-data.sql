@@ -20,8 +20,12 @@ update T_PERSON
 set FAMILY_ID = 1
 where PERSON_ID in (1, 2);
 
-insert into T_FAMILY_CHILDREN (FAMILY_FAMILY_ID, CHILDREN_PERSON_ID)
+update T_PERSON
+set PARENT_FAMILY_ID = 1
+where PERSON_ID in (3, 4);
+
+insert into T_CHILDREN (FAMILY_ID, PERSON_ID)
 values (1, 3);
 
-insert into T_FAMILY_CHILDREN (FAMILY_FAMILY_ID, CHILDREN_PERSON_ID)
+insert into T_CHILDREN (FAMILY_ID, PERSON_ID)
 values (1, 4);

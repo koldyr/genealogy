@@ -28,7 +28,6 @@ import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpHeaders.LOCATION
 import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.annotation.IfProfileValue
-import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
@@ -37,7 +36,6 @@ import java.time.LocalDate
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = [Genealogy::class])
 @AutoConfigureMockMvc
-@TestPropertySource(properties = ["spring.config.location = classpath:application-test.yaml"])
 @IfProfileValue(name = "spring.profiles.active", values = ["int-test"])
 abstract class BaseControllerTest {
 
@@ -92,7 +90,6 @@ abstract class BaseControllerTest {
         }
             .andExpect {
                 status { isCreated() }
-                header { exists(LOCATION) }
                 header { string(LOCATION, matchesRegex("/api/user/login")) }
             }
     }
@@ -148,7 +145,6 @@ abstract class BaseControllerTest {
         }
             .andExpect {
                 status { isCreated() }
-                header { exists(LOCATION) }
                 header { string(LOCATION, matchesRegex("/api/genealogy/persons/[\\d]+")) }
             }.andReturn().response.getHeader(LOCATION)
         personModel.id = getLastIdFromLocation(location)
@@ -162,8 +158,10 @@ abstract class BaseControllerTest {
         return familyDTO
     }
 
-    protected fun createFamily(): FamilyDTO {
+    protected fun createFamily(children: List<Int>): FamilyDTO {
         val familyDTO = createSuccessFamilyModel()
+        familyDTO.children = children
+
         val location = mockMvc.post("/api/genealogy/families") {
             content = mapper.writeValueAsString(familyDTO)
             accept = APPLICATION_JSON
@@ -172,11 +170,11 @@ abstract class BaseControllerTest {
         }
             .andExpect {
                 status { isCreated() }
-                header { exists(LOCATION) }
                 header { string(LOCATION, matchesRegex("/api/genealogy/families/[\\d]+")) }
             }.andReturn().response.getHeader(LOCATION)
+
         familyDTO.id = getLastIdFromLocation(location)
-        familyDTO.children = listOf()
+        familyDTO.children = children
         familyDTO.events = listOf()
         return familyDTO
     }

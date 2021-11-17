@@ -18,5 +18,6 @@
 
     <logger name="org.springframework.boot.test" level="warn"/>
     <logger name="org.springframework.test" level="warn"/>
+    <logger name="ch.qos.logback" level="error"/>
     <logger name="com.koldyr.genealogy" level="trace"/>
 </configuration>

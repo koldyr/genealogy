@@ -26,7 +26,7 @@ class FamilyControllerTest : BaseControllerTest() {
                 status { isOk() }
             }
 
-        val familyDto = createFamily()
+        val familyDto = createFamily(listOf())
 
         mockMvc.get("/api/genealogy/families/${familyDto.id}") {
             accept = APPLICATION_JSON
@@ -110,6 +110,46 @@ class FamilyControllerTest : BaseControllerTest() {
     }
 
     @Test
+    fun deleteFamily() {
+        val children = listOf(
+                createPerson(Gender.FEMALE).id!!,
+                createPerson(Gender.FEMALE).id!!
+        )
+
+        val familyDto = createFamily(children)
+
+        mockMvc.get("/api/genealogy/families/${familyDto.id}") {
+            accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+        }
+            .andDo { print() }
+            .andExpect {
+                status { isOk() }
+                content { contentType(APPLICATION_JSON) }
+                content { json(mapper.writeValueAsString(familyDto)) }
+            }
+
+        mockMvc.delete("/api/genealogy/families/${familyDto.id}") {
+            accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+        }
+            .andDo { print() }
+            .andExpect {
+                status { isNoContent() }
+            }
+
+        mockMvc.get("/api/genealogy/families/${familyDto.id}") {
+            accept = APPLICATION_JSON
+            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+        }
+            .andDo { print() }
+            .andExpect {
+                status { isNotFound() }
+                status { reason("Family with id '${familyDto.id}' is not found") }
+            }
+    }
+
+    @Test
     fun events() {
         val randomId: Int = (99999..999999).random()
         mockMvc.get("/api/genealogy/families/$randomId/events") {
@@ -122,7 +162,7 @@ class FamilyControllerTest : BaseControllerTest() {
                 status { reason("Family with id '${randomId}' is not found") }
             }
 
-        val familyDTO = createFamily()
+        val familyDTO = createFamily(listOf())
         val familyEvent = createFamilyEventModel()
         val location = mockMvc.post("/api/genealogy/families/${familyDTO.id}/events") {
             content = mapper.writeValueAsString(familyEvent)
@@ -183,7 +223,7 @@ class FamilyControllerTest : BaseControllerTest() {
                 status { reason("Family with id '${randomId}' is not found") }
             }
 
-        val familyDTO = createFamily()
+        val familyDTO = createFamily(listOf())
 
         val child1 = createPersonModel(Gender.MALE)
         val childId1 = mockMvc.post("/api/genealogy/families/${familyDTO.id}/children") {
@@ -195,13 +235,12 @@ class FamilyControllerTest : BaseControllerTest() {
             .andDo { print() }
             .andExpect {
                 status { isCreated() }
-                header { exists(LOCATION) }
                 header { string(LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+")) }
             }.andReturn().response.getHeader(LOCATION)
         child1.id = getLastIdFromLocation(childId1!!)
         child1.parentFamilyId = familyDTO.id
 
-        val child2 = createPerson(Gender.MALE)
+        val child2 = createPerson(Gender.FEMALE)
         val childId2 = mockMvc.patch("/api/genealogy/families/${familyDTO.id}/children/${child2.id}") {
             accept = APPLICATION_JSON
             header(HttpHeaders.AUTHORIZATION, getBearerToken())
@@ -209,7 +248,6 @@ class FamilyControllerTest : BaseControllerTest() {
             .andDo { print() }
             .andExpect {
                 status { isCreated() }
-                header { exists(LOCATION) }
                 header { string(LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+")) }
             }.andReturn().response.getHeader(LOCATION)
         child2.id = getLastIdFromLocation(childId2!!)
