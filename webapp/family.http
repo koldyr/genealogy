@@ -1,3 +1,13 @@
+### Login
+POST http://localhost/api/user/login
+Content-Type: application/json
+Accept: */*
+
+{
+  "username": "me@koldyr.com",
+  "password": "koldyr"
+}
+
 ### Get Families
 GET http://localhost/api/genealogy/families
 Authorization: Bearer {{authToken}}
