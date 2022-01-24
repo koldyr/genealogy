@@ -86,8 +86,8 @@ class GenealogyConfig {
     }
 
     @Bean
-    fun authenticationUserDetailsService(userService: UserService) : AuthenticationUserDetailsService {
-        return AuthenticationUserDetailsService(userService)
+    fun authenticationUserDetailsService() : AuthenticationUserDetailsService {
+        return AuthenticationUserDetailsService(userRepository)
     }
 
     @Bean

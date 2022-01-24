@@ -16,6 +16,9 @@ spring:
           batch_size: 10
           order_inserts: true
           order_updates: true
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
 security:
   secret: kdskliojfsdl32r3hhkjdfdf
   token:

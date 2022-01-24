@@ -45,15 +45,11 @@ open class UserServiceImpl(
         userModel.password = passwordEncoder.encode(userModel.password)
         userRepository.save(userModel)
     }
-
-    override fun readUserByEmail(email: String): User {
-        return userRepository.findByEmail(email)
-                .orElseThrow { EntityNotFoundException() }
-    }
-
+    
     override fun currentUser(): User {
         val username: String = SecurityContextHolder.getContext().authentication.principal.toString()
-        return readUserByEmail(username)
+        return userRepository.findByEmail(username)
+                .orElseThrow { EntityNotFoundException() }
     }
 
     override fun login(credentials: Credentials): String {
