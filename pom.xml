@@ -6,19 +6,20 @@
 
     <groupId>com.koldyr.genealogy</groupId>
     <artifactId>application</artifactId>
+    <name>Genealogy</name>
     <version>2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Genealogy</name>
     <url>http://www.koldyr.com</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>11</maven.compiler.source>
         <maven.compiler.target>11</maven.compiler.target>
-        <kotlin.version>1.6.0</kotlin.version>
+        <kotlin.version>1.6.10</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
+
+        <spring-boot.version>2.6.3</spring-boot.version>
         <jackson.version>2.13.1</jackson.version>
-        <spring-boot.version>2.6.2</spring-boot.version>
         <spring-fox.version>3.0.0</spring-fox.version>
     </properties>
 
