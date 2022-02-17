@@ -20,6 +20,7 @@ import java.util.Objects.nonNull
  * Description of class FamilyServiceImpl
  * @created: 2021-09-28
  */
+@Transactional
 open class FamilyServiceImpl(
     private val familyRepository: FamilyRepository,
     private val personRepository: PersonRepository,
@@ -32,7 +33,6 @@ open class FamilyServiceImpl(
         return familyRepository.findAllByUser(userService.currentUser()).map(this::mapFamily)
     }
 
-    @Transactional
     override fun create(family: FamilyDTO): Int {
         family.id = null
         val newFamily = mapper.map(family, Family::class.java)
@@ -83,7 +83,6 @@ open class FamilyServiceImpl(
             .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
     }
 
-    @Transactional
     override fun update(familyId: Int, family: FamilyDTO) {
         val persisted = find(familyId)
 
@@ -111,7 +110,6 @@ open class FamilyServiceImpl(
         familyRepository.save(persisted);
     }
 
-    @Transactional
     override fun delete(familyId: Int) {
         val family = find(familyId)
 
@@ -139,7 +137,6 @@ open class FamilyServiceImpl(
         familyRepository.delete(family)
     }
 
-    @Transactional
     override fun createEvent(familyId: Int, event: FamilyEvent): Int {
         val family = find(familyId)
         
@@ -152,7 +149,6 @@ open class FamilyServiceImpl(
         return event.id!!
     }
 
-    @Transactional
     override fun deleteEvent(familyId: Int, eventId: Int) {
         val family = find(familyId)
 
@@ -167,7 +163,6 @@ open class FamilyServiceImpl(
         return familyRepository.findEvents(familyId)
     }
 
-    @Transactional
     override fun createChild(familyId: Int, child: Person): Int {
         val family = find(familyId)
 
@@ -182,7 +177,6 @@ open class FamilyServiceImpl(
         return saved.id!!
     }
 
-    @Transactional
     override fun addChild(familyId: Int, childId: Int) {
         val family = find(familyId)
 
@@ -208,7 +202,6 @@ open class FamilyServiceImpl(
         return familyRepository.findChildren(familyId)
     }
 
-    @Transactional
     override fun deleteChild(familyId: Int, childId: Int) {
         val family = find(familyId)
         if (family.children.none { it.id ==childId }) {

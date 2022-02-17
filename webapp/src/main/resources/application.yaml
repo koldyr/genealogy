@@ -22,7 +22,7 @@ spring:
 security:
   secret: kdskliojfsdl32r3hhkjdfdf
   token:
-    exp: 10 #days
+    exp: 10 #minutes
 
 #    schema: classpath:sql/schema.sql
 #    initialization-mode: always

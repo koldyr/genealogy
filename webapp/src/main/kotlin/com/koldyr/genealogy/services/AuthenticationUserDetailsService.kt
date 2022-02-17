@@ -9,6 +9,7 @@ import javax.persistence.EntityNotFoundException
 class AuthenticationUserDetailsService(
     private val userRepository: UserRepository
 ) : UserDetailsService {
+    
     override fun loadUserByUsername(email: String): UserDetails {
         val user: User = userRepository.findByEmail(email).orElseThrow { EntityNotFoundException() }
         return org.springframework.security.core.userdetails.User(user.email, user.password, listOf())

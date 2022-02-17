@@ -1,3 +1,4 @@
+### Login
 POST http://localhost/api/user/login
 Content-Type: application/json
 
@@ -6,11 +7,22 @@ Content-Type: application/json
   "password": "koldyr"
 }
 
-###
+### Registration
+POST http://localhost/api/user/registration
+Content-Type: application/json
+
+{
+  "email": "me@koldyr.com",
+  "password": "koldyr",
+  "name": "me",
+  "surName": "koldyr"
+}
+
+### Get All Persons
 GET http://localhost/api/genealogy/persons
 Authorization: Bearer {{authToken}}
 
-###
+### Get Person By ID
 GET http://localhost/api/genealogy/persons/1
 Authorization: Bearer {{authToken}}
 Accept: application/json

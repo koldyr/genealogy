@@ -15,6 +15,7 @@ import java.util.Objects.nonNull
  * Description of class PersonServiceImpl
  * @created: 2021-09-28
  */
+@Transactional
 open class PersonServiceImpl(
         private val personRepository: PersonRepository,
         private val personEventRepository: PersonEventRepository,
@@ -24,7 +25,6 @@ open class PersonServiceImpl(
 
     override fun findAll(): List<Person> = personRepository.findAllByUser(userService.currentUser())
 
-    @Transactional
     override fun create(person: Person): Int {
         person.user = userService.currentUser()
         val saved = personRepository.save(person)
@@ -35,7 +35,6 @@ open class PersonServiceImpl(
         return findPerson(personId)
     }
 
-    @Transactional
     override fun update(personId: Int, person: Person) {
         val persisted = findPerson(personId)
 
@@ -46,7 +45,6 @@ open class PersonServiceImpl(
         personRepository.save(persisted);
     }
 
-    @Transactional
     override fun delete(personId: Int) {
         val person = findPerson(personId)
 
@@ -63,7 +61,6 @@ open class PersonServiceImpl(
         personRepository.deleteById(personId)
     }
 
-    @Transactional
     override fun createEvent(personId: Int, event: PersonEvent): Int {
         event.id = null
 
@@ -81,7 +78,6 @@ open class PersonServiceImpl(
         return personRepository.findEvents(personId)
     }
 
-    @Transactional
     override fun deleteEvent(personId: Int, eventId: Int) {
         val person = findPerson(personId)
         findPersonEvent(eventId)

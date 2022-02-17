@@ -51,6 +51,7 @@ open class SecurityConfiguration : WebSecurityConfigurerAdapter() {
             .cors()
             .and()
             .csrf().disable()
+            .headers().disable()
             .authorizeRequests()
             .antMatchers("/api/**").authenticated()
             .and()

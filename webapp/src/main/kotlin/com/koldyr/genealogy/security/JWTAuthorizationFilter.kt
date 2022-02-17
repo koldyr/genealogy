@@ -1,6 +1,5 @@
 package com.koldyr.genealogy.security
 
-import java.io.IOException
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
@@ -8,8 +7,10 @@ import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
+import java.io.IOException
 import javax.servlet.FilterChain
 import javax.servlet.ServletException
 import javax.servlet.http.HttpServletRequest
@@ -34,7 +35,7 @@ open class JWTAuthorizationFilter(
                 chain.doFilter(request, response)
                 return
             }
-            val authentication = getAuthentication(request)
+            val authentication = getAuthentication(header)
             SecurityContextHolder.getContext().authentication = authentication
             chain.doFilter(request, response)
         } catch (ex: JWTVerificationException) {
@@ -42,12 +43,7 @@ open class JWTAuthorizationFilter(
         }
     }
 
-    private fun getAuthentication(request: HttpServletRequest): UsernamePasswordAuthenticationToken? {
-        val token = request.getHeader(HttpHeaders.AUTHORIZATION)
-        if (token == null) {
-            return null
-        }
-
+    private fun getAuthentication(token: String): Authentication {
         val user: String = JWT.require(algorithm)
                 .build()
                 .verify(token.replace("Bearer ", ""))

@@ -66,7 +66,7 @@ open class UserServiceImpl(
     }
 
     private fun generateToken(username: String): String {
-        val tokenLive = LocalDateTime.now().plusDays(expiration.toLong())
+        val tokenLive = LocalDateTime.now().plusMinutes(expiration.toLong())
         return JWT.create()
                 .withSubject(username)
                 .withExpiresAt(Date.from(tokenLive.atZone(ZoneId.systemDefault()).toInstant()))
