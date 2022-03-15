@@ -19,6 +19,8 @@ spring:
   mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
+  jackson:
+    default-property-inclusion: non_null
 security:
   secret: kdskliojfsdl32r3hhkjdfdf
   token:

@@ -8,4 +8,4 @@ Java 11, Kotlin 1.5, H2 database, Maven, Tomcat, OpenAPI
 execute: `mvn clean install`
 
 ### Open API
-Use http://localhost/swagger-ui.html to test REST API
+Use http://localhost/swagger-ui/index.html to test REST API

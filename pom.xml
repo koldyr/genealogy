@@ -18,7 +18,7 @@
         <kotlin.version>1.6.10</kotlin.version>
         <kotlin.compiler.incremental>true</kotlin.compiler.incremental>
 
-        <spring-boot.version>2.6.3</spring-boot.version>
+        <spring-boot.version>2.6.4</spring-boot.version>
         <jackson.version>2.13.1</jackson.version>
         <spring-fox.version>3.0.0</spring-fox.version>
     </properties>
