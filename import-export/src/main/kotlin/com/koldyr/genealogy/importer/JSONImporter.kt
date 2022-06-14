@@ -24,7 +24,7 @@ class JSONImporter : Importer {
     private fun mapper(): ObjectMapper {
         val mapper = ObjectMapper()
         mapper.registerModule(JavaTimeModule())
-        mapper.registerModule(KotlinModule())
+        mapper.registerModule(KotlinModule.Builder().build())
         mapper.enable(ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
         mapper.disable(FAIL_ON_UNKNOWN_PROPERTIES)
         return mapper

@@ -1,5 +1,14 @@
 package com.koldyr.genealogy.importer
 
+import java.io.BufferedInputStream
+import java.io.InputStream
+import java.nio.charset.Charset
+import java.nio.file.Files
+import java.nio.file.Path
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.regex.Pattern
+import kotlin.math.max
 import com.koldyr.genealogy.model.EventPrefix
 import com.koldyr.genealogy.model.EventType
 import com.koldyr.genealogy.model.Family
@@ -11,15 +20,6 @@ import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.model.PersonNames
 import org.apache.commons.lang3.StringUtils
-import java.io.BufferedInputStream
-import java.io.InputStream
-import java.nio.charset.Charset
-import java.nio.file.Files
-import java.nio.file.Path
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.regex.Pattern
-import kotlin.math.max
 
 const val PERSON = "INDI"
 const val CHAR_ENCODING = "CHAR"

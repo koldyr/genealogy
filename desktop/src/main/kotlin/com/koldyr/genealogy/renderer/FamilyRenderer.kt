@@ -1,10 +1,10 @@
-package com.koldyr.genealogy.ui
+package com.koldyr.genealogy.renderer
 
 import java.awt.Component
-import com.koldyr.genealogy.model.Family
-import com.koldyr.genealogy.model.Lineage
 import javax.swing.DefaultListCellRenderer
 import javax.swing.JList
+import com.koldyr.genealogy.model.Family
+import com.koldyr.genealogy.model.Lineage
 
 /**
  * Description of class FamilyRenderer
@@ -16,18 +16,18 @@ class FamilyRenderer(val lineage: Lineage) : DefaultListCellRenderer() {
         super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus)
 
         val family = value as Family?
-        val lastName = getFamilyName(family)
-        this.text = "${family?.id ?: "-"} $lastName"
+        family?.let {
+            val familyName = getFamilyName(family)
+            this.text = "${family.id ?: "-"} $familyName"
+        }
 
         return this
     }
 
-    private fun getFamilyName(family: Family?): String {
-        if (family == null) {
-            return ""
-        }
+    private fun getFamilyName(family: Family): String {
         val person = family.husband ?: family.wife ?: return ""
-
-        return person.name?.last ?: ""
+        val firstName = person.name?.first ?: ""
+        val lastName = person.name?.last ?: ""
+        return "$lastName $firstName"
     }
 }

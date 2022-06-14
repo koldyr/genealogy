@@ -1,20 +1,20 @@
 package com.koldyr.genealogy.export
 
-import com.koldyr.genealogy.importer.CSVImporter
 import com.koldyr.genealogy.importer.Importer
+import com.koldyr.genealogy.importer.JSONImporter
 
 /**
- * Description of class CSVExporterTest
+ * Description of class JSONExporterTest
  *
  * @created: 2019-11-12
  */
-class CSVExporterTest : BaseExpImpTest() {
+class JSONExporterTest : BaseExpImpTest() {
 
     override fun getImporter(): Importer {
-        return CSVImporter()
+        return JSONImporter()
     }
 
     override fun getExporter(): Exporter {
-        return CSVExporter()
+        return JSONExporter()
     }
 }

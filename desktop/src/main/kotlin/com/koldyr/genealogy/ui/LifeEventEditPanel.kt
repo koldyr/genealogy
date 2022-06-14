@@ -1,18 +1,19 @@
 package com.koldyr.genealogy.ui
 
 import java.awt.GridBagConstraints
+import java.awt.GridBagConstraints.*
 import java.awt.GridBagLayout
 import java.awt.Insets
-import com.koldyr.genealogy.model.EventPrefix
-import com.koldyr.genealogy.model.EventType
-import com.koldyr.genealogy.model.LifeEvent
-import org.jdatepicker.JDatePicker
 import javax.swing.JComboBox
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JTextArea
 import javax.swing.JTextField
+import org.jdatepicker.JDatePicker
+import com.koldyr.genealogy.model.EventPrefix
+import com.koldyr.genealogy.model.EventType
+import com.koldyr.genealogy.model.LifeEvent
 
 /**
  * Description of class LifeEventEditPanel
@@ -44,7 +45,7 @@ class LifeEventEditPanel: JPanel {
         val lblNote = JLabel("Note:")
         txtNote = JTextArea(3, 5)
 
-        if (event != null) {
+        event?.let {
             cmbType.selectedItem = event.type
             cmbPrefix.selectedItem = event.prefix
             dateModel.value = event.date
@@ -54,29 +55,29 @@ class LifeEventEditPanel: JPanel {
 
         var rowIndex = 0
         add(lblType, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+                WEST, NONE, Insets(0, 0, 5, 5), 0, 0))
         add(cmbType, GridBagConstraints(1, rowIndex, 2, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 5), 0, 0))
+                WEST, HORIZONTAL, Insets(0, 0, 5, 5), 0, 0))
 
         rowIndex++
         add(lblDate, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+                WEST, NONE, Insets(0, 0, 5, 5), 0, 0))
         add(cmbPrefix, GridBagConstraints(1, rowIndex, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 5), 0, 0))
+                WEST, HORIZONTAL, Insets(0, 0, 5, 5), 0, 0))
         add(dpBirth, GridBagConstraints(2, rowIndex, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+                WEST, HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
         rowIndex++
         add(lblPlace, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+                WEST, NONE, Insets(0, 0, 5, 5), 0, 0))
         add(txtPlace, GridBagConstraints(1, rowIndex, 2, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+                WEST, HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
 
         rowIndex++
         add(lblNote, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+                WEST, NONE, Insets(0, 0, 5, 5), 0, 0))
         add(JScrollPane(txtNote), GridBagConstraints(1, rowIndex, 2, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+                WEST, HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
     }
 
     fun getEvent(): LifeEvent {

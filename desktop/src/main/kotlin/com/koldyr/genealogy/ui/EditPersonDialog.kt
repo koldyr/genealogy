@@ -1,40 +1,48 @@
 package com.koldyr.genealogy.ui
 
+import java.awt.BorderLayout.SOUTH
+import java.awt.Dimension
+import java.awt.FlowLayout
+import java.awt.FlowLayout.*
+import java.awt.Frame
+import java.awt.GridBagConstraints
+import java.awt.GridBagConstraints.HORIZONTAL
+import java.awt.GridBagConstraints.NONE
+import java.awt.GridBagConstraints.NORTHWEST
+import java.awt.GridBagConstraints.VERTICAL
+import java.awt.GridBagConstraints.WEST
+import java.awt.GridBagLayout
+import java.awt.Insets
+import java.awt.event.ActionEvent
+import java.awt.event.KeyEvent.*
+import java.awt.event.MouseAdapter
+import java.awt.event.MouseEvent
+import java.awt.event.MouseEvent.*
+import javax.swing.AbstractAction
+import javax.swing.BoxLayout
+import javax.swing.JButton
+import javax.swing.JComboBox
+import javax.swing.JComponent.WHEN_IN_FOCUSED_WINDOW
+import javax.swing.JDialog
+import javax.swing.JLabel
+import javax.swing.JList
+import javax.swing.JOptionPane.*
+import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.JTextArea
+import javax.swing.JTextField
+import javax.swing.KeyStroke.*
+import javax.swing.border.EmptyBorder
+import org.apache.commons.lang3.StringUtils.*
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
-import org.apache.commons.lang3.StringUtils.*
-import java.awt.BorderLayout
-import java.awt.Dimension
-import java.awt.FlowLayout
-import java.awt.Frame
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
-import java.awt.Insets
-import java.awt.event.ActionEvent
-import java.awt.event.KeyEvent
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
-import java.util.stream.Collectors.*
-import javax.swing.AbstractAction
-import javax.swing.Action
-import javax.swing.BoxLayout
-import javax.swing.JButton
-import javax.swing.JComboBox
-import javax.swing.JComponent
-import javax.swing.JDialog
-import javax.swing.JLabel
-import javax.swing.JList
-import javax.swing.JOptionPane
-import javax.swing.JPanel
-import javax.swing.JScrollPane
-import javax.swing.JTextArea
-import javax.swing.JTextField
-import javax.swing.KeyStroke
-import javax.swing.border.EmptyBorder
+import com.koldyr.genealogy.renderer.FamilyRenderer
+import com.koldyr.genealogy.renderer.LifeEventRenderer
+import com.koldyr.genealogy.renderer.SpouseRenderer
 
 /**
  * Description of class EditPersonDialog
@@ -56,7 +64,7 @@ class EditPersonDialog : JDialog {
     private val txtOccupation: JTextField
     private val txtNote: JTextArea
     private val cmbParentFamily: JComboBox<Family>
-    private val cmbFamily: JComboBox<Family>
+    private val cmbFamily: JComboBox<Person>
 
     constructor(owner: Frame?, lineage: Lineage, person: Person) : super(owner, "Edit Person", true) {
         this.lineage = lineage
@@ -66,11 +74,12 @@ class EditPersonDialog : JDialog {
         val txtId = JTextField(person.id.toString())
         txtId.isEditable = false
 
-        val name: PersonNames = person.name ?: PersonNames("", "", "", "")
+        val name = person.name ?: PersonNames("", "", "", "")
         val lblName = JLabel("Name/Middle:")
         txtName = JTextField(name.first)
+        txtName.minimumSize = Dimension(200, 20)
         txtMiddle = JTextField(name.middle)
-        txtMiddle.preferredSize = Dimension(200, 20)
+        txtMiddle.minimumSize = Dimension(200, 20)
 
         val lblLast = JLabel("Last/Maiden:")
         txtLast = JTextField(name.last)
@@ -90,7 +99,7 @@ class EditPersonDialog : JDialog {
         lstEvents.cellRenderer = LifeEventRenderer()
         lstEvents.addMouseListener(object : MouseAdapter() {
             override fun mouseClicked(e: MouseEvent) {
-                if (e.button == MouseEvent.BUTTON1 && e.clickCount == 2) {
+                if (e.button == BUTTON1 && e.clickCount == 2) {
                     editEvent(lstEvents.selectedValue as LifeEvent)
                 }
             }
@@ -112,104 +121,115 @@ class EditPersonDialog : JDialog {
         cmbParentFamily.renderer = FamilyRenderer(lineage)
         cmbParentFamily.selectedItem = lineage.findFamily(person.parentFamilyId)
 
-        val lblFamily = JLabel("Family:")
-        cmbFamily = JComboBox(lineage.families.toTypedArray())
-        cmbFamily.renderer = FamilyRenderer(lineage)
-        cmbFamily.selectedItem = lineage.findFamily(person.familyId)
+        val persons = lineage.persons
+            .filter { if (person.gender == Gender.MALE) it.gender == Gender.FEMALE else it.gender == Gender.MALE }
+            .toTypedArray()
+
+        val lblFamily = JLabel("Married to:")
+        cmbFamily = JComboBox(persons)
+        cmbFamily.renderer = SpouseRenderer()
+        cmbFamily.selectedItem = lineage.findFamily(person.familyId)?.let {
+            if (person.gender == Gender.MALE) it.wife else it.husband
+        }
 
         rootPane.border = EmptyBorder(10, 10, 10, 10)
 
+        val zeroInsets = Insets(0, 0, 0, 0)
+        val bottomRightInsets = Insets(0, 0, 5, 5)
+        val bottomInsets = Insets(0, 0, 5, 0)
+
         val pnlNames1 = JPanel(GridBagLayout())
         pnlNames1.add(txtName, GridBagConstraints(0, 0, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 0), 0, 0))
+            WEST, HORIZONTAL, zeroInsets, 0, 0))
         pnlNames1.add(txtMiddle, GridBagConstraints(1, 0, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 0, 0), 0, 0))
+            WEST, HORIZONTAL, Insets(0, 5, 0, 0), 0, 0))
 
         pnlNames2.add(txtLast, GridBagConstraints(0, 0, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 0, 0), 0, 0))
+            WEST, HORIZONTAL, zeroInsets, 0, 0))
         pnlNames2.add(txtMaiden, GridBagConstraints(1, 0, 1, 1, 0.5, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 5, 0, 0), 0, 0))
+            WEST, HORIZONTAL, Insets(0, 5, 0, 0), 0, 0))
 
         var rowIndex = 0
         val pnlContent = JPanel(GridBagLayout())
         pnlContent.add(lblId, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+            WEST, NONE, bottomRightInsets, 0, 0))
+
         pnlContent.add(txtId, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+            WEST, HORIZONTAL, bottomInsets, 0, 0))
 
         rowIndex++
         pnlContent.add(lblName, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+            WEST, NONE, bottomRightInsets, 0, 0))
         pnlContent.add(pnlNames1, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+            WEST, HORIZONTAL, bottomInsets, 0, 0))
 
         rowIndex++
         pnlContent.add(lblLast, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+            WEST, NONE, bottomRightInsets, 0, 0))
         pnlContent.add(pnlNames2, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+            WEST, HORIZONTAL, bottomInsets, 0, 0))
 
         rowIndex++
         pnlContent.add(lblSex, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+            WEST, NONE, bottomRightInsets, 0, 0))
         pnlContent.add(cmbGender, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 0), 0, 0))
+            WEST, NONE, bottomInsets, 0, 0))
 
         rowIndex++
         pnlContent.add(lblEvents, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+            NORTHWEST, NONE, bottomRightInsets, 0, 0))
         pnlContent.add(JScrollPane(lstEvents), GridBagConstraints(1, rowIndex, 1, 1, 1.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.BOTH, Insets(0, 0, 5, 0), 0, 0))
+            WEST, GridBagConstraints.BOTH, bottomInsets, 0, 0))
         pnlContent.add(pnlEventButtons, GridBagConstraints(2, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.NORTHWEST, GridBagConstraints.VERTICAL, Insets(0, 5, 5, 0), 0, 0))
+            NORTHWEST, VERTICAL, Insets(0, 5, 5, 0), 0, 0))
 
         rowIndex++
         pnlContent.add(lblPlace, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+            WEST, NONE, bottomRightInsets, 0, 0))
         pnlContent.add(txtPlace, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+            WEST, HORIZONTAL, bottomInsets, 0, 0))
 
         rowIndex++
         pnlContent.add(lblOccupation, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+            WEST, NONE, bottomRightInsets, 0, 0))
         pnlContent.add(txtOccupation, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+            WEST, HORIZONTAL, bottomInsets, 0, 0))
 
         rowIndex++
         pnlContent.add(lblNote, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.NORTHWEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+            NORTHWEST, NONE, bottomRightInsets, 0, 0))
         pnlContent.add(JScrollPane(txtNote), GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+            WEST, HORIZONTAL, bottomInsets, 0, 0))
 
         rowIndex++
         pnlContent.add(lblParentFamily, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+            WEST, NONE, bottomRightInsets, 0, 0))
         pnlContent.add(cmbParentFamily, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+            WEST, HORIZONTAL, bottomInsets, 0, 0))
 
         rowIndex++
         pnlContent.add(lblFamily, GridBagConstraints(0, rowIndex, 1, 1, 0.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.NONE, Insets(0, 0, 5, 5), 0, 0))
+            WEST, NONE, bottomRightInsets, 0, 0))
         pnlContent.add(cmbFamily, GridBagConstraints(1, rowIndex, 2, 1, 1.0, 0.0,
-                GridBagConstraints.WEST, GridBagConstraints.HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
+            WEST, HORIZONTAL, bottomInsets, 0, 0))
 
         cmbGender.selectedItem = person.gender
         val pnlButtons = createButtonsPanel()
 
         contentPane.add(pnlContent)
-        contentPane.add(pnlButtons, BorderLayout.SOUTH)
+        contentPane.add(pnlButtons, SOUTH)
 
         pack()
         setLocationRelativeTo(null)
     }
 
     fun getPerson(): Person {
-        val name: String = txtName.text
-        val middle: String? = defaultIfEmpty(txtMiddle.text, null)
-        val last: String? = defaultIfEmpty(txtLast.text, null)
-        val maiden: String? = defaultIfEmpty(txtMaiden.text, null)
+        val name = txtName.text
+        val middle = defaultIfEmpty(txtMiddle.text, null)
+        val last = defaultIfEmpty(txtLast.text, null)
+        val maiden = defaultIfEmpty(txtMaiden.text, null)
         person.name = PersonNames(name, middle, last, maiden)
-        person.events = eventsModel.events.stream().map { it.toPersonEvent() }.collect(toSet())
+        person.events = eventsModel.events.map { it.toPersonEvent() }.toMutableSet()
         person.gender = cmbGender.selectedItem as Gender
         person.place = defaultIfEmpty(txtPlace.text, null)
         person.occupation = defaultIfEmpty(txtOccupation.text, null)
@@ -245,29 +265,29 @@ class EditPersonDialog : JDialog {
     private fun createButtonsPanel(): JPanel {
         val okAction = object : AbstractAction("Ok") {
             init {
-                putValue(Action.MNEMONIC_KEY, KeyEvent.VK_ENTER)
+                putValue(MNEMONIC_KEY, VK_ENTER)
             }
 
             override fun actionPerformed(evt: ActionEvent) = close(true)
         }
 
         val btnOk = JButton(okAction)
-        btnOk.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0), "ok")
+        btnOk.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(getKeyStroke(VK_ENTER, 0), "ok")
         btnOk.actionMap.put("ok", okAction)
 
         val cancelAction = object : AbstractAction("Cancel") {
             init {
-                putValue(Action.MNEMONIC_KEY, KeyEvent.VK_ESCAPE)
+                putValue(MNEMONIC_KEY, VK_ESCAPE)
             }
 
             override fun actionPerformed(evt: ActionEvent) = close(false)
         }
 
         val btnCancel = JButton(cancelAction)
-        btnCancel.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "cancel")
+        btnCancel.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(getKeyStroke(VK_ESCAPE, 0), "cancel")
         btnCancel.actionMap.put("cancel", cancelAction)
 
-        val pnlButtons = JPanel(FlowLayout(FlowLayout.TRAILING))
+        val pnlButtons = JPanel(FlowLayout(TRAILING))
         pnlButtons.add(btnOk)
         pnlButtons.add(btnCancel)
         rootPane.defaultButton = btnOk
@@ -282,9 +302,9 @@ class EditPersonDialog : JDialog {
 
     private fun editEvent(event: LifeEvent?) {
         val eventEditPanel = LifeEventEditPanel(event)
-        val result = JOptionPane.showConfirmDialog(this, eventEditPanel, "Edit event", JOptionPane.OK_CANCEL_OPTION)
+        val result = showConfirmDialog(this, eventEditPanel, "Edit event", OK_CANCEL_OPTION)
 
-        if (result == JOptionPane.OK_OPTION) {
+        if (result == OK_OPTION) {
             val newEvent = eventEditPanel.getEvent()
 
             if (event == null) {
@@ -294,7 +314,7 @@ class EditPersonDialog : JDialog {
     }
 
     private fun removeEvent() {
-        if (lstEvents.selectedValue != null) {
+        lstEvents.selectedValue?.let {
             eventsModel.remove(lstEvents.selectedValue)
         }
     }

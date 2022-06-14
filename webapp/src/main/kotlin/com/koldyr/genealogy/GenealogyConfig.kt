@@ -1,5 +1,15 @@
 package com.koldyr.genealogy
 
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.EnableAspectJAutoProxy
+import org.springframework.http.HttpHeaders.*
+import org.springframework.http.HttpMethod.*
+import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.web.servlet.config.annotation.CorsRegistry
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.mapper.FamilyEventConverter
 import com.koldyr.genealogy.mapper.PersonConverter
@@ -10,8 +20,6 @@ import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import com.koldyr.genealogy.persistence.UserRepository
-import com.koldyr.genealogy.security.Secured
-import com.koldyr.genealogy.security.UnSecured
 import com.koldyr.genealogy.services.AuthenticationUserDetailsService
 import com.koldyr.genealogy.services.FamilyService
 import com.koldyr.genealogy.services.FamilyServiceImpl
@@ -21,32 +29,6 @@ import com.koldyr.genealogy.services.UserService
 import com.koldyr.genealogy.services.UserServiceImpl
 import ma.glasnost.orika.MapperFacade
 import ma.glasnost.orika.impl.DefaultMapperFactory
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.EnableAspectJAutoProxy
-import org.springframework.http.HttpHeaders.AUTHORIZATION
-import org.springframework.http.HttpMethod.DELETE
-import org.springframework.http.HttpMethod.GET
-import org.springframework.http.HttpMethod.HEAD
-import org.springframework.http.HttpMethod.PATCH
-import org.springframework.http.HttpMethod.POST
-import org.springframework.http.HttpMethod.PUT
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
-import org.springframework.security.crypto.password.PasswordEncoder
-import org.springframework.web.servlet.config.annotation.CorsRegistry
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import springfox.documentation.builders.RequestHandlerSelectors
-import springfox.documentation.service.ApiInfo
-import springfox.documentation.service.ApiKey
-import springfox.documentation.service.AuthorizationScope
-import springfox.documentation.service.SecurityReference
-import springfox.documentation.service.SecurityScheme
-import springfox.documentation.service.VendorExtension
-import springfox.documentation.spi.DocumentationType.SWAGGER_2
-import springfox.documentation.spi.service.contexts.SecurityContext
-import springfox.documentation.spring.web.plugins.Docket
 
 
 /**
@@ -124,59 +106,5 @@ class GenealogyConfig {
                         .exposedHeaders(AUTHORIZATION)
             }
         }
-    }
-
-    @Bean
-    fun passwordEncoder(): PasswordEncoder {
-        return BCryptPasswordEncoder()
-    }
-
-    @Bean
-    fun serviceApiSecured(): Docket {
-        return Docket(SWAGGER_2)
-                .groupName("secured")
-                .apiInfo(apiInfo())
-                .select()
-                .apis(RequestHandlerSelectors.withClassAnnotation(Secured::class.java))
-                .build()
-                .useDefaultResponseMessages(false)
-                .enableUrlTemplating(false)
-                .securitySchemes(listOf(apiKey()) as List<SecurityScheme>)
-                .securityContexts(listOf(securityContext()))
-    }
-
-    @Bean
-    fun serviceApiLogin(): Docket {
-        return Docket(SWAGGER_2)
-                .groupName("login")
-                .apiInfo(apiInfo())
-                .select()
-                .apis(RequestHandlerSelectors.withClassAnnotation(UnSecured::class.java))
-                .build()
-                .useDefaultResponseMessages(false)
-                .enableUrlTemplating(false)
-    }
-
-    private fun apiKey(): ApiKey {
-        return ApiKey("JWT", "Authorization", "header")
-    }
-
-    private fun securityContext(): SecurityContext {
-        return SecurityContext.builder().securityReferences(defaultAuth()).build()
-    }
-
-    private fun defaultAuth(): List<SecurityReference> {
-        val authorizationScope = AuthorizationScope("global", "accessEverything")
-        val authorizationScopes: Array<AuthorizationScope> = arrayOf(authorizationScope)
-        return listOf(SecurityReference("JWT", authorizationScopes))
-    }
-
-    private fun apiInfo(): ApiInfo {
-        val title = "Genealogy"
-        val description = "RESTfull back end for Genealogy SPA"
-        val vendorExtensions: List<VendorExtension<*>> = mutableListOf()
-        val termsOfServiceUrl = "http://koldyr.com/genealogy/tos"
-        val licenseUrl = "http://www.apache.org/licenses/LICENSE-2.0"
-        return ApiInfo(title, description, "2.0", termsOfServiceUrl, null, "Apache 2.0", licenseUrl, vendorExtensions)
     }
 }

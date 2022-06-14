@@ -36,7 +36,6 @@ spring:
       on-profile: prod
 server:
   port: 8081
-  address: 10.92.92.22
 
 ---
 spring:

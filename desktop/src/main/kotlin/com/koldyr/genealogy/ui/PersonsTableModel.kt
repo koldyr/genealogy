@@ -1,10 +1,10 @@
 package com.koldyr.genealogy.ui
 
 import java.util.function.Predicate
+import javax.swing.table.AbstractTableModel
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
-import javax.swing.table.AbstractTableModel
 
 /**
  * Description of class PersonsTableModel
@@ -13,11 +13,11 @@ import javax.swing.table.AbstractTableModel
 class PersonsTableModel : AbstractTableModel() {
 
     private var original: MutableList<Person>? = null
-    private var persons: MutableList<Person> = mutableListOf()
+    private var persons = mutableListOf<Person>()
     private val columnNames = listOf("Id", "Name", "Gender", "Birth", "Death", "Place", "Occupation", "Note", "Family Id")
 
     fun setPersons(value: Collection<Person>) {
-        persons = value as? MutableList ?: value.toMutableList()
+        persons = value.toMutableList()
         persons.sortBy(Person::id)
         fireTableDataChanged()
     }
@@ -99,7 +99,7 @@ class PersonsTableModel : AbstractTableModel() {
                 original = persons
             }
 
-            val input = if (data.matchCase) data.input else data.input.toLowerCase()
+            val input = if (data.matchCase) data.input else data.input.lowercase()
 
             val checkFn: Predicate<String?> = if (data.wholeWord)
                 Predicate {
@@ -109,7 +109,7 @@ class PersonsTableModel : AbstractTableModel() {
                     if (data.matchCase) {
                         it.contains(input)
                     } else {
-                        it.toLowerCase().contains(input)
+                        it.lowercase().contains(input)
                     }
                 }
             else
@@ -120,7 +120,7 @@ class PersonsTableModel : AbstractTableModel() {
                     if (data.matchCase) {
                         it.equals(input)
                     } else {
-                        it.toLowerCase().equals(input)
+                        it.lowercase().equals(input)
                     }
                 }
 

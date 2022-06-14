@@ -1,6 +1,6 @@
 package com.koldyr.genealogy.export
 
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
 /**
@@ -13,15 +13,15 @@ class ExporterFactoryTest {
     @Test
     fun create() {
         var exporter = ExporterFactory.create("json")
-        assertTrue(exporter is JSONExporter)
+        Assertions.assertTrue(exporter is JSONExporter)
 
         exporter = ExporterFactory.create("ged")
-        assertTrue(exporter is GEDExporter)
+        Assertions.assertTrue(exporter is GEDExporter)
 
         exporter = ExporterFactory.create("csv")
-        assertTrue(exporter is CSVExporter)
+        Assertions.assertTrue(exporter is CSVExporter)
 
         exporter = ExporterFactory.create("")
-        assertTrue(exporter is CSVExporter)
+        Assertions.assertTrue(exporter is CSVExporter)
     }
 }

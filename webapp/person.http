@@ -1,21 +1,21 @@
-### Login
+### User registration
+POST http://localhost/api/user/registration
+Content-Type: application/json
+
+{
+  "name": "me",
+  "surName": "koldyr",
+  "email": "me@koldyr.com",
+  "password": "koldyr"
+}
+
+### User login
 POST http://localhost/api/user/login
 Content-Type: application/json
 
 {
   "username": "me@koldyr.com",
   "password": "koldyr"
-}
-
-### Registration
-POST http://localhost/api/user/registration
-Content-Type: application/json
-
-{
-  "email": "me@koldyr.com",
-  "password": "koldyr",
-  "name": "me",
-  "surName": "koldyr"
 }
 
 ### Get All Persons
@@ -88,3 +88,14 @@ Accept: application/json
 DELETE http://localhost/api/genealogy/persons/1/events/10
 Authorization: Bearer {{authToken}}
 Accept: application/json
+
+### Create Person Photo
+POST http://localhost/api/genealogy/persons/1/photo
+Authorization: Bearer {{authToken}}
+Content-Type: image/jpeg
+
+< C:\Dist\avatar0.jpg
+
+### Get Person Photo
+GET http://localhost/api/genealogy/persons/1/photo
+Authorization: Bearer {{authToken}}

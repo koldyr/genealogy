@@ -1,19 +1,19 @@
 package com.koldyr.genealogy.export
 
+import java.io.OutputStream
+import java.nio.file.Files
+import java.nio.file.Path
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
+import java.util.StringJoiner
+import java.util.regex.Pattern
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
-import org.apache.commons.lang3.StringUtils.*
-import org.apache.commons.text.StringEscapeUtils.*
-import java.io.OutputStream
-import java.nio.file.Files
-import java.nio.file.Path
-import java.time.format.DateTimeFormatter
-import java.util.*
-import java.util.regex.Pattern
-import java.util.stream.Collectors
+import org.apache.commons.lang3.StringUtils.EMPTY
+import org.apache.commons.lang3.StringUtils.isEmpty
+import org.apache.commons.text.StringEscapeUtils.escapeCsv
 
 /**
  * Description of class CSVExporter
@@ -56,8 +56,8 @@ class CSVExporter : Exporter {
         val line = StringJoiner(",", EMPTY, "\n")
 
         line.add('F' + it.id.toString())
-        line.add(if (it.husband == null) EMPTY else it.husband!!.id.toString())
-        line.add(if (it.wife == null) EMPTY else it.wife!!.id.toString())
+        line.add(it.husband?.id?.toString() ?: EMPTY)
+        line.add(it.wife?.id?.toString() ?: EMPTY)
         line.add(persons(it.children))
         line.add(events(it.events))
         line.add(note(it.note))
@@ -85,9 +85,9 @@ class CSVExporter : Exporter {
             return EMPTY
         }
 
-        return events.stream()
+        return events
                 .map { event(it) }
-                .collect(Collectors.joining("!"))
+                .joinToString("!")
     }
 
     private fun event(it: LifeEvent): String {
@@ -96,7 +96,7 @@ class CSVExporter : Exporter {
         value.append('|')
         value.append(escapeCsv(it.prefix?.name ?: EMPTY))
         value.append('|')
-        value.append(it.date?.format(DateTimeFormatter.ISO_LOCAL_DATE) ?: EMPTY)
+        value.append(it.date?.format(ISO_LOCAL_DATE) ?: EMPTY)
         value.append('|')
         value.append(escapeCsv(it.place ?: EMPTY))
         value.append('|')
@@ -109,9 +109,9 @@ class CSVExporter : Exporter {
             return EMPTY
         }
 
-        return children.stream()
+        return children
                 .map { it.id.toString() }
-                .collect(Collectors.joining("|"))
+                .joinToString("|")
     }
 
     private fun note(note: String?): String? {

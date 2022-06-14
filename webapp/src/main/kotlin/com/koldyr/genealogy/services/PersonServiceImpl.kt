@@ -1,15 +1,17 @@
 package com.koldyr.genealogy.services
 
+import java.io.InputStream
+import java.io.InputStream.*
+import java.util.Objects.*
+import org.springframework.http.HttpStatus.*
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import ma.glasnost.orika.MapperFacade
-import org.springframework.http.HttpStatus.NOT_FOUND
-import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.server.ResponseStatusException
-import java.util.Objects.nonNull
 
 /**
  * Description of class PersonServiceImpl
@@ -85,6 +87,22 @@ open class PersonServiceImpl(
 
         personEventRepository.deleteById(eventId)
         personRepository.save(person)
+    }
+
+    override fun photo(personId: Int): InputStream {
+        val person = findPerson(personId)
+        return person.photo?.inputStream() ?: nullInputStream()
+    }
+
+    override fun createPhoto(personId: Int, type: String, photo: ByteArray): String {
+        val imageType = if (type.lowercase().contains("jpeg")) "jpeg" else "png"
+
+        val person = findPerson(personId)
+        person.photo = photo
+        person.photoUrl = "/api/genealogy/persons/$personId/photo.$imageType"
+        personRepository.save(person)
+        
+        return person.photoUrl!!
     }
 
     private fun findPerson(personId: Int): Person {
