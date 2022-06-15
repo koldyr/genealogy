@@ -3,8 +3,7 @@ package com.koldyr.genealogy.importer
 import java.io.InputStream
 import java.nio.file.Files
 import java.nio.file.Path
-import com.fasterxml.jackson.databind.DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT
-import com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
+import com.fasterxml.jackson.databind.DeserializationFeature.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
@@ -13,7 +12,9 @@ import com.koldyr.genealogy.model.Lineage
 class JSONImporter : Importer {
 
     override fun import(file: Path): Lineage {
-        return import(Files.newInputStream(file))
+        return Files.newInputStream(file).use {
+            import(it)
+        }
     }
 
     override fun import(input: InputStream): Lineage {

@@ -1,7 +1,7 @@
 package com.koldyr.genealogy.export
 
 import java.io.OutputStream
-import java.nio.file.Files
+import java.nio.file.Files.*
 import java.nio.file.Path
 import java.time.format.DateTimeFormatter
 import com.koldyr.genealogy.importer.CHILD
@@ -34,12 +34,32 @@ import com.koldyr.genealogy.model.PersonNames
 class GEDExporter : Exporter {
     private val datePattern = DateTimeFormatter.ofPattern("d MMM yyyy")
 
+    private val header =
+            "0 HEAD\n" +
+            "1 SOUR ALTREE\n" +
+            "2 NAME Древо Жизни\n" +
+            "2 VERS 2.31\n" +
+            "2 CORP Genery Software\n" +
+            "3 ADDR www.genery.com\n" +
+            "1 CHAR windows-1251\n" +
+            "1 DATE DD MMM YYYY\n" +
+            "1 GEDC\n" +
+            "2 VERS 5.5\n" +
+            "2 FORM Lineage-Linked\n" +
+            "1 SUBM @SUBM@\n" +
+            "0 @SUBM@ SUBM\n" +
+            "1 NAME unknown\n"
+
+    private val footer = "0 TRLR\n"
+
     override fun export(lineage: Lineage, file: Path) {
-        export(lineage, Files.newOutputStream(file))
+        export(lineage, newOutputStream(file))
     }
 
     override fun export(lineage: Lineage, output: OutputStream) {
         output.bufferedWriter(Charsets.UTF_8).use { writer ->
+            writer.write(header)
+
             lineage.persons.forEach {
                 writer.write(person(it))
             }
@@ -47,6 +67,8 @@ class GEDExporter : Exporter {
             lineage.families.forEach {
                 writer.write(family(it))
             }
+
+            writer.write(footer)
         }
     }
 

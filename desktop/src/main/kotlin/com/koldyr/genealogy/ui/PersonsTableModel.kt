@@ -2,6 +2,7 @@ package com.koldyr.genealogy.ui
 
 import java.util.function.Predicate
 import javax.swing.table.AbstractTableModel
+import com.koldyr.genealogy.model.EventType
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
@@ -38,7 +39,7 @@ class PersonsTableModel : AbstractTableModel() {
 
     fun add(person: Person) {
         persons.add(person)
-        fireTableRowsInserted(persons.size, persons.size)
+        fireTableRowsInserted(persons.size - 1, persons.size - 1)
     }
 
     fun update(person: Person) {
@@ -78,8 +79,8 @@ class PersonsTableModel : AbstractTableModel() {
             0 -> person.id
             1 -> person.name
             2 -> person.gender
-            3 -> person.getBirth()
-            4 -> person.getDeath()
+            3 -> person.findEvent(EventType.Birth)
+            4 -> person.findEvent(EventType.Death)
             5 -> person.place
             6 -> person.occupation
             7 -> person.note

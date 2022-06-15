@@ -94,14 +94,8 @@ class Person() : Cloneable {
         this.familyId = family
     }
 
-    @JsonIgnore
-    fun getBirth(): LifeEvent? {
-        return events.firstOrNull { it.type == EventType.Birth }
-    }
-
-    @JsonIgnore
-    fun getDeath(): LifeEvent? {
-        return events.firstOrNull { it.type == EventType.Death }
+    fun findEvent(type: EventType): LifeEvent? {
+        return events.firstOrNull { it.type == type }
     }
 
     fun search(checkFn: Predicate<String?>): Boolean {
