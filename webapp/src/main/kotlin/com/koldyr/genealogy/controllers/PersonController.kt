@@ -100,8 +100,7 @@ class PersonController(private val personService: PersonService) {
     @ResponseBody
     fun photo(@PathVariable personId: Int): ResponseEntity<Resource> {
         val personPhoto = personService.photo(personId)
-        return ResponseEntity
-            .status(OK)
+        return status(OK)
             .header("Content-Type", IMAGE_JPEG_VALUE)
             .header("Content-Disposition", "inline; filename=\"avatar${personId}.jpg\"")
             .body(InputStreamResource(personPhoto))
