@@ -307,7 +307,13 @@ class EditPersonDialog : JDialog {
         if (result == OK_OPTION) {
             val newEvent = eventEditPanel.getEvent()
 
-            if (event == null) {
+            newEvent?.let {
+                eventsModel.events
+                    .firstOrNull { it.type == newEvent.type }
+                    ?.let {
+                        eventsModel.remove(it)
+                    }
+
                 eventsModel.add(newEvent)
             }
         }
@@ -315,7 +321,7 @@ class EditPersonDialog : JDialog {
 
     private fun removeEvent() {
         lstEvents.selectedValue?.let {
-            eventsModel.remove(lstEvents.selectedValue)
+            eventsModel.remove(it)
         }
     }
 }

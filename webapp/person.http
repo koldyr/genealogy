@@ -1,5 +1,5 @@
 ### User registration
-POST http://localhost/api/user/registration
+POST http://{{server}}/api/user/registration
 Content-Type: application/json
 
 {
@@ -10,7 +10,7 @@ Content-Type: application/json
 }
 
 ### User login
-POST http://localhost/api/user/login
+POST http://{{server}}/api/user/login
 Content-Type: application/json
 
 {
@@ -19,16 +19,16 @@ Content-Type: application/json
 }
 
 ### Get All Persons
-GET http://localhost/api/genealogy/persons
+GET http://{{server}}/api/genealogy/persons
 Authorization: Bearer {{authToken}}
 
 ### Get Person By ID
-GET http://localhost/api/genealogy/persons/1
+GET http://{{server}}/api/genealogy/persons/1
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Create Person
-POST http://localhost/api/genealogy/persons
+POST http://{{server}}/api/genealogy/persons
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 Accept: application/json
@@ -46,7 +46,7 @@ Accept: application/json
 }
 
 ### Update Person
-PUT http://localhost/api/genealogy/persons/33
+PUT http://{{server}}/api/genealogy/persons/33
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 Accept: application/json
@@ -64,10 +64,10 @@ Accept: application/json
 }
 
 ### Delete Person
-DELETE http://localhost/api/genealogy/persons/33
+DELETE http://{{server}}/api/genealogy/persons/33
 
 ### Create Person Event
-POST http://localhost/api/genealogy/persons/1/events
+POST http://{{server}}/api/genealogy/persons/1/events
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 Accept: application/json
@@ -80,22 +80,22 @@ Accept: application/json
 }
 
 ### Get Person Events
-GET http://localhost/api/genealogy/persons/1/events
+GET http://{{server}}/api/genealogy/persons/1/events
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Delete Person Event
-DELETE http://localhost/api/genealogy/persons/1/events/10
+DELETE http://{{server}}/api/genealogy/persons/1/events/10
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Create Person Photo
-POST http://localhost/api/genealogy/persons/1/photo
+POST http://{{server}}/api/genealogy/persons/1/photo
 Authorization: Bearer {{authToken}}
 Content-Type: image/jpeg
 
 < C:\Dist\avatar0.jpg
 
 ### Get Person Photo
-GET http://localhost/api/genealogy/persons/1/photo
+GET http://{{server}}/api/genealogy/persons/1/photo
 Authorization: Bearer {{authToken}}

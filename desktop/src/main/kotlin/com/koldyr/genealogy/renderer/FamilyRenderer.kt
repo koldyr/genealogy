@@ -17,8 +17,7 @@ class FamilyRenderer(val lineage: Lineage) : DefaultListCellRenderer() {
 
         val family = value as Family?
         family?.let {
-            val familyName = getFamilyName(family)
-            this.text = "${family.id ?: "-"} $familyName"
+            this.text = getFamilyName(family)
         }
 
         return this
@@ -28,6 +27,6 @@ class FamilyRenderer(val lineage: Lineage) : DefaultListCellRenderer() {
         val person = family.husband ?: family.wife ?: return ""
         val firstName = person.name?.first ?: ""
         val lastName = person.name?.last ?: ""
-        return "$lastName $firstName"
+        return "${person.id} $lastName $firstName"
     }
 }

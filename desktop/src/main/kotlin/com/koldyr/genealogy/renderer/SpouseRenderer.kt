@@ -14,6 +14,10 @@ class SpouseRenderer : DefaultListCellRenderer() {
     override fun getListCellRendererComponent(list: JList<*>?, value: Any?, index: Int, isSelected: Boolean, cellHasFocus: Boolean): Component {
         super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus)
 
+        if (value == null) {
+            return this
+        }
+
         val person = value as Person
         person.name?.let {name ->
             val nameBuilder = mutableListOf<String>()

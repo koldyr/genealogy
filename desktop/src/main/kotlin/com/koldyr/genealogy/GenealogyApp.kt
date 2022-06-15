@@ -8,6 +8,8 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseEvent.*
 import java.io.File
 import java.io.IOException
+import java.util.*
+import java.util.function.ToIntFunction
 import javax.swing.AbstractAction
 import javax.swing.JFileChooser
 import javax.swing.JFrame
@@ -160,12 +162,14 @@ class GenealogyApp : JFrame, ActionListener {
     }
 
     private fun addPerson() {
-        val index = 1
-//        val index = personsModel.getAll().stream()
-//            .filter { it.id != null }
-//            .map(Person::id)
-//            .max(Comparator({ (p1: Int?, p2: Int?) -> compareValues(p1, p2) }))
-//            .get() + 1
+        val index = personsModel.getAll()
+            .stream()
+            .map(Person::id)
+            .filter(Objects::nonNull)
+            .mapToInt(ToIntFunction<Int?> { it })
+            .max()
+            .orElse(0) + 1
+
         var person = Person(index)
 
         val editPersonDialog = EditPersonDialog(this, lineage, person)

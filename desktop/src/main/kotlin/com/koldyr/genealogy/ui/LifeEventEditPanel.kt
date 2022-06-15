@@ -80,18 +80,26 @@ class LifeEventEditPanel: JPanel {
                 WEST, HORIZONTAL, Insets(0, 0, 5, 0), 0, 0))
     }
 
-    fun getEvent(): LifeEvent {
+    fun getEvent(): LifeEvent? {
+        if (dateModel.value == null) {
+            return null
+        }
+
+        val place = txtPlace.text.takeIf { it.isNotEmpty() }
+        val note = txtNote.text.takeIf { it.isNotEmpty() }
+
         if (this.event == null) {
             val type = cmbType.selectedItem as EventType
             val prefix = getPrefix()
-            return LifeEvent(type, prefix, dateModel.value, txtPlace.text, null)
+            return LifeEvent(type, prefix, dateModel.value, place, note)
         }
 
-        val changed: LifeEvent = this.event!!
+        val changed = this.event as LifeEvent
         changed.type = cmbType.selectedItem as EventType
         changed.prefix = getPrefix()
         changed.date = dateModel.value
-        changed.place = txtPlace.text
+        changed.place = place
+        changed.note = note
 
         return changed
     }
