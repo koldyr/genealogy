@@ -13,7 +13,7 @@ import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.security.UnSecured
 import com.koldyr.genealogy.services.UserService
 
-private const val USER_NAME = "X-USER-NAME"
+private const val USER_NAME = "User-Name"
 
 @RestController
 @RequestMapping("/api/user")
