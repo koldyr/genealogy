@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.services
 
+import java.io.InputStream
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 
@@ -17,4 +18,7 @@ interface PersonService {
     fun createEvent(personId: Int, event: PersonEvent): Int
     fun findEvents(personId: Int): Collection<PersonEvent>
     fun deleteEvent(personId: Int, eventId: Int)
+    
+    fun photo(personId: Int): InputStream
+    fun createPhoto(personId: Int, type: String, photo: ByteArray): String
 }

@@ -8,7 +8,7 @@ package com.koldyr.genealogy.ui
  * @created 11/14/2019
  */
 data class SearchData(
-        val input: String,
-        val matchCase: Boolean,
-        val wholeWord: Boolean
+    val input: String,
+    val matchCase: Boolean,
+    val wholeWord: Boolean
 )

@@ -1,5 +1,15 @@
 package com.koldyr.genealogy.importer
 
+import java.io.BufferedInputStream
+import java.io.InputStream
+import java.nio.charset.Charset
+import java.nio.file.Files.*
+import java.nio.file.Path
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.util.regex.Pattern
+import kotlin.math.max
+import org.apache.commons.lang3.StringUtils
 import com.koldyr.genealogy.model.EventPrefix
 import com.koldyr.genealogy.model.EventType
 import com.koldyr.genealogy.model.Family
@@ -10,16 +20,6 @@ import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.model.PersonNames
-import org.apache.commons.lang3.StringUtils
-import java.io.BufferedInputStream
-import java.io.InputStream
-import java.nio.charset.Charset
-import java.nio.file.Files
-import java.nio.file.Path
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.regex.Pattern
-import kotlin.math.max
 
 const val PERSON = "INDI"
 const val CHAR_ENCODING = "CHAR"
@@ -49,7 +49,7 @@ class GEDImporter : Importer {
     private val familyIdPattern = Pattern.compile("@\\w(\\d+)@")
 
     override fun import(file: Path): Lineage {
-        return import(Files.newInputStream(file))
+        return import(newInputStream(file))
     }
 
     override fun import(input: InputStream): Lineage {
@@ -172,8 +172,11 @@ class GEDImporter : Importer {
         return Lineage(persons.values, families, true)
     }
 
-    private fun findFamily(families: MutableSet<Family>, familyId: Int) =
-            families.stream().filter { it.id == familyId }.findFirst().orElseGet { Family(familyId) }
+    private fun findFamily(families: MutableSet<Family>, familyId: Int): Family =
+        families.stream()
+            .filter { it.id == familyId }
+            .findFirst()
+            .orElse(Family(familyId))
 
     private fun getEncoding(input: InputStream): Charset {
         val charset = Charsets.UTF_8

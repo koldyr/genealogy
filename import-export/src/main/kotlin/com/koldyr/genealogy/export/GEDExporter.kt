@@ -1,5 +1,9 @@
 package com.koldyr.genealogy.export
 
+import java.io.OutputStream
+import java.nio.file.Files.*
+import java.nio.file.Path
+import java.time.format.DateTimeFormatter
 import com.koldyr.genealogy.importer.CHILD
 import com.koldyr.genealogy.importer.CONTINUE
 import com.koldyr.genealogy.importer.DATE
@@ -22,10 +26,6 @@ import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
-import java.io.OutputStream
-import java.nio.file.Files
-import java.nio.file.Path
-import java.time.format.DateTimeFormatter
 
 /**
  * Description of class GEDExporter
@@ -34,12 +34,32 @@ import java.time.format.DateTimeFormatter
 class GEDExporter : Exporter {
     private val datePattern = DateTimeFormatter.ofPattern("d MMM yyyy")
 
+    private val header =
+            "0 HEAD\n" +
+            "1 SOUR ALTREE\n" +
+            "2 NAME Древо Жизни\n" +
+            "2 VERS 2.31\n" +
+            "2 CORP Genery Software\n" +
+            "3 ADDR www.genery.com\n" +
+            "1 CHAR windows-1251\n" +
+            "1 DATE DD MMM YYYY\n" +
+            "1 GEDC\n" +
+            "2 VERS 5.5\n" +
+            "2 FORM Lineage-Linked\n" +
+            "1 SUBM @SUBM@\n" +
+            "0 @SUBM@ SUBM\n" +
+            "1 NAME unknown\n"
+
+    private val footer = "0 TRLR\n"
+
     override fun export(lineage: Lineage, file: Path) {
-        export(lineage, Files.newOutputStream(file))
+        export(lineage, newOutputStream(file))
     }
 
     override fun export(lineage: Lineage, output: OutputStream) {
         output.bufferedWriter(Charsets.UTF_8).use { writer ->
+            writer.write(header)
+
             lineage.persons.forEach {
                 writer.write(person(it))
             }
@@ -47,6 +67,8 @@ class GEDExporter : Exporter {
             lineage.families.forEach {
                 writer.write(family(it))
             }
+
+            writer.write(footer)
         }
     }
 
@@ -66,11 +88,11 @@ class GEDExporter : Exporter {
     }
 
     private fun families(person: Person, builder: StringBuilder) {
-        if (person.familyId != null) {
-            builder.append("1 ").append(OWN_FAMILY).append(" @F").append(person.familyId!!).append("@\n")
+        person.familyId?.let {
+            builder.append("1 ").append(OWN_FAMILY).append(" @F").append(it).append("@\n")
         }
-        if (person.parentFamilyId != null) {
-            builder.append("1 ").append(PARENT_FAMILY).append(" @F").append(person.parentFamilyId!!).append("@\n")
+        person.parentFamilyId?.let {
+            builder.append("1 ").append(PARENT_FAMILY).append(" @F").append(it).append("@\n")
         }
     }
 
@@ -99,25 +121,25 @@ class GEDExporter : Exporter {
         if (names != null) {
             val nameBuilder = StringBuilder()
 
-            if (names.first != null) {
-                nameBuilder.append(names.first)
+            names.first?.let {
+                nameBuilder.append(it)
             }
-            if (names.middle != null) {
+            names.middle?.let {
                 if (nameBuilder.isNotEmpty()) nameBuilder.append(' ')
-                nameBuilder.append(names.middle)
+                nameBuilder.append(it)
             }
             if (names.last != null || names.maiden != null) {
                 if (nameBuilder.isNotEmpty()) nameBuilder.append(' ')
 
                 nameBuilder.append('/')
 
-                if (names.last != null) {
-                    nameBuilder.append(names.last)
+                names.last?.let {
+                    nameBuilder.append(it)
                 }
 
-                if (names.maiden != null) {
+                names.maiden?.let {
                     if (names.last != null) nameBuilder.append(' ')
-                    nameBuilder.append('(').append(names.maiden).append(')')
+                    nameBuilder.append('(').append(it).append(')')
                 }
 
                 nameBuilder.append('/')
@@ -134,20 +156,20 @@ class GEDExporter : Exporter {
     }
 
     private fun place(place: String?, builder: StringBuilder) {
-        if (place != null) {
-            builder.append("1 ").append(RESIDENCE).append(" ").append(place).append('\n')
+        place?.let {
+            builder.append("1 ").append(RESIDENCE).append(" ").append(it).append('\n')
         }
     }
 
     private fun occupation(occupation: String?, builder: StringBuilder) {
-        if (occupation != null) {
-            builder.append("1 ").append(OCCUPATION).append(" ").append(occupation).append('\n')
+        occupation?.let {
+            builder.append("1 ").append(OCCUPATION).append(" ").append(it).append('\n')
         }
     }
 
     private fun note(note: String?, builder: StringBuilder) {
-        if (note != null) {
-            val paragraphs = note.split('\n')
+        note?.let {
+            val paragraphs = it.split('\n')
             for ((index, paragraph) in paragraphs.withIndex()) {
                 if (index == 0) {
                     builder.append("1 ").append(NOTE).append(" ").append(paragraph).append('\n')
@@ -167,18 +189,18 @@ class GEDExporter : Exporter {
     private fun event(event: LifeEvent, builder: StringBuilder) {
         builder.append("1 ").append(event.type.getCode()).append('\n')
 
-        if (event.date != null) {
+        event.date?.let {
             builder.append("2 ").append(DATE).append(" ")
             if (event.prefix != null && event.prefix != EventPrefix.None) {
                 builder.append(event.prefix!!.code).append(' ')
             }
-            builder.append(event.date!!.format(datePattern)).append('\n')
+            builder.append(it.format(datePattern)).append('\n')
         }
-        if (event.place != null) {
-            builder.append("2 ").append(PLACE).append(" ").append(event.place).append('\n')
+        event.place?.let {
+            builder.append("2 ").append(PLACE).append(" ").append(it).append('\n')
         }
-        if (event.note != null) {
-            val paragraphs = event.note!!.split('\n')
+        event.note?.let {
+            val paragraphs = it.split('\n')
             for ((index, paragraph) in paragraphs.withIndex()) {
                 if (index == 0) {
                     builder.append("2 ").append(NOTE).append(" ").append(paragraph).append('\n')
@@ -196,8 +218,8 @@ class GEDExporter : Exporter {
     }
 
     private fun person(person: Person?, type: String, builder: StringBuilder) {
-        if (person != null) {
-            builder.append("1 ").append(type).append(" @").append(person.id).append("@\n")
+        person?.let {
+            builder.append("1 ").append(type).append(" @").append(it.id).append("@\n")
         }
     }
 }

@@ -28,7 +28,7 @@ class JSONExporter : Exporter {
     private fun mapper(): ObjectMapper {
         val mapper = ObjectMapper()
         mapper.registerModule(JavaTimeModule())
-        mapper.registerModule(KotlinModule())
+        mapper.registerModule(KotlinModule.Builder().build())
         mapper.setSerializationInclusion(Include.NON_EMPTY)
         mapper.enable(INDENT_OUTPUT)
         mapper.disable(WRITE_DATES_AS_TIMESTAMPS)

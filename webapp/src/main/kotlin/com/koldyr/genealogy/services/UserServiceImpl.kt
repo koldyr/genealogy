@@ -1,14 +1,12 @@
 package com.koldyr.genealogy.services
 
-import com.auth0.jwt.JWT
-import com.auth0.jwt.algorithms.Algorithm
-import com.koldyr.genealogy.model.Credentials
-import com.koldyr.genealogy.model.User
-import com.koldyr.genealogy.persistence.UserRepository
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.util.*
+import javax.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus.BAD_REQUEST
-import org.springframework.http.HttpStatus.UNAUTHORIZED
+import org.springframework.http.HttpStatus.*
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.DisabledException
@@ -16,10 +14,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.server.ResponseStatusException
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.util.Date
-import javax.persistence.EntityNotFoundException
+import com.auth0.jwt.JWT
+import com.auth0.jwt.algorithms.Algorithm
+import com.koldyr.genealogy.dto.AuthenticatedUser
+import com.koldyr.genealogy.model.Credentials
+import com.koldyr.genealogy.model.User
+import com.koldyr.genealogy.persistence.UserRepository
 
 open class UserServiceImpl(
         private val userRepository: UserRepository,
@@ -52,12 +52,15 @@ open class UserServiceImpl(
                 .orElseThrow { EntityNotFoundException() }
     }
 
-    override fun login(credentials: Credentials): String {
+    override fun login(credentials: Credentials): AuthenticatedUser {
         try {
-            val token = UsernamePasswordAuthenticationToken(credentials.username, credentials.password, listOf())
-            authenticationManager.authenticate(token)
-            
-            return "Bearer " + generateToken(credentials.username)
+            val usernamePassword = UsernamePasswordAuthenticationToken(credentials.username, credentials.password, listOf())
+            val authentication = authenticationManager.authenticate(usernamePassword)
+
+            val authenticated = authentication.principal as AuthenticatedUser
+            authenticated.token = "Bearer " + generateToken(authenticated.username)
+
+            return authenticated
         } catch (e: DisabledException) {
             throw ResponseStatusException(UNAUTHORIZED, "user is disabled")
         } catch (e: BadCredentialsException) {

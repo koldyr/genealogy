@@ -1,5 +1,12 @@
 package com.koldyr.genealogy.importer
 
+import java.io.InputStream
+import java.nio.file.Files.newInputStream
+import java.nio.file.Path
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
+import java.util.regex.Pattern
+import kotlin.text.Charsets.UTF_8
 import com.koldyr.genealogy.model.EventPrefix
 import com.koldyr.genealogy.model.EventType
 import com.koldyr.genealogy.model.Family
@@ -10,13 +17,8 @@ import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.model.PersonNames
-import org.apache.commons.lang3.StringUtils.*
-import java.io.InputStream
-import java.nio.file.Files
-import java.nio.file.Path
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.regex.Pattern
+import org.apache.commons.lang3.StringUtils.defaultIfEmpty
+import org.apache.commons.lang3.StringUtils.isEmpty
 
 class CSVImporter : Importer {
     private val pattern = Pattern.compile("\\\\n")
@@ -24,11 +26,11 @@ class CSVImporter : Importer {
     private val families = mutableSetOf<Family>()
 
     override fun import(file: Path): Lineage {
-        return import(Files.newInputStream(file))
+        return import(newInputStream(file))
     }
 
     override fun import(input: InputStream): Lineage {
-        input.bufferedReader(Charsets.UTF_8).use { reader ->
+        input.bufferedReader(UTF_8).use { reader ->
             reader.lines().forEach { line ->
                 if (line.startsWith('P')) {
                     persons.add(readPerson(line))
@@ -167,7 +169,7 @@ class CSVImporter : Importer {
     private fun parseDate(date: String): LocalDate? {
         return if (isEmpty(date)) {
             null
-        } else LocalDate.parse(date, DateTimeFormatter.ISO_LOCAL_DATE)
+        } else LocalDate.parse(date, ISO_LOCAL_DATE)
     }
 
     private fun note(value: String): String? {

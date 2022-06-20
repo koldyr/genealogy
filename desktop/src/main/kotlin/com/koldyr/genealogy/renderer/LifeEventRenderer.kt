@@ -1,10 +1,10 @@
-package com.koldyr.genealogy.ui
+package com.koldyr.genealogy.renderer
 
 import java.awt.Component
-import com.koldyr.genealogy.model.LifeEvent
-import org.apache.commons.lang3.StringUtils.EMPTY
 import javax.swing.DefaultListCellRenderer
 import javax.swing.JList
+import org.apache.commons.lang3.StringUtils
+import com.koldyr.genealogy.model.LifeEvent
 
 class LifeEventRenderer : DefaultListCellRenderer() {
 
@@ -12,7 +12,7 @@ class LifeEventRenderer : DefaultListCellRenderer() {
         super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus)
 
         if (value is LifeEvent) {
-            text = "${value.prefix ?: EMPTY} ${value.date ?: "?"} ${value.type} in ${value.place ?: "?"}"
+            text = "${value.prefix ?: StringUtils.EMPTY} ${value.date ?: "?"} ${value.type} in ${value.place ?: "?"}"
         }
 
         return this

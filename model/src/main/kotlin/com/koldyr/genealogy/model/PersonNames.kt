@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.model
 
+import java.util.StringJoiner
 import java.util.function.Predicate
 import javax.persistence.Embeddable
 
@@ -8,7 +9,7 @@ import javax.persistence.Embeddable
  * @created: 2019-10-26
  */
 @Embeddable
-class PersonNames(): Cloneable {
+class PersonNames() : Cloneable {
     var first: String? = null
     var middle: String? = null
     var last: String? = null
@@ -53,6 +54,17 @@ class PersonNames(): Cloneable {
         result = 31 * result + (last?.hashCode() ?: 0)
         result = 31 * result + (maiden?.hashCode() ?: 0)
         return result
+    }
+
+    fun toUiString(): CharSequence {
+        val names = StringJoiner(" ")
+            .add(last)
+            .add(first)
+            .add(middle)
+        if (maiden != null) {
+            names.add(" ($maiden)")
+        }
+        return names.toString()
     }
 
     override fun toString(): String {
