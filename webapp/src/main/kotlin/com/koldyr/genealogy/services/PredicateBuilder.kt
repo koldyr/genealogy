@@ -14,6 +14,7 @@ import com.koldyr.genealogy.model.EventType
 import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
+import com.koldyr.genealogy.model.PersonNames
 
 /**
  * Description of the PredicateBuilder class
@@ -71,7 +72,7 @@ class PredicateBuilder {
         val nameFilters = mutableListOf<Predicate>()
 
         val pattern = "%${name.lowercase()}%"
-        val namePath = person.get<String>("name")
+        val namePath = person.get<PersonNames>("name")
 
         var predicate = builder.like(builder.lower(namePath.get("first")), pattern)
         nameFilters.add(predicate)

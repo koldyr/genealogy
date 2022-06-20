@@ -72,10 +72,10 @@ abstract class BaseControllerTest {
 
     protected fun createUser(): User {
         val user = User()
-        user.password = "1111"
-        user.email = "yan@gmail.com"
-        user.name = "Yan"
-        user.surName = "Efimov"
+        user.password = "koldyr"
+        user.email = "me@koldyr.com"
+        user.name = "me"
+        user.surName = "koldyr"
         return user
     }
 
@@ -104,8 +104,8 @@ abstract class BaseControllerTest {
 
     protected fun getBearerToken(): String {
         val credentials = Credentials()
-        credentials.username = "yan@gmail.com"
-        credentials.password = "1111"
+        credentials.username = "me@koldyr.com"
+        credentials.password = "koldyr"
 
         val token = mockMvc.post("/api/user/login") {
             content = mapper.writeValueAsString(credentials)
@@ -183,6 +183,6 @@ abstract class BaseControllerTest {
     }
 
     protected fun createRandomWord(): String {
-        return randomAlphabetic(10);
+        return randomAlphabetic(10)
     }
 }

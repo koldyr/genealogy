@@ -218,10 +218,10 @@ class PersonControllerTest : BaseControllerTest() {
         ))
         result = searchPerson(criteria)
         assertNotNull(result)
-        assertTrue(result.isNotEmpty())
+        assertTrue(result.size == 4)
     }
 
-    private fun searchPerson(criteria: SearchDTO): Collection<Person> {
+    private fun searchPerson(criteria: SearchDTO): List<Person> {
         val response = mockMvc.post("/api/genealogy/persons/search") {
             content = mapper.writeValueAsString(criteria)
             accept = APPLICATION_JSON

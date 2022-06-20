@@ -50,6 +50,8 @@ open class PersonServiceImpl(
 
     override fun create(person: Person): Int {
         person.user = userService.currentUser()
+        person.events.forEach { it.person = person }
+
         val saved = personRepository.save(person)
         return saved.id!!
     }
