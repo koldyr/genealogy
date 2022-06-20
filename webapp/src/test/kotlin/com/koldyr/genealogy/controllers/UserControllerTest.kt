@@ -27,7 +27,7 @@ class UserControllerTest : BaseControllerTest() {
     @Test
     fun authenticationUser() {
         val creds = Credentials()
-        creds.username = "yan@gmail.com"
+        creds.username = "me@koldyr.com"
         creds.password = "1112"
 
         mockMvc.post("/api/user/login") {
@@ -51,7 +51,7 @@ class UserControllerTest : BaseControllerTest() {
         }
             .andDo { print() }
             .andExpect {
-                status { isForbidden() }
+                status { isUnauthorized() }
                 status { reason("invalid token") }
             }
 
