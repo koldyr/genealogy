@@ -1,12 +1,12 @@
 package com.koldyr.genealogy.controllers
 
-import com.koldyr.genealogy.model.Credentials
-import com.koldyr.genealogy.model.Gender
 import org.junit.Test
-import org.springframework.http.HttpHeaders.AUTHORIZATION
-import org.springframework.http.MediaType.APPLICATION_JSON
+import org.springframework.http.HttpHeaders.*
+import org.springframework.http.MediaType.*
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
+import com.koldyr.genealogy.model.Credentials
+import com.koldyr.genealogy.model.Gender
 
 class UserControllerTest : BaseControllerTest() {
 
@@ -51,7 +51,7 @@ class UserControllerTest : BaseControllerTest() {
         }
             .andDo { print() }
             .andExpect {
-                status { isUnauthorized() }
+                status { isForbidden() }
                 status { reason("invalid token") }
             }
 
