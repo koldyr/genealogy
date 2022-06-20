@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
+import com.koldyr.genealogy.dto.SearchDTO
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.security.Secured
@@ -26,12 +27,19 @@ import com.koldyr.genealogy.services.PersonService
 
 /**
  * Description of class PersonController
+ *
+ * @author d.halitski@gmail.com
  * @created: 2021-09-25
  */
 @RestController
 @RequestMapping("/api/genealogy/persons")
 @Secured
 class PersonController(private val personService: PersonService) {
+
+    @PostMapping("/search", consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])
+    fun search(@RequestBody criteria: SearchDTO): Collection<Person> {
+        return personService.search(criteria)
+    }
 
     @GetMapping(produces = [APPLICATION_JSON_VALUE])
     fun persons(): Collection<Person> = personService.findAll()

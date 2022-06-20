@@ -1,20 +1,26 @@
 package com.koldyr.genealogy.services
 
+import ma.glasnost.orika.MapperFacade
 import java.io.InputStream
 import java.io.InputStream.*
 import java.util.Objects.*
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
+import com.koldyr.genealogy.dto.SearchDTO
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
-import ma.glasnost.orika.MapperFacade
 
 /**
  * Description of class PersonServiceImpl
+ *
+ * @author d.halitski@gmail.com
  * @created: 2021-09-28
  */
 @Transactional
@@ -25,7 +31,22 @@ open class PersonServiceImpl(
         private val mapper: MapperFacade,
         private val userService: UserService) : PersonService {
 
+    private val predicateBuilder = PredicateBuilder()
+
     override fun findAll(): List<Person> = personRepository.findAllByUser(userService.currentUser())
+
+    override fun search(criteria: SearchDTO): Collection<Person> {
+        val filter = predicateBuilder.personFilter(criteria)
+
+        val page = criteria.page?.index ?: 0
+        val size = criteria.page?.size ?: 100
+        val direction = if (criteria.sort == null) Sort.Direction.ASC else Sort.Direction.fromString(criteria.sort!!.order)
+        val property = if (criteria.sort == null) "id" else criteria.sort!!.name
+        val pageSelector = PageRequest.of(page, size, direction, property)
+
+        val result: Page<Person> = personRepository.findAll(filter, pageSelector)
+        return result.content
+    }
 
     override fun create(person: Person): Int {
         person.user = userService.currentUser()
