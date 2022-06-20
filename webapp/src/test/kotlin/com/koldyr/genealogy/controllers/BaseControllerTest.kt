@@ -1,5 +1,20 @@
 package com.koldyr.genealogy.controllers
 
+import java.time.LocalDate
+import org.apache.commons.lang3.RandomStringUtils.*
+import org.hamcrest.Matchers.*
+import org.junit.After
+import org.junit.Before
+import org.junit.runner.RunWith
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.http.HttpHeaders.*
+import org.springframework.http.MediaType.*
+import org.springframework.test.annotation.IfProfileValue
+import org.springframework.test.context.junit4.SpringRunner
+import org.springframework.test.web.servlet.MockMvc
+import org.springframework.test.web.servlet.post
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.koldyr.genealogy.Genealogy
 import com.koldyr.genealogy.dto.FamilyDTO
@@ -16,22 +31,6 @@ import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import com.koldyr.genealogy.persistence.UserRepository
-import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
-import org.hamcrest.Matchers.matchesRegex
-import org.junit.After
-import org.junit.Before
-import org.junit.runner.RunWith
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpHeaders.AUTHORIZATION
-import org.springframework.http.HttpHeaders.LOCATION
-import org.springframework.http.MediaType.APPLICATION_JSON
-import org.springframework.test.annotation.IfProfileValue
-import org.springframework.test.context.junit4.SpringRunner
-import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.post
-import java.time.LocalDate
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = [Genealogy::class])
@@ -73,10 +72,10 @@ abstract class BaseControllerTest {
 
     protected fun createUser(): User {
         val user = User()
-        user.password = "1111"
-        user.email = "yan@gmail.com"
-        user.name = "Yan"
-        user.surName = "Efimov"
+        user.password = "koldyr"
+        user.email = "me@koldyr.com"
+        user.name = "me"
+        user.surName = "koldyr"
         return user
     }
 
@@ -105,8 +104,8 @@ abstract class BaseControllerTest {
 
     protected fun getBearerToken(): String {
         val credentials = Credentials()
-        credentials.username = "yan@gmail.com"
-        credentials.password = "1111"
+        credentials.username = "me@koldyr.com"
+        credentials.password = "koldyr"
 
         val token = mockMvc.post("/api/user/login") {
             content = mapper.writeValueAsString(credentials)
@@ -136,10 +135,14 @@ abstract class BaseControllerTest {
     }
 
     protected fun createPerson(gender: Gender): Person {
-        val personModel = createPersonModel(gender)
+        val person = createPersonModel(gender)
+        return createPerson(person)
+    }
+
+    protected fun createPerson(person: Person): Person {
         val location = mockMvc.post("/api/genealogy/persons") {
             header(AUTHORIZATION, getBearerToken())
-            content = mapper.writeValueAsString(personModel)
+            content = mapper.writeValueAsString(person)
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
         }
@@ -147,8 +150,8 @@ abstract class BaseControllerTest {
                 status { isCreated() }
                 header { string(LOCATION, matchesRegex("/api/genealogy/persons/[\\d]+")) }
             }.andReturn().response.getHeader(LOCATION)
-        personModel.id = getLastIdFromLocation(location)
-        return personModel
+        person.id = getLastIdFromLocation(location)
+        return person
     }
 
     protected fun createSuccessFamilyModel(): FamilyDTO {
@@ -180,6 +183,6 @@ abstract class BaseControllerTest {
     }
 
     protected fun createRandomWord(): String {
-        return randomAlphabetic(10);
+        return randomAlphabetic(10)
     }
 }
