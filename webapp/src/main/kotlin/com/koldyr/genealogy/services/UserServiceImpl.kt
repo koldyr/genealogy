@@ -2,14 +2,13 @@ package com.koldyr.genealogy.services
 
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.*
+import java.util.Date
 import javax.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus.*
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
-import org.springframework.security.authentication.DisabledException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -61,10 +60,8 @@ open class UserServiceImpl(
             authenticated.token = "Bearer " + generateToken(authenticated.username)
 
             return authenticated
-        } catch (e: DisabledException) {
-            throw ResponseStatusException(UNAUTHORIZED, "user is disabled")
         } catch (e: BadCredentialsException) {
-            throw ResponseStatusException(UNAUTHORIZED, "username or password invalid")
+            throw ResponseStatusException(FORBIDDEN, "username or password invalid")
         }
     }
 

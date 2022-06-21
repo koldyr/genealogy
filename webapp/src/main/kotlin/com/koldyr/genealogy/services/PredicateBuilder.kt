@@ -15,6 +15,7 @@ import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.model.PersonNames
+import com.koldyr.genealogy.model.User
 
 /**
  * Description of the PredicateBuilder class
@@ -24,7 +25,7 @@ import com.koldyr.genealogy.model.PersonNames
  */
 class PredicateBuilder {
 
-    fun personFilter(criteria: SearchDTO): Specification<Person>? {
+    fun personFilter(criteria: SearchDTO, userId: Int): Specification<Person>? {
         if (!hasCriteria(criteria)) {
             return null
         }
@@ -63,6 +64,10 @@ class PredicateBuilder {
                 filters.add(eventPredicate)
             }
 
+            if (!criteria.universal) {
+                val predicate = builder.equal(person.get<User>("user").get<Int>("id"), userId)
+                filters.add(predicate)
+            }
 
             builder.and(*filters.toTypedArray())
         }

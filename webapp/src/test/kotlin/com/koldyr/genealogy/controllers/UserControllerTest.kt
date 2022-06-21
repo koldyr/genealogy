@@ -11,7 +11,7 @@ import com.koldyr.genealogy.model.Gender
 class UserControllerTest : BaseControllerTest() {
 
     @Test
-    fun registrationUser() {
+    fun registerExistingUser() {
         mockMvc.post("/api/user/registration") {
             content = mapper.writeValueAsString(createUser())
             contentType = APPLICATION_JSON
@@ -25,35 +25,86 @@ class UserControllerTest : BaseControllerTest() {
     }
 
     @Test
-    fun authenticationUser() {
-        val creds = Credentials()
-        creds.username = "me@koldyr.com"
-        creds.password = "1112"
-
-        mockMvc.post("/api/user/login") {
-            content = mapper.writeValueAsString(creds)
+    fun registerUserNoPassword() {
+        val credentials = Credentials().apply {
+            username = "lemming@koldyr.com"
+        }
+        mockMvc.post("/api/user/registration") {
+            content = mapper.writeValueAsString(credentials)
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
         }
             .andDo { print() }
             .andExpect {
-                status { isUnauthorized() }
+                status { isBadRequest() }
+                status { reason("invalid data") }
+            }
+    }
+
+    @Test
+    fun wrongPassword() {
+        val credentials = Credentials().apply {
+            username = "me@koldyr.com"
+            password = "1112"
+        }
+
+        mockMvc.post("/api/user/login") {
+            content = mapper.writeValueAsString(credentials)
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
+        }
+            .andDo { print() }
+            .andExpect {
+                status { isForbidden() }
                 status { reason("username or password invalid") }
             }
     }
 
     @Test
-    fun authorizationUser() {
-        val person = createPerson(Gender.MALE)
-        mockMvc.get("/api/genealogy/persons/${person.id}") {
-            header(AUTHORIZATION, "Bearer fjdkslfjdslkjjlkdsfj")
+    fun wrongUser() {
+        val credentials = Credentials().apply {
+            username = "you@koldyr.com"
+            password = "koldyr"
+        }
+
+        mockMvc.post("/api/user/login") {
+            content = mapper.writeValueAsString(credentials)
+            contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
         }
             .andDo { print() }
             .andExpect {
-                status { isUnauthorized() }
+                status { isForbidden() }
+                status { reason("username or password invalid") }
+            }
+    }
+
+    @Test
+    fun wrongToken() {
+        val person = createPerson(Gender.MALE)
+        mockMvc.get("/api/genealogy/persons/${person.id}") {
+            header(AUTHORIZATION, "Bearer 12345")
+            accept = APPLICATION_JSON
+        }
+            .andDo { print() }
+            .andExpect {
+                status { isForbidden() }
                 status { reason("invalid token") }
             }
+
+        mockMvc.get("/api/genealogy/persons/${person.id}") {
+            accept = APPLICATION_JSON
+        }
+            .andDo { print() }
+            .andExpect {
+                status { isForbidden() }
+                status { reason("Access Denied") }
+            }
+    }
+
+    @Test
+    fun noToken() {
+        val person = createPerson(Gender.MALE)
 
         mockMvc.get("/api/genealogy/persons/${person.id}") {
             accept = APPLICATION_JSON
