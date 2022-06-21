@@ -39,8 +39,8 @@ class PredicateBuilder {
             }
 
             criteria.gender?.let {
-                val gender = Gender.valueOf(it.uppercase())
-                val predicate = builder.equal(person.get<String>("gender"), gender.name[0])
+                val gender = Gender.parse(it)
+                val predicate = builder.equal(person.get<Gender>("gender"), gender)
                 filters.add(predicate)
             }
 

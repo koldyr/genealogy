@@ -214,6 +214,11 @@ class PersonControllerTest : BaseControllerTest() {
         assertNotNull(result)
         assertTrue(result.size == 1)
 
+        criteria = SearchDTO(gender = "male")
+        result = searchPerson(criteria)
+        assertNotNull(result)
+        assertTrue(result.size == 5)
+
         criteria = SearchDTO(event = SearchEventDTO(
             type = EventType.Birth.getCode(),
             dateFrom = LocalDate.of(1993, Month.JANUARY, 1),
