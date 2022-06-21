@@ -64,7 +64,8 @@ class PredicateBuilder {
                 filters.add(eventPredicate)
             }
 
-            if (!criteria.universal) {
+            val global = criteria.global ?: false
+            if (!global) {
                 val predicate = builder.equal(person.get<User>("user").get<Int>("id"), userId)
                 filters.add(predicate)
             }

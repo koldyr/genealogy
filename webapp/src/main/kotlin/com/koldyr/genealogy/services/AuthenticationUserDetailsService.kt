@@ -7,6 +7,12 @@ import com.koldyr.genealogy.dto.AuthenticatedUser
 import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.persistence.UserRepository
 
+/**
+ * Description of class AuthenticationUserDetailsService
+ *
+ * @author d.halitski@gmail.com
+ * @created: 2021-11-04
+ */
 class AuthenticationUserDetailsService(
     private val userRepository: UserRepository
 ) : UserDetailsService {

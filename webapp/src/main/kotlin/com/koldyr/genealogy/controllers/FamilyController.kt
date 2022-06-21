@@ -1,15 +1,9 @@
 package com.koldyr.genealogy.controllers
 
-import com.koldyr.genealogy.dto.FamilyDTO
-import com.koldyr.genealogy.model.FamilyEvent
-import com.koldyr.genealogy.model.Person
-import com.koldyr.genealogy.security.Secured
-import com.koldyr.genealogy.services.FamilyService
-import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+import java.net.URI
+import org.springframework.http.MediaType.*
 import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.created
-import org.springframework.http.ResponseEntity.noContent
-import org.springframework.http.ResponseEntity.ok
+import org.springframework.http.ResponseEntity.*
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PatchMapping
@@ -19,10 +13,16 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import java.net.URI
+import com.koldyr.genealogy.dto.FamilyDTO
+import com.koldyr.genealogy.model.FamilyEvent
+import com.koldyr.genealogy.model.Person
+import com.koldyr.genealogy.security.Secured
+import com.koldyr.genealogy.services.FamilyService
 
 /**
  * Description of class FamilyController
+ *
+ * @author d.halitski@gmail.com
  * @created: 2021-09-25
  */
 @RestController

@@ -1,6 +1,7 @@
 package com.koldyr.genealogy.services
 
 import java.io.InputStream
+import com.koldyr.genealogy.dto.PageResultDTO
 import com.koldyr.genealogy.dto.SearchDTO
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
@@ -13,7 +14,7 @@ import com.koldyr.genealogy.model.PersonEvent
  */
 interface PersonService {
     fun findAll(): List<Person>
-    fun search(criteria: SearchDTO): Collection<Person>
+    fun search(criteria: SearchDTO): PageResultDTO<Person>
 
     fun create(person: Person): Int
     fun findById(personId: Int): Person

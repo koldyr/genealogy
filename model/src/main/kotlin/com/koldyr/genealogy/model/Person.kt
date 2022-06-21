@@ -106,7 +106,6 @@ class Person() : Cloneable {
                 || checkFn.test(gender.name)
                 || (if (name == null) false else name!!.search(checkFn))
                 || checkEvents(checkFn)
-
     }
 
     override fun equals(other: Any?): Boolean {
@@ -134,10 +133,9 @@ class Person() : Cloneable {
     }
 
     fun removeEvent(eventId: Int) {
-        val event = events.find { it.id == eventId }
-        if (event != null) {
-            events.remove(event)
-            event.person = null
+        events.find { it.id == eventId }?.let {
+            events.remove(it)
+            it.person = null
         }
     }
 

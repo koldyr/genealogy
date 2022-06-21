@@ -16,7 +16,7 @@ data class SearchDTO(
     var place: String? = null,
     var note: String? = null
 ) {
-    var universal: Boolean = false
+    var global: Boolean? = null
     var page: PageDTO? = null
     var sort: SortDTO? = null
 }

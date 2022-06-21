@@ -6,6 +6,8 @@ import com.koldyr.genealogy.model.Person
 
 /**
  * Description of class FamilyService
+ *
+ * @author d.halitski@gmail.com
  * @created: 2021-09-28
  */
 interface FamilyService {

@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.services
 
+import ma.glasnost.orika.MapperFacade
 import java.io.InputStream
 import java.io.InputStream.*
 import java.util.Objects.*
@@ -9,13 +10,13 @@ import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
+import com.koldyr.genealogy.dto.PageResultDTO
 import com.koldyr.genealogy.dto.SearchDTO
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
-import ma.glasnost.orika.MapperFacade
 
 /**
  * Description of class PersonServiceImpl
@@ -24,7 +25,7 @@ import ma.glasnost.orika.MapperFacade
  * @created: 2021-09-28
  */
 @Transactional
-open class PersonServiceImpl(
+class PersonServiceImpl(
         private val personRepository: PersonRepository,
         private val personEventRepository: PersonEventRepository,
         private val familyRepository: FamilyRepository,
@@ -35,7 +36,7 @@ open class PersonServiceImpl(
 
     override fun findAll(): List<Person> = personRepository.findAllByUser(userService.currentUser())
 
-    override fun search(criteria: SearchDTO): Collection<Person> {
+    override fun search(criteria: SearchDTO): PageResultDTO<Person> {
         val filter = predicateBuilder.personFilter(criteria, userService.currentUser().id!!)
 
         val page = criteria.page?.index ?: 0
@@ -44,8 +45,8 @@ open class PersonServiceImpl(
         val property = if (criteria.sort == null) "id" else criteria.sort!!.name
         val pageSelector = PageRequest.of(page, size, direction, property)
 
-        val result: Page<Person> = personRepository.findAll(filter, pageSelector)
-        return result.content
+        val result = personRepository.findAll(filter, pageSelector)
+        return createPageResult(result)
     }
 
     override fun create(person: Person): Int {
@@ -56,9 +57,7 @@ open class PersonServiceImpl(
         return saved.id!!
     }
 
-    override fun findById(personId: Int): Person {
-        return findPerson(personId)
-    }
+    override fun findById(personId: Int): Person = findPerson(personId)
 
     override fun update(personId: Int, person: Person) {
         val persisted = findPerson(personId)
@@ -136,5 +135,13 @@ open class PersonServiceImpl(
     private fun findPersonEvent(personEventId: Int): PersonEvent {
         return personEventRepository.findById(personEventId)
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Event with id '$personEventId' is not found") }
+    }
+
+    private fun <I> createPageResult(contentPage: Page<I>): PageResultDTO<I> {
+        val pageResult = PageResultDTO<I>(contentPage.content)
+        pageResult.total = contentPage.totalElements
+        pageResult.page = contentPage.number
+        pageResult.size = contentPage.size
+        return pageResult
     }
 }

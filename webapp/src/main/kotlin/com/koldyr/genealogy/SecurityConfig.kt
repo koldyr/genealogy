@@ -18,6 +18,12 @@ import com.koldyr.genealogy.security.JWTAuthorizationFilter
 import com.koldyr.genealogy.services.AuthenticationUserDetailsService
 
 
+/**
+ * Description of class SecurityConfig
+ *
+ * @author d.halitski@gmail.com
+ * @created: 2021-11-04
+ */
 @EnableWebSecurity
 @Configuration
 @EnableGlobalMethodSecurity(prePostEnabled = true)

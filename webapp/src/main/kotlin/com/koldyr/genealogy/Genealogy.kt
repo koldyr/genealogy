@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 
 /**
  * Description of class Genealogy
+ *
+ * @author d.halitski@gmail.com
  * @created: 2021-09-25
  */
 @SpringBootApplication

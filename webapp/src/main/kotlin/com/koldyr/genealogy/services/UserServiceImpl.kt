@@ -2,7 +2,7 @@ package com.koldyr.genealogy.services
 
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.util.Date
+import java.util.*
 import javax.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -20,6 +20,12 @@ import com.koldyr.genealogy.model.Credentials
 import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.persistence.UserRepository
 
+/**
+ * Description of class UserServiceImpl
+ *
+ * @author d.halitski@gmail.com
+ * @created: 2021-11-04
+ */
 open class UserServiceImpl(
         private val userRepository: UserRepository,
         private val passwordEncoder: PasswordEncoder,

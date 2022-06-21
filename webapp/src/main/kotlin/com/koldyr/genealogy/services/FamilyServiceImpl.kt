@@ -1,5 +1,10 @@
 package com.koldyr.genealogy.services
 
+import ma.glasnost.orika.MapperFacade
+import java.util.Objects.*
+import org.springframework.http.HttpStatus.*
+import org.springframework.transaction.annotation.Transactional
+import org.springframework.web.server.ResponseStatusException
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.FamilyEvent
@@ -8,16 +13,11 @@ import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.persistence.FamilyEventRepository
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonRepository
-import ma.glasnost.orika.MapperFacade
-import org.springframework.http.HttpStatus.BAD_REQUEST
-import org.springframework.http.HttpStatus.NOT_FOUND
-import org.springframework.transaction.annotation.Transactional
-import org.springframework.web.server.ResponseStatusException
-import java.util.Objects.isNull
-import java.util.Objects.nonNull
 
 /**
  * Description of class FamilyServiceImpl
+ *
+ * @author d.halitski@gmail.com
  * @created: 2021-09-28
  */
 @Transactional

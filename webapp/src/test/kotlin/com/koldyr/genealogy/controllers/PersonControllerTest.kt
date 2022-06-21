@@ -191,12 +191,12 @@ class PersonControllerTest : BaseControllerTest() {
         assertNotNull(result)
         assertTrue(result.size == 1)
 
-        criteria = SearchDTO(name = "maiden-3")
+        criteria = SearchDTO(note = "note-4")
         result = searchPerson(criteria)
         assertNotNull(result)
         assertTrue(result.size == 1)
 
-        criteria = SearchDTO(note = "note-5")
+        criteria = SearchDTO(name = "maiden-5")
         result = searchPerson(criteria)
         assertNotNull(result)
         assertTrue(result.size == 1)

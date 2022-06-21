@@ -99,3 +99,13 @@ Content-Type: image/jpeg
 ### Get Person Photo
 GET http://{{server}}/api/genealogy/persons/1/photo
 Authorization: Bearer {{authToken}}
+
+### Person Search
+POST http://{{server}}/api/genealogy/persons/search
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "p3"
+}
