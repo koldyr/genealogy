@@ -13,6 +13,7 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
+import com.koldyr.genealogy.dto.PageResultDTO
 import com.koldyr.genealogy.dto.SearchDTO
 import com.koldyr.genealogy.dto.SearchEventDTO
 import com.koldyr.genealogy.model.EventType
@@ -28,6 +29,8 @@ import com.koldyr.genealogy.model.PersonNames
  * @created: 2021-10-23
  */
 class PersonControllerTest : BaseControllerTest() {
+
+    private val pageResultType = jacksonTypeRef<PageResultDTO<Person>>()
 
     private fun getUpdatePersonModel(person: Person): Person {
         person.name!!.first = createRandomWord()
@@ -233,7 +236,8 @@ class PersonControllerTest : BaseControllerTest() {
                 status { isOk() }
             }.andReturn().response
 
-        return mapper.readValue(response.contentAsString, jacksonTypeRef())
+        val result = mapper.readValue(response.contentAsString, pageResultType)
+        return result.result
     }
 
     private fun newPerson(i: Int): Person {
