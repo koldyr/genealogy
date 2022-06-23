@@ -26,77 +26,77 @@ import com.koldyr.genealogy.services.FamilyService
  * @created: 2021-09-25
  */
 @RestController
-@RequestMapping("/api/genealogy/families")
+@RequestMapping("/api/lineage")
 @Secured
 class FamilyController(private val familyService: FamilyService) {
 
-    @GetMapping(produces = [APPLICATION_JSON_VALUE])
-    fun families(): Collection<FamilyDTO> = familyService.findAll()
+    @GetMapping("/{lineageId}/families", produces = [APPLICATION_JSON_VALUE])
+    fun families(@PathVariable lineageId: Long): Collection<FamilyDTO> = familyService.findAll(lineageId)
 
-    @PostMapping(consumes = [APPLICATION_JSON_VALUE])
-    fun create(@RequestBody family: FamilyDTO): ResponseEntity<Unit> {
+    @PostMapping("/{lineageId}/families", consumes = [APPLICATION_JSON_VALUE])
+    fun create(@PathVariable lineageId: Long, @RequestBody family: FamilyDTO): ResponseEntity<Unit> {
         val familyId = familyService.create(family)
 
-        val uri = URI.create("/api/genealogy/families/${familyId}")
+        val uri = URI.create("/api/lineage/$lineageId/families/${familyId}")
         return created(uri).build()
     }
 
-    @GetMapping("/{familyId}", produces = [APPLICATION_JSON_VALUE])
-    fun familyById(@PathVariable familyId: Int): FamilyDTO = familyService.findById(familyId)
+    @GetMapping("/{lineageId}/families/{familyId}", produces = [APPLICATION_JSON_VALUE])
+    fun familyById(@PathVariable lineageId: Long, @PathVariable familyId: Long): FamilyDTO = familyService.findById(familyId)
 
-    @PutMapping("/{familyId}", consumes = [APPLICATION_JSON_VALUE])
-    fun update(@PathVariable familyId: Int, @RequestBody family: FamilyDTO): ResponseEntity<Unit> {
+    @PutMapping("/{lineageId}/families/{familyId}", consumes = [APPLICATION_JSON_VALUE])
+    fun update(@PathVariable lineageId: Long, @PathVariable familyId: Long, @RequestBody family: FamilyDTO): ResponseEntity<Unit> {
         familyService.update(familyId, family)
         
         return ok().build()
     }
 
-    @DeleteMapping("/{familyId}")
-    fun delete(@PathVariable familyId: Int): ResponseEntity<Unit> {
+    @DeleteMapping("/{lineageId}/families/{familyId}")
+    fun delete(@PathVariable lineageId: Long, @PathVariable familyId: Long): ResponseEntity<Unit> {
         familyService.delete(familyId)
 
         return noContent().build()
     }
 
-    @PostMapping("/{familyId}/events", consumes = [APPLICATION_JSON_VALUE])
-    fun createEvent(@PathVariable familyId: Int, @RequestBody event: FamilyEvent): ResponseEntity<Unit> {
+    @PostMapping("/{lineageId}/families/{familyId}/events", consumes = [APPLICATION_JSON_VALUE])
+    fun createEvent(@PathVariable lineageId: Long, @PathVariable familyId: Long, @RequestBody event: FamilyEvent): ResponseEntity<Unit> {
         val eventId = familyService.createEvent(familyId, event)
 
-        val uri = URI.create("/api/genealogy/families/$familyId/events/$eventId")
+        val uri = URI.create("/api/lineage/$lineageId/families/$familyId/events/$eventId")
         return created(uri).build()
     }
 
-    @GetMapping("/{familyId}/events", produces = [APPLICATION_JSON_VALUE])
-    fun events(@PathVariable familyId: Int): Collection<FamilyEvent> = familyService.findEvents(familyId)
+    @GetMapping("/{lineageId}/families/{familyId}/events", produces = [APPLICATION_JSON_VALUE])
+    fun events(@PathVariable lineageId: Long, @PathVariable familyId: Long): Collection<FamilyEvent> = familyService.findEvents(familyId)
 
-    @DeleteMapping("/{familyId}/events/{eventId}")
-    fun deleteEvent(@PathVariable familyId: Int, @PathVariable eventId: Int): ResponseEntity<Unit> {
+    @DeleteMapping("/{lineageId}/families/{familyId}/events/{eventId}")
+    fun deleteEvent(@PathVariable lineageId: Long, @PathVariable familyId: Long, @PathVariable eventId: Long): ResponseEntity<Unit> {
         familyService.deleteEvent(familyId, eventId)
 
         return noContent().build()
     }
 
-    @PostMapping("/{familyId}/children", consumes = [APPLICATION_JSON_VALUE])
-    fun createChild(@PathVariable familyId: Int, @RequestBody child: Person): ResponseEntity<Unit> {
+    @PostMapping("/{lineageId}/families/{familyId}/children", consumes = [APPLICATION_JSON_VALUE])
+    fun createChild(@PathVariable lineageId: Int, @PathVariable familyId: Long, @RequestBody child: Person): ResponseEntity<Unit> {
         val childId = familyService.createChild(familyId, child)
 
-        val uri = URI.create("/api/genealogy/persons/$childId")
+        val uri = URI.create("/api/lineage/$lineageId/persons/$childId")
         return created(uri).build()
     }
 
-    @PatchMapping("/{familyId}/children/{childId}")
-    fun addChild(@PathVariable familyId: Int, @PathVariable childId: Int): ResponseEntity<Unit> {
+    @PatchMapping("/{lineageId}/families/{familyId}/children/{childId}")
+    fun addChild(@PathVariable lineageId: Long, @PathVariable familyId: Long, @PathVariable childId: Long): ResponseEntity<Unit> {
         familyService.addChild(familyId, childId)
 
-        val uri = URI.create("/api/genealogy/persons/$childId")
+        val uri = URI.create("/api/lineage/$lineageId/persons/$childId")
         return created(uri).build()
     }
 
-    @GetMapping("/{familyId}/children", produces = [APPLICATION_JSON_VALUE])
-    fun children(@PathVariable familyId: Int): Collection<Person> = familyService.findChildren(familyId)
+    @GetMapping("/{lineageId}/families/{familyId}/children", produces = [APPLICATION_JSON_VALUE])
+    fun children(@PathVariable lineageId: Long, @PathVariable familyId: Long): Collection<Person> = familyService.findChildren(familyId)
 
-    @DeleteMapping("/{familyId}/children/{childId}")
-    fun deleteChild(@PathVariable familyId: Int, @PathVariable childId: Int): ResponseEntity<Unit> {
+    @DeleteMapping("/{lineageId}/families/{familyId}/children/{childId}")
+    fun deleteChild(@PathVariable lineageId: Long, @PathVariable familyId: Long, @PathVariable childId: Long): ResponseEntity<Unit> {
         familyService.deleteChild(familyId, childId)
 
         return noContent().build()

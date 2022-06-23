@@ -82,7 +82,7 @@ class UserControllerTest : BaseControllerTest() {
     @Test
     fun wrongToken() {
         val person = createPerson(Gender.MALE)
-        mockMvc.get("/api/genealogy/persons/${person.id}") {
+        mockMvc.get("$baseUrl/$lineageId/persons/${person.id}") {
             header(AUTHORIZATION, "Bearer 12345")
             accept = APPLICATION_JSON
         }
@@ -92,7 +92,7 @@ class UserControllerTest : BaseControllerTest() {
                 status { reason("invalid token") }
             }
 
-        mockMvc.get("/api/genealogy/persons/${person.id}") {
+        mockMvc.get("$baseUrl/$lineageId/persons/${person.id}") {
             accept = APPLICATION_JSON
         }
             .andDo { print() }
@@ -106,7 +106,7 @@ class UserControllerTest : BaseControllerTest() {
     fun noToken() {
         val person = createPerson(Gender.MALE)
 
-        mockMvc.get("/api/genealogy/persons/${person.id}") {
+        mockMvc.get("$baseUrl/$lineageId/persons/${person.id}") {
             accept = APPLICATION_JSON
         }
             .andDo { print() }

@@ -1,5 +1,15 @@
 package com.koldyr.genealogy.model
 
+import java.time.LocalDate
+import java.util.function.Predicate
+import javax.persistence.Basic
+import javax.persistence.Column
+import javax.persistence.Convert
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType.*
+import javax.persistence.Id
+import javax.persistence.MappedSuperclass
+import javax.persistence.SequenceGenerator
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
@@ -10,16 +20,6 @@ import com.koldyr.genealogy.handlers.EventTypeDeserializer
 import com.koldyr.genealogy.handlers.EventTypeSerializer
 import com.koldyr.genealogy.model.converter.EventPrefixConverter
 import com.koldyr.genealogy.model.converter.EventTypeConverter
-import java.time.LocalDate
-import java.util.function.Predicate
-import javax.persistence.Basic
-import javax.persistence.Column
-import javax.persistence.Convert
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType.SEQUENCE
-import javax.persistence.Id
-import javax.persistence.MappedSuperclass
-import javax.persistence.SequenceGenerator
 
 /**
  * Description of class LifeEvent
@@ -32,7 +32,7 @@ open class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
     @GeneratedValue(strategy = SEQUENCE, generator = "SEQ_EVENT")
     @SequenceGenerator(name = "SEQ_EVENT", sequenceName = "SEQ_EVENT", allocationSize = 1)
     @Column(name = "EVENT_ID")
-    open var id: Int? = null
+    open var id: Long? = null
 
     @Basic(optional = false)
     @Convert(converter = EventTypeConverter::class)
@@ -121,7 +121,7 @@ open class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
         result = 31 * result + (date?.hashCode() ?: 0)
         result = 31 * result + (place?.hashCode() ?: 0)
         result = 31 * result + (note?.hashCode() ?: 0)
-        return result
+        return result.toInt()
     }
 
     override fun toString(): String {

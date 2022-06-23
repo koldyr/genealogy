@@ -54,7 +54,7 @@ class GEDImporter : Importer {
 
     override fun import(input: InputStream): Lineage {
         val families: MutableSet<Family> = mutableSetOf()
-        val persons: MutableMap<Int, Person> = mutableMapOf()
+        val persons: MutableMap<Long, Person> = mutableMapOf()
 
         val rewindInput = if (input.markSupported()) input else BufferedInputStream(input)
         rewindInput.mark(rewindInput.available())
@@ -70,7 +70,7 @@ class GEDImporter : Importer {
             var line: String? = reader.readLine()
             while (line != null) {
                 if (line.endsWith(PERSON)) {
-                    val personId: Int = getPersonId(line)
+                    val personId = getPersonId(line)
                     person = Person(personId)
                     persons[personId] = person
 
@@ -172,7 +172,7 @@ class GEDImporter : Importer {
         return Lineage(persons.values, families, true)
     }
 
-    private fun findFamily(families: MutableSet<Family>, familyId: Int): Family =
+    private fun findFamily(families: MutableSet<Family>, familyId: Long): Family =
         families.stream()
             .filter { it.id == familyId }
             .findFirst()
@@ -193,7 +193,7 @@ class GEDImporter : Importer {
         return charset
     }
 
-    private fun handleFamily(familyId: Int, families: MutableSet<Family>) {
+    private fun handleFamily(familyId: Long, families: MutableSet<Family>) {
         val family = families.firstOrNull { it.id == familyId }
         if (family == null) {
             families.add(Family(familyId))
@@ -244,20 +244,20 @@ class GEDImporter : Importer {
         return PersonNames(name, middle, lastName, maidenName)
     }
 
-    private fun getPersonId(value: String): Int {
+    private fun getPersonId(value: String): Long {
         val matcher = personIdPattern.matcher(value)
         if (matcher.find()) {
             val id = matcher.group(1)
-            return Integer.parseInt(id)
+            return java.lang.Long.parseLong(id)
         }
         return -1
     }
 
-    private fun parseFamilyId(value: String): Int {
+    private fun parseFamilyId(value: String): Long {
         val matcher = familyIdPattern.matcher(value)
         if (matcher.find()) {
             val id = matcher.group(1)
-            return Integer.parseInt(id)
+            return java.lang.Long.parseLong(id)
         }
         return -1
     }

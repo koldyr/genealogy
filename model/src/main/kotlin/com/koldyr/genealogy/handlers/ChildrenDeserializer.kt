@@ -8,6 +8,8 @@ import com.koldyr.genealogy.model.Person
 
 /**
  * Description of class ChildrenDeserializer
+ *
+ * @author d.halitski@gmail.com
  * @created: 2019-11-05
  */
 class ChildrenDeserializer : StdDeserializer<Set<Person>>(Set::class.java) {
@@ -17,7 +19,7 @@ class ChildrenDeserializer : StdDeserializer<Set<Person>>(Set::class.java) {
 
         val node: ArrayNode = p.codec.readTree(p)
         node.elements().forEach {
-            children.add(Person(it.asInt()))
+            children.add(Person(it.asLong()))
         }
 
         return children

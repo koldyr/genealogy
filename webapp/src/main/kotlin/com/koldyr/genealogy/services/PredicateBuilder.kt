@@ -25,7 +25,7 @@ import com.koldyr.genealogy.model.User
  */
 class PredicateBuilder {
 
-    fun personFilter(criteria: SearchDTO, userId: Int): Specification<Person>? {
+    fun personFilter(criteria: SearchDTO, userId: Long): Specification<Person>? {
         if (!hasCriteria(criteria)) {
             return null
         }

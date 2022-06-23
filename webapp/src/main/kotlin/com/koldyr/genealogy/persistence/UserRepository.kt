@@ -1,11 +1,11 @@
 package com.koldyr.genealogy.persistence
 
-import com.koldyr.genealogy.model.User
+import java.util.*
 import org.springframework.data.repository.CrudRepository
 import org.springframework.stereotype.Repository
-import java.util.*
+import com.koldyr.genealogy.model.User
 
 @Repository("userRepository")
-interface UserRepository : CrudRepository<User, Int>{
+interface UserRepository : CrudRepository<User, Long>{
     fun findByEmail(email : String) : Optional<User>
 }

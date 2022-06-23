@@ -6,7 +6,7 @@ package com.koldyr.genealogy.model
  */
 @Suppress("SpellCheckingInspection")
 enum class EventType(
-        private val code: String
+    private val code: String
 ) {
     Birth("BIRT"), Death("DEAT"), Engagement("ENGA"), Marriage("MARR"), Divorce("DIV"), Adoption("ADOP"), Christening("CHRI"),
     Relocation("RESI"), Education("EDUC"), Emigration("EMIG"), GetJob("OCCU"), Graduation("GRAD"), Retirement("RETI"), Immigration("IMMI");

@@ -16,9 +16,9 @@ import com.koldyr.genealogy.model.User
  * @created: 2021-09-25
  */
 @Repository("personRepository")
-interface PersonRepository : JpaRepository<Person, Int>, JpaSpecificationExecutor<Person> {
+interface PersonRepository : JpaRepository<Person, Long>, JpaSpecificationExecutor<Person> {
     @Query("select p.events from Person as p where p.id = :personId")
-    fun findEvents(@Param("personId") personId: Int): Collection<PersonEvent>
+    fun findEvents(@Param("personId") personId: Long): Collection<PersonEvent>
 
-    fun findAllByUser(user : User) : List<Person>
+    fun findAllByUserAndLineageId(user: User, lineageId: Long): List<Person>
 }

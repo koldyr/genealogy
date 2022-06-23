@@ -26,6 +26,7 @@ import com.koldyr.genealogy.model.converter.GenderConverter
 /**
  * Description of class Person
  *
+ * @author d.halitski@gmail.com
  * @created: 2019-10-25
  */
 @Entity
@@ -37,7 +38,7 @@ class Person() : Cloneable {
     @Id
     @GeneratedValue(strategy = SEQUENCE, generator = "PersonIds")
     @Column(name = "PERSON_ID")
-    var id: Int? = null
+    var id: Long? = null
 
     @Embedded
     @AttributeOverrides(value = [
@@ -62,10 +63,10 @@ class Person() : Cloneable {
     var gender: Gender = Gender.MALE
 
     @Column(name = "PARENT_FAMILY_ID", nullable = true)
-    var parentFamilyId: Int? = null
+    var parentFamilyId: Long? = null
 
     @Column(name = "FAMILY_ID", nullable = true)
-    var familyId: Int? = null
+    var familyId: Long? = null
 
     @Column(name = "PHOTO_URL", nullable = true)
     var photoUrl: String? = null
@@ -79,11 +80,15 @@ class Person() : Cloneable {
     @JsonIgnore
     var user: User? = null
 
-    constructor(id: Int) : this() {
+    @Column(name = "LINEAGE_ID")
+    @JsonIgnore
+    var lineageId: Long? = null
+
+    constructor(id: Long) : this() {
         this.id = id
     }
 
-    constructor(id: Int, name: PersonNames, events: MutableSet<PersonEvent>, place: String?, occupation: String?, note: String?, gender: Gender, family: Int?) : this() {
+    constructor(id: Long, name: PersonNames, events: MutableSet<PersonEvent>, place: String?, occupation: String?, note: String?, gender: Gender, family: Long?) : this() {
         this.id = id
         this.name = name
         this.events = events
@@ -116,7 +121,7 @@ class Person() : Cloneable {
     }
 
     override fun hashCode(): Int {
-        return id!!
+        return id!!.toInt()
     }
 
     public override fun clone(): Person {
@@ -132,7 +137,7 @@ class Person() : Cloneable {
         event.person = this
     }
 
-    fun removeEvent(eventId: Int) {
+    fun removeEvent(eventId: Long) {
         events.find { it.id == eventId }?.let {
             events.remove(it)
             it.person = null

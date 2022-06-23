@@ -1,12 +1,13 @@
 package com.koldyr.genealogy.importer
 
 import java.io.InputStream
-import java.nio.file.Files.newInputStream
+import java.nio.file.Files.*
 import java.nio.file.Path
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
+import java.time.format.DateTimeFormatter.*
 import java.util.regex.Pattern
 import kotlin.text.Charsets.UTF_8
+import org.apache.commons.lang3.StringUtils.*
 import com.koldyr.genealogy.model.EventPrefix
 import com.koldyr.genealogy.model.EventType
 import com.koldyr.genealogy.model.Family
@@ -17,8 +18,6 @@ import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.model.PersonNames
-import org.apache.commons.lang3.StringUtils.defaultIfEmpty
-import org.apache.commons.lang3.StringUtils.isEmpty
 
 class CSVImporter : Importer {
     private val pattern = Pattern.compile("\\\\n")
@@ -46,7 +45,7 @@ class CSVImporter : Importer {
     private fun readPerson(line: String): Person {
         val values = splitValues(line)
 
-        val person = Person(Integer.parseInt(values[0].removePrefix("P")))
+        val person = Person(java.lang.Long.parseLong(values[0].removePrefix("P")))
 
         for ((index, value) in values.withIndex()) {
             when (index) {
@@ -56,8 +55,8 @@ class CSVImporter : Importer {
                 4 -> person.place = value
                 5 -> person.occupation = value
                 6 -> person.note = note(value)
-                7 -> person.parentFamilyId = if (isEmpty(value)) null else Integer.parseInt(value)
-                8 -> person.familyId = if (isEmpty(value)) null else Integer.parseInt(value)
+                7 -> person.parentFamilyId = if (isEmpty(value)) null else java.lang.Long.parseLong(value)
+                8 -> person.familyId = if (isEmpty(value)) null else java.lang.Long.parseLong(value)
             }
         }
         return person
@@ -66,12 +65,12 @@ class CSVImporter : Importer {
     private fun readFamily(line: String): Family {
         val values = line.split(',')
 
-        val family = Family(Integer.parseInt(values[0].removePrefix("F")))
+        val family = Family(java.lang.Long.parseLong(values[0].removePrefix("F")))
 
         for ((index, value) in values.withIndex()) {
             when (index) {
-                1 -> family.husband = if (isEmpty(value)) null else Person(Integer.parseInt(value))
-                2 -> family.wife = if (isEmpty(value)) null else Person(Integer.parseInt(value))
+                1 -> family.husband = if (isEmpty(value)) null else Person(java.lang.Long.parseLong(value))
+                2 -> family.wife = if (isEmpty(value)) null else Person(java.lang.Long.parseLong(value))
                 3 -> family.children.addAll(persons(value))
                 4 -> family.events.addAll(familyEvents(value))
                 5 -> family.note = note(value)
@@ -162,7 +161,7 @@ class CSVImporter : Importer {
 
     private fun persons(value: String): Collection<Person> {
         return value.split('|').map {
-            Person(Integer.parseInt(it))
+            Person(java.lang.Long.parseLong(it))
         }
     }
 

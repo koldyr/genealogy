@@ -1,15 +1,56 @@
 package com.koldyr.genealogy.model
 
+import javax.persistence.Column
+import javax.persistence.Entity
+import javax.persistence.FetchType.*
+import javax.persistence.GeneratedValue
+import javax.persistence.GenerationType
+import javax.persistence.Id
+import javax.persistence.JoinColumn
+import javax.persistence.ManyToOne
+import javax.persistence.OneToMany
+import javax.persistence.SequenceGenerator
+import javax.persistence.Table
+import com.fasterxml.jackson.annotation.JsonIgnore
+
 /**
  * Description of class Lineage
- * @created: 2019-10-30
+ *
+ * @author d.halitski@gmail.com
+ * @created: 2022-06-23
  */
-data class Lineage(
-        var persons: Collection<Person>,
-        var families: Set<Family>
-) {
+@Entity
+@Table(name = "T_LINEAGE")
+@SequenceGenerator(name = "LineageIds", sequenceName = "SEQ_LINEAGE", allocationSize = 1)
+class Lineage() {
 
-    constructor(persons: Collection<Person>, families: Set<Family>, rebuild: Boolean) : this(persons, families) {
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "LineageIds")
+    @Column(name = "LINEAGE_ID")
+    var id: Long? = null
+
+    @Column(name = "LINEAGE_NAME")
+    var name: String? = null
+
+    var note: String? = null
+
+    @OneToMany(fetch = LAZY, orphanRemoval = true)
+    @JoinColumn(name = "LINEAGE_ID")
+    var persons: Collection<Person> = setOf()
+
+    @OneToMany(fetch = LAZY, orphanRemoval = true)
+    @JoinColumn(name = "LINEAGE_ID")
+    var families: Set<Family> = setOf()
+
+    @JoinColumn(name = "USER_ID", nullable = false)
+    @ManyToOne(fetch = LAZY)
+    @JsonIgnore
+    var user: User? = null
+
+    constructor(persons: Collection<Person>, families: Set<Family>, rebuild: Boolean = false) : this() {
+        this.persons = persons
+        this.families = families
+
         if (rebuild) {
             families.forEach {
                 if (it.wife != null) {
@@ -37,17 +78,17 @@ data class Lineage(
         }
     }
 
-    fun findFamily(id: Int?): Family? {
+    fun findFamily(id: Long?): Family? {
         return families.stream()
-                .filter { it.id == id }
-                .findFirst()
-                .orElse(null)
+            .filter { it.id == id }
+            .findFirst()
+            .orElse(null)
     }
 
-    fun findPerson(id: Int?): Person? {
+    fun findPerson(id: Long?): Person? {
         return persons.stream()
-                .filter { it.id == id }
-                .findFirst()
-                .orElse(null)
+            .filter { it.id == id }
+            .findFirst()
+            .orElse(null)
     }
 }

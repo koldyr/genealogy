@@ -9,7 +9,7 @@ import java.awt.event.MouseEvent.*
 import java.io.File
 import java.io.IOException
 import java.util.*
-import java.util.function.ToIntFunction
+import java.util.function.ToLongFunction
 import javax.swing.AbstractAction
 import javax.swing.JFileChooser
 import javax.swing.JFrame
@@ -166,7 +166,7 @@ class GenealogyApp : JFrame, ActionListener {
             .stream()
             .map(Person::id)
             .filter(Objects::nonNull)
-            .mapToInt(ToIntFunction<Int?> { it })
+            .mapToLong(ToLongFunction<Long?> { it })
             .max()
             .orElse(0) + 1
 

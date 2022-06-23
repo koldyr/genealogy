@@ -19,12 +19,15 @@ import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.persistence.FamilyEventRepository
 import com.koldyr.genealogy.persistence.FamilyRepository
+import com.koldyr.genealogy.persistence.LineageRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import com.koldyr.genealogy.persistence.UserRepository
 import com.koldyr.genealogy.services.AuthenticationUserDetailsService
 import com.koldyr.genealogy.services.FamilyService
 import com.koldyr.genealogy.services.FamilyServiceImpl
+import com.koldyr.genealogy.services.LineageService
+import com.koldyr.genealogy.services.LineageServiceImpl
 import com.koldyr.genealogy.services.PersonService
 import com.koldyr.genealogy.services.PersonServiceImpl
 import com.koldyr.genealogy.services.UserService
@@ -51,16 +54,13 @@ class GenealogyConfig {
     lateinit var familyEventRepository: FamilyEventRepository
 
     @Autowired
-    lateinit var personEventRepository: PersonEventRepository
-
-    @Autowired
     lateinit var userRepository: UserRepository
 
     @Value("\${security.secret}")
     private lateinit var secret: String
 
     @Bean
-    fun personService(mapper: MapperFacade, userService: UserService): PersonService {
+    fun personService(mapper: MapperFacade, userService: UserService, personEventRepository: PersonEventRepository): PersonService {
         return PersonServiceImpl(personRepository, personEventRepository, familyRepository, mapper, userService)
     }
 
@@ -70,12 +70,17 @@ class GenealogyConfig {
     }
 
     @Bean
+    fun lineageService(mapper: MapperFacade, userService: UserService, lineageRepository: LineageRepository): LineageService {
+        return LineageServiceImpl(lineageRepository, familyRepository, personRepository, userService)
+    }
+
+    @Bean
     fun userService(passwordEncoder: PasswordEncoder): UserService {
         return UserServiceImpl(userRepository, passwordEncoder, secret)
     }
 
     @Bean
-    fun authenticationUserDetailsService() : AuthenticationUserDetailsService {
+    fun authenticationUserDetailsService(): AuthenticationUserDetailsService {
         return AuthenticationUserDetailsService(userRepository)
     }
 
@@ -84,12 +89,12 @@ class GenealogyConfig {
         val mapperFactory = DefaultMapperFactory.Builder().build()
 
         mapperFactory.classMap(Family::class.java, FamilyDTO::class.java)
-                .byDefault()
-                .register()
+            .byDefault()
+            .register()
         mapperFactory.classMap(Person::class.java, Person::class.java)
-                .exclude("events")
-                .byDefault()
-                .register()
+            .exclude("events")
+            .byDefault()
+            .register()
 
         val converterFactory = mapperFactory.converterFactory
         converterFactory.registerConverter(PersonConverter(personRepository))
@@ -103,9 +108,9 @@ class GenealogyConfig {
         return object : WebMvcConfigurer {
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("*")
-                        .allowedMethods(GET.name, HEAD.name, POST.name, PUT.name, DELETE.name, PATCH.name)
-                        .exposedHeaders(AUTHORIZATION)
+                    .allowedOrigins("*")
+                    .allowedMethods(GET.name, HEAD.name, POST.name, PUT.name, DELETE.name, PATCH.name)
+                    .exposedHeaders(AUTHORIZATION)
             }
         }
     }
