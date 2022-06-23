@@ -169,7 +169,7 @@ class GEDImporter : Importer {
             }
         }
 
-        return Lineage(persons.values, families, true)
+        return Lineage(persons.values.toSet(), families, true)
     }
 
     private fun findFamily(families: MutableSet<Family>, familyId: Long): Family =

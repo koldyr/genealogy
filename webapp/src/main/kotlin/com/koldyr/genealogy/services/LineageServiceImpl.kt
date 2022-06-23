@@ -49,13 +49,6 @@ class LineageServiceImpl(
 
     override fun delete(lineageId: Long) {
         val entity = findAndCheck(lineageId)
-
-//        val families = familyRepository.findAllByUserAndLineageId(userService.currentUser(), lineageId)
-//        familyRepository.deleteAll(families)
-//
-//        val persons = personRepository.findAllByUserAndLineageId(userService.currentUser(), lineageId)
-//        personRepository.deleteAll(persons)
-
         lineageRepository.delete(entity)
     }
 

@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.model
 
+import javax.persistence.CascadeType
 import javax.persistence.Column
 import javax.persistence.Entity
 import javax.persistence.FetchType.*
@@ -34,11 +35,11 @@ class Lineage() {
 
     var note: String? = null
 
-    @OneToMany(fetch = LAZY, orphanRemoval = true)
+    @OneToMany(fetch = LAZY, cascade = [CascadeType.REMOVE], orphanRemoval = true)
     @JoinColumn(name = "LINEAGE_ID")
-    var persons: Collection<Person> = setOf()
+    var persons: Set<Person> = setOf()
 
-    @OneToMany(fetch = LAZY, orphanRemoval = true)
+    @OneToMany(fetch = LAZY, cascade = [CascadeType.REMOVE], orphanRemoval = true)
     @JoinColumn(name = "LINEAGE_ID")
     var families: Set<Family> = setOf()
 
@@ -47,7 +48,7 @@ class Lineage() {
     @JsonIgnore
     var user: User? = null
 
-    constructor(persons: Collection<Person>, families: Set<Family>, rebuild: Boolean = false) : this() {
+    constructor(persons: Set<Person>, families: Set<Family>, rebuild: Boolean = false) : this() {
         this.persons = persons
         this.families = families
 

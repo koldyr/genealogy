@@ -21,7 +21,7 @@ import com.koldyr.genealogy.model.PersonNames
 
 class CSVImporter : Importer {
     private val pattern = Pattern.compile("\\\\n")
-    private val persons = mutableListOf<Person>()
+    private val persons = mutableSetOf<Person>()
     private val families = mutableSetOf<Family>()
 
     override fun import(file: Path): Lineage {

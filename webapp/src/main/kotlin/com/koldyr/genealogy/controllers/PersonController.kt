@@ -45,6 +45,7 @@ class PersonController(private val personService: PersonService) {
 
     @PostMapping("/{lineageId}/persons", consumes = [APPLICATION_JSON_VALUE])
     fun create(@PathVariable lineageId: Long, @RequestBody person: Person): ResponseEntity<Unit> {
+        person.lineageId = lineageId
         val personId: Long = personService.create(person)
 
         val uri = URI.create("/api/lineage/$lineageId/persons/$personId")

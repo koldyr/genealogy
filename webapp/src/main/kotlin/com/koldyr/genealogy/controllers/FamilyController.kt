@@ -35,7 +35,7 @@ class FamilyController(private val familyService: FamilyService) {
 
     @PostMapping("/{lineageId}/families", consumes = [APPLICATION_JSON_VALUE])
     fun create(@PathVariable lineageId: Long, @RequestBody family: FamilyDTO): ResponseEntity<Unit> {
-        val familyId = familyService.create(family)
+        val familyId = familyService.create(lineageId, family)
 
         val uri = URI.create("/api/lineage/$lineageId/families/${familyId}")
         return created(uri).build()

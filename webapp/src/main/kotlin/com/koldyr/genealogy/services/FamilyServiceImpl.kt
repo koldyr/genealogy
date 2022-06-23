@@ -33,7 +33,7 @@ class FamilyServiceImpl(
         return familyRepository.findAllByUserAndLineageId(userService.currentUser(), lineageId).map(this::mapFamily)
     }
 
-    override fun create(family: FamilyDTO): Long {
+    override fun create(lineageId: Long, family: FamilyDTO): Long {
         family.id = null
         val newFamily = mapper.map(family, Family::class.java)
 
@@ -59,6 +59,7 @@ class FamilyServiceImpl(
             }
         }
 
+        newFamily.lineageId = lineageId
         newFamily.user = userService.currentUser()
         familyRepository.save(newFamily)
 

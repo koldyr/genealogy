@@ -12,7 +12,7 @@ import com.koldyr.genealogy.model.Person
  */
 interface FamilyService {
     fun findAll(lineageId: Long): List<FamilyDTO>
-    fun create(family: FamilyDTO): Long
+    fun create(lineageId: Long, family: FamilyDTO): Long
     fun findById(familyId: Long): FamilyDTO
     fun update(familyId: Long, family: FamilyDTO)
     fun delete(familyId: Long)

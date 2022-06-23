@@ -9,6 +9,7 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.put
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.genealogy.dto.LineageDTO
+import com.koldyr.genealogy.model.Gender
 
 /**
  * Description of the LineageControllerTest class
@@ -21,15 +22,17 @@ class LineageControllerTest : BaseControllerTest() {
     @Test
     fun lineages() {
         val all = allLineages()
-        val id = all[0].id!!
+        assertTrue(all.isNotEmpty())
 
-        val result = getLineage(id)
-        assertEquals(id, result.id)
+        lineageId = createLineAge()
 
-        result.name = "new name $id"
-        result.note = "new note $id"
+        val result = getLineage(lineageId!!)
+        assertEquals(lineageId, result.id)
 
-        mockMvc.put("$baseUrl/$id") {
+        result.name = "new name $lineageId"
+        result.note = "new note $lineageId"
+
+        mockMvc.put("$baseUrl/$lineageId") {
             header(AUTHORIZATION, getBearerToken())
             content = mapper.writeValueAsString(result)
             accept = APPLICATION_JSON
@@ -39,20 +42,34 @@ class LineageControllerTest : BaseControllerTest() {
                 status { isOk() }
             }
 
-        val updated = getLineage(id)
+        val updated = getLineage(lineageId!!)
         assertEquals(result.id, updated.id)
         assertEquals(result.name, updated.name)
         assertEquals(result.note, updated.note)
 
+        val children = listOf(
+            createPerson(Gender.MALE),
+            createPerson(Gender.MALE),
+            createPerson(Gender.FEMALE)
+        ).map { it.id!! }
+        val family = createFamily(children)
 
-        mockMvc.delete("$baseUrl/$id") {
+        mockMvc.delete("$baseUrl/$lineageId") {
             header(AUTHORIZATION, getBearerToken())
         }
             .andExpect {
                 status { isNoContent() }
             }
 
-        mockMvc.get("$baseUrl/$id") {
+        mockMvc.get("$baseUrl/$lineageId/families/${family.id}") {
+            header(AUTHORIZATION, getBearerToken())
+            accept = APPLICATION_JSON
+        }
+            .andExpect {
+                status { isNotFound() }
+            }
+
+        mockMvc.get("$baseUrl/$lineageId") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }

@@ -105,18 +105,7 @@ abstract class BaseControllerTest {
         }
 
         if (lineageId == null) {
-            val lineage = LineageDTO("Koldyrs", "Test lineage")
-            val location = mockMvc.post("/api/lineage") {
-                header(AUTHORIZATION, getBearerToken())
-                content = mapper.writeValueAsString(lineage)
-                contentType = APPLICATION_JSON
-            }
-                .andExpect {
-                    status { isCreated() }
-                    header { string(LOCATION, matchesRegex("/api/lineage/\\d+$")) }
-                }
-                .andReturn().response.getHeader(LOCATION)
-            lineageId = getLastIdFromLocation(location)
+            lineageId = createLineAge()
         }
     }
 
@@ -212,5 +201,20 @@ abstract class BaseControllerTest {
 
     protected fun createRandomWord(): String {
         return randomAlphabetic(10)
+    }
+
+    protected fun createLineAge(): Long {
+        val lineage = LineageDTO("Koldyrs", "Test lineage")
+        val location = mockMvc.post("/api/lineage") {
+            header(AUTHORIZATION, getBearerToken())
+            content = mapper.writeValueAsString(lineage)
+            contentType = APPLICATION_JSON
+        }
+            .andExpect {
+                status { isCreated() }
+                header { string(LOCATION, matchesRegex("/api/lineage/\\d+$")) }
+            }
+            .andReturn().response.getHeader(LOCATION)
+        return getLastIdFromLocation(location)
     }
 }
