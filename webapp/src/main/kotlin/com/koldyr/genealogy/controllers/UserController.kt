@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import com.koldyr.genealogy.UnSecured
 import com.koldyr.genealogy.model.Credentials
 import com.koldyr.genealogy.model.User
-import com.koldyr.genealogy.security.UnSecured
 import com.koldyr.genealogy.services.UserService
 
 private const val USER_NAME = "User-Name"

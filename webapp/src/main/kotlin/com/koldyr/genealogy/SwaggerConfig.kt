@@ -1,19 +1,21 @@
 package com.koldyr.genealogy
 
-import springfox.documentation.builders.RequestHandlerSelectors
+import springfox.documentation.builders.RequestHandlerSelectors.*
 import springfox.documentation.service.ApiInfo
 import springfox.documentation.service.ApiKey
 import springfox.documentation.service.AuthorizationScope
 import springfox.documentation.service.SecurityReference
-import springfox.documentation.service.SecurityScheme
 import springfox.documentation.service.VendorExtension
-import springfox.documentation.spi.DocumentationType
+import springfox.documentation.spi.DocumentationType.*
 import springfox.documentation.spi.service.contexts.SecurityContext
 import springfox.documentation.spring.web.plugins.Docket
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import com.koldyr.genealogy.security.Secured
-import com.koldyr.genealogy.security.UnSecured
+
+annotation class UnSecured
+
+annotation class Secured
+
 
 /**
  * Description of the SwaggerConfig class
@@ -26,25 +28,25 @@ class SwaggerConfig {
 
     @Bean
     fun serviceApiSecured(): Docket {
-        return Docket(DocumentationType.SWAGGER_2)
+        return Docket(SWAGGER_2)
             .groupName("Authenticated")
             .apiInfo(apiInfo())
             .select()
-            .apis(RequestHandlerSelectors.withClassAnnotation(Secured::class.java))
+            .apis(withClassAnnotation(Secured::class.java))
             .build()
             .useDefaultResponseMessages(false)
             .enableUrlTemplating(false)
-            .securitySchemes(listOf(apiKey()) as List<SecurityScheme>)
+            .securitySchemes(listOf(apiKey()))
             .securityContexts(listOf(securityContext()))
     }
 
     @Bean
     fun serviceApiLogin(): Docket {
-        return Docket(DocumentationType.SWAGGER_2)
+        return Docket(SWAGGER_2)
             .groupName("Anonymous")
             .apiInfo(apiInfo())
             .select()
-            .apis(RequestHandlerSelectors.withClassAnnotation(UnSecured::class.java))
+            .apis(withClassAnnotation(UnSecured::class.java))
             .build()
             .useDefaultResponseMessages(false)
             .enableUrlTemplating(false)
@@ -60,7 +62,7 @@ class SwaggerConfig {
 
     private fun defaultAuth(): List<SecurityReference> {
         val authorizationScope = AuthorizationScope("global", "accessEverything")
-        val authorizationScopes: Array<AuthorizationScope> = arrayOf(authorizationScope)
+        val authorizationScopes = arrayOf(authorizationScope)
         return listOf(SecurityReference("JWT", authorizationScopes))
     }
 

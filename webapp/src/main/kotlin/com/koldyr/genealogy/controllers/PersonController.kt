@@ -18,11 +18,11 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
+import com.koldyr.genealogy.Secured
 import com.koldyr.genealogy.dto.PageResultDTO
 import com.koldyr.genealogy.dto.SearchDTO
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
-import com.koldyr.genealogy.security.Secured
 import com.koldyr.genealogy.services.PersonService
 
 

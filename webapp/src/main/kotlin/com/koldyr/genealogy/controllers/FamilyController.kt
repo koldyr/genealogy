@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import com.koldyr.genealogy.Secured
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.FamilyEvent
 import com.koldyr.genealogy.model.Person
-import com.koldyr.genealogy.security.Secured
 import com.koldyr.genealogy.services.FamilyService
 
 /**
