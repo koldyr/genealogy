@@ -1,21 +1,11 @@
 package com.koldyr.genealogy.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize
-import com.fasterxml.jackson.databind.annotation.JsonSerialize
-import com.koldyr.genealogy.handlers.ChildrenDeserializer
-import com.koldyr.genealogy.handlers.ChildrenSerializer
-import com.koldyr.genealogy.handlers.PersonIdDeserializer
-import com.koldyr.genealogy.handlers.PersonIdSerializer
-import javax.persistence.CascadeType.ALL
-import javax.persistence.CascadeType.MERGE
-import javax.persistence.CascadeType.PERSIST
-import javax.persistence.CascadeType.REFRESH
+import javax.persistence.CascadeType.*
 import javax.persistence.Column
 import javax.persistence.Entity
-import javax.persistence.FetchType.EAGER
+import javax.persistence.FetchType.*
 import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType.SEQUENCE
+import javax.persistence.GenerationType.*
 import javax.persistence.Id
 import javax.persistence.JoinColumn
 import javax.persistence.JoinTable
@@ -24,6 +14,13 @@ import javax.persistence.OneToMany
 import javax.persistence.OneToOne
 import javax.persistence.SequenceGenerator
 import javax.persistence.Table
+import com.fasterxml.jackson.annotation.JsonIgnore
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize
+import com.fasterxml.jackson.databind.annotation.JsonSerialize
+import com.koldyr.genealogy.handlers.ChildrenDeserializer
+import com.koldyr.genealogy.handlers.ChildrenSerializer
+import com.koldyr.genealogy.handlers.PersonIdDeserializer
+import com.koldyr.genealogy.handlers.PersonIdSerializer
 
 /**
  * Description of class Family
@@ -37,7 +34,7 @@ class Family() {
     @Id
     @GeneratedValue(strategy = SEQUENCE, generator = "FamilyIds")
     @Column(name = "FAMILY_ID")
-    var id: Int? = null
+    var id: Long? = null
 
     @OneToOne
     @JoinColumn(name = "HUSBAND_ID", referencedColumnName = "PERSON_ID")
@@ -64,6 +61,9 @@ class Family() {
     @OneToMany(mappedBy = "family",cascade = [ALL], fetch = EAGER, orphanRemoval = true)
     val events: MutableSet<FamilyEvent> = mutableSetOf()
 
+    @Column(name = "LINEAGE_ID")
+    var lineageId: Long? = null
+
     @JoinColumn(name = "USER_ID", nullable = false)
     @ManyToOne
     @JsonIgnore
@@ -71,7 +71,7 @@ class Family() {
 
     var note: String? = null
 
-    constructor(id: Int) : this() {
+    constructor(id: Long) : this() {
         this.id = id
     }
 
@@ -85,7 +85,7 @@ class Family() {
         event.family = this
     }
 
-    fun removeEvent(eventId: Int) {
+    fun removeEvent(eventId: Long) {
         val event = events.find { it.id == eventId }
         if (event != null) {
             events.remove(event)

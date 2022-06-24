@@ -33,63 +33,67 @@ import com.koldyr.genealogy.services.PersonService
  * @created: 2021-09-25
  */
 @RestController
-@RequestMapping("/api/genealogy/persons")
+@RequestMapping("/api/lineage")
 @Secured
 class PersonController(private val personService: PersonService) {
 
-    @PostMapping("/search", consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])
-    fun search(@RequestBody criteria: SearchDTO): PageResultDTO<Person> = personService.search(criteria)
+    @PostMapping("/{lineageId}/persons/search", consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])
+    fun search(@PathVariable lineageId: Long, @RequestBody criteria: SearchDTO): PageResultDTO<Person> = personService.search(criteria)
 
-    @GetMapping(produces = [APPLICATION_JSON_VALUE])
-    fun persons(): Collection<Person> = personService.findAll()
+    @GetMapping("/{lineageId}/persons", produces = [APPLICATION_JSON_VALUE])
+    fun persons(@PathVariable lineageId: Long): Collection<Person> = personService.findAll(lineageId)
 
-    @PostMapping
-    fun create(@RequestBody person: Person): ResponseEntity<Unit> {
-        val personId: Int = personService.create(person)
+    @PostMapping("/{lineageId}/persons", consumes = [APPLICATION_JSON_VALUE])
+    fun create(@PathVariable lineageId: Long, @RequestBody person: Person): ResponseEntity<Unit> {
+        person.lineageId = lineageId
+        val personId: Long = personService.create(person)
 
-        val uri = URI.create("/api/genealogy/persons/$personId")
+        val uri = URI.create("/api/lineage/$lineageId/persons/$personId")
         return created(uri).build()
     }
 
-    @PutMapping("/{personId}")
-    fun update(@PathVariable personId: Int, @RequestBody person: Person): ResponseEntity<Unit> {
+    @PutMapping("/{lineageId}/persons/{personId}")
+    fun update(@PathVariable lineageId: Long, @PathVariable personId: Long, @RequestBody person: Person): ResponseEntity<Unit> {
         personService.update(personId, person)
 
         return ok().build()
     }
 
-    @GetMapping("/{personId}", produces = [APPLICATION_JSON_VALUE])
-    fun personById(@PathVariable personId: Int): Person = personService.findById(personId)
+    @GetMapping("/{lineageId}/persons/{personId}", produces = [APPLICATION_JSON_VALUE])
+    fun personById(@PathVariable lineageId: Long, @PathVariable personId: Long): Person = personService.findById(personId)
 
-    @DeleteMapping("/{personId}")
-    fun delete(@PathVariable personId: Int): ResponseEntity<Unit> {
+    @DeleteMapping("/{lineageId}/persons/{personId}")
+    fun delete(@PathVariable lineageId: Long, @PathVariable personId: Long): ResponseEntity<Unit> {
         personService.delete(personId)
 
         return noContent().build()
     }
 
-    @PostMapping("/{personId}/events", consumes = [APPLICATION_JSON_VALUE])
-    fun createEvent(@PathVariable personId: Int, @RequestBody event: PersonEvent): ResponseEntity<Unit> {
+    @PostMapping("/{lineageId}/persons/{personId}/events", consumes = [APPLICATION_JSON_VALUE])
+    fun createEvent(@PathVariable lineageId: Long, @PathVariable personId: Long, @RequestBody event: PersonEvent): ResponseEntity<Unit> {
         val eventId = personService.createEvent(personId, event)
 
-        val uri = URI.create("/api/genealogy/persons/$personId/events/$eventId")
+        val uri = URI.create("/api/lineage/$lineageId/persons/$personId/events/$eventId")
         return created(uri).build()
     }
 
-    @GetMapping("/{personId}/events", produces = [APPLICATION_JSON_VALUE])
-    fun events(@PathVariable personId: Int): Collection<PersonEvent> = personService.findEvents(personId)
+    @GetMapping("/{lineageId}/persons/{personId}/events", produces = [APPLICATION_JSON_VALUE])
+    fun events(@PathVariable lineageId: Long, @PathVariable personId: Long): Collection<PersonEvent> = personService.findEvents(personId)
 
-    @DeleteMapping("/{personId}/events/{eventId}")
-    fun deleteEvent(@PathVariable personId: Int, @PathVariable eventId: Int): ResponseEntity<Unit> {
+    @DeleteMapping("/{lineageId}/persons/{personId}/events/{eventId}")
+    fun deleteEvent(@PathVariable lineageId: Long, @PathVariable personId: Long, @PathVariable eventId: Long): ResponseEntity<Unit> {
         personService.deleteEvent(personId, eventId)
 
         return noContent().build()
     }
 
-    @PostMapping("/{personId}/photo", consumes = [IMAGE_JPEG_VALUE, IMAGE_PNG_VALUE])
-    fun createPhoto(@PathVariable personId: Int,
-                    @RequestHeader("Content-Type") imageType: String,
-                    @RequestBody photo: ByteArray): ResponseEntity<Unit> {
+    @PostMapping("/{lineageId}/persons/{personId}/photo", consumes = [IMAGE_JPEG_VALUE, IMAGE_PNG_VALUE])
+    fun createPhoto(
+        @PathVariable lineageId: Long,
+        @PathVariable personId: Long,
+        @RequestHeader("Content-Type") imageType: String,
+        @RequestBody photo: ByteArray
+    ): ResponseEntity<Unit> {
         if (!(imageType == IMAGE_JPEG_VALUE || imageType == IMAGE_PNG_VALUE)) {
             throw ResponseStatusException(BAD_REQUEST, "Supported image types: jpeg/png")
         }
@@ -103,9 +107,9 @@ class PersonController(private val personService: PersonService) {
         return created(uri).build()
     }
 
-    @GetMapping("/{personId}/photo", produces = [IMAGE_JPEG_VALUE, IMAGE_PNG_VALUE])
+    @GetMapping("/{lineageId}/persons/{personId}/photo", produces = [IMAGE_JPEG_VALUE, IMAGE_PNG_VALUE])
     @ResponseBody
-    fun photo(@PathVariable personId: Int): ResponseEntity<Resource> {
+    fun photo(@PathVariable lineageId: Long, @PathVariable personId: Long): ResponseEntity<Resource> {
         val personPhoto = personService.photo(personId)
         return status(OK)
             .header("Content-Type", IMAGE_JPEG_VALUE)

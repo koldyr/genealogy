@@ -47,7 +47,7 @@ class PersonControllerTest : BaseControllerTest() {
     fun persons() {
         val personModel = createPerson(Gender.MALE)
 
-        mockMvc.get("/api/genealogy/persons/${personModel.id}") {
+        mockMvc.get("$baseUrl/$lineageId/persons/${personModel.id}") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
@@ -59,7 +59,7 @@ class PersonControllerTest : BaseControllerTest() {
             }
 
         val personEntityChange = getUpdatePersonModel(personModel)
-        mockMvc.put("/api/genealogy/persons/${personModel.id}") {
+        mockMvc.put("$baseUrl/$lineageId/persons/${personModel.id}") {
             header(AUTHORIZATION, getBearerToken())
             content = mapper.writeValueAsString(personEntityChange)
             accept = APPLICATION_JSON
@@ -70,7 +70,7 @@ class PersonControllerTest : BaseControllerTest() {
                 status { isOk() }
             }
 
-        mockMvc.get("/api/genealogy/persons/${personModel.id}") {
+        mockMvc.get("$baseUrl/$lineageId/persons/${personModel.id}") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
@@ -81,7 +81,7 @@ class PersonControllerTest : BaseControllerTest() {
                 content { json(mapper.writeValueAsString(personEntityChange)) }
             }
 
-        mockMvc.delete("/api/genealogy/persons/${personModel.id}") {
+        mockMvc.delete("$baseUrl/$lineageId/persons/${personModel.id}") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
@@ -90,7 +90,7 @@ class PersonControllerTest : BaseControllerTest() {
                 status { isNoContent() }
             }
 
-        mockMvc.get("/api/genealogy/persons/${personModel.id}") {
+        mockMvc.get("$baseUrl/$lineageId/persons/${personModel.id}") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
@@ -104,7 +104,7 @@ class PersonControllerTest : BaseControllerTest() {
     @Test
     fun events() {
         val randomId: Int = (99999..999999).random()
-        mockMvc.get("/api/genealogy/persons/$randomId/events") {
+        mockMvc.get("$baseUrl/$lineageId/persons/$randomId/events") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
@@ -115,7 +115,7 @@ class PersonControllerTest : BaseControllerTest() {
             }
 
         val person = createPerson(Gender.FEMALE)
-        mockMvc.get("/api/genealogy/persons/${person.id}/events") {
+        mockMvc.get("$baseUrl/$lineageId/persons/${person.id}/events") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
@@ -126,7 +126,7 @@ class PersonControllerTest : BaseControllerTest() {
             }
 
         val personEvent = createPersonEventModel()
-        val personEventId = mockMvc.post("/api/genealogy/persons/${person.id}/events") {
+        val personEventId = mockMvc.post("$baseUrl/$lineageId/persons/${person.id}/events") {
             content = mapper.writeValueAsString(personEvent)
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
@@ -136,11 +136,11 @@ class PersonControllerTest : BaseControllerTest() {
             .andExpect {
                 status { isCreated() }
                 header { exists(LOCATION) }
-                header { string(LOCATION, Matchers.matchesRegex("/api/genealogy/persons/[\\d]+/events/[\\d]+")) }
+                header { string(LOCATION, Matchers.matchesRegex("$baseUrl/$lineageId/persons/[\\d]+/events/[\\d]+")) }
             }.andReturn().response.getHeader(LOCATION)
         personEvent.id = getLastIdFromLocation(personEventId)
 
-        mockMvc.get("/api/genealogy/persons/${person.id}/events") {
+        mockMvc.get("$baseUrl/$lineageId/persons/${person.id}/events") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
@@ -151,7 +151,7 @@ class PersonControllerTest : BaseControllerTest() {
                 content { json(mapper.writeValueAsString(listOf(personEvent))) }
             }
 
-        mockMvc.delete("/api/genealogy/persons/${person.id}/events/${personEvent.id}") {
+        mockMvc.delete("$baseUrl/$lineageId/persons/${person.id}/events/${personEvent.id}") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
@@ -161,7 +161,7 @@ class PersonControllerTest : BaseControllerTest() {
 
             }
 
-        mockMvc.delete("/api/genealogy/persons/${person.id}/events/${personEvent.id}") {
+        mockMvc.delete("$baseUrl/$lineageId/persons/${person.id}/events/${personEvent.id}") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
@@ -230,7 +230,7 @@ class PersonControllerTest : BaseControllerTest() {
     }
 
     private fun searchPerson(criteria: SearchDTO): List<Person> {
-        val response = mockMvc.post("/api/genealogy/persons/search") {
+        val response = mockMvc.post("$baseUrl/$lineageId/persons/search") {
             content = mapper.writeValueAsString(criteria)
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON

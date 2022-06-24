@@ -3,9 +3,9 @@ package com.koldyr.genealogy.export
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.time.LocalDate
-import com.koldyr.genealogy.importer.Importer
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
+import com.koldyr.genealogy.importer.Importer
 
 /**
  * Description of class BaseExpImpTest
@@ -90,7 +90,7 @@ abstract class BaseExpImpTest {
         family.children.add(person3)
         family.events.addAll(familyEvents)
 
-        val persons = listOf(person1, person2, person3)
+        val persons = setOf(person1, person2, person3)
         val families = setOf(family)
 
         return com.koldyr.genealogy.model.Lineage(persons, families)

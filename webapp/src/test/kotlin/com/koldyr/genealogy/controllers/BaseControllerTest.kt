@@ -18,6 +18,7 @@ import org.springframework.test.web.servlet.post
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.koldyr.genealogy.Genealogy
 import com.koldyr.genealogy.dto.FamilyDTO
+import com.koldyr.genealogy.dto.LineageDTO
 import com.koldyr.genealogy.model.Credentials
 import com.koldyr.genealogy.model.EventPrefix
 import com.koldyr.genealogy.model.EventType
@@ -28,9 +29,15 @@ import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.model.PersonNames
 import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.persistence.FamilyRepository
+import com.koldyr.genealogy.persistence.LineageRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import com.koldyr.genealogy.persistence.UserRepository
+
+var lineageId: Long? = null
+var user: User? = null
+var accessToken: String? = null
+
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = [Genealogy::class])
@@ -51,6 +58,9 @@ abstract class BaseControllerTest {
     lateinit var personRepository: PersonRepository
 
     @Autowired
+    lateinit var lineageRepository: LineageRepository
+
+    @Autowired
     lateinit var familyRepository: FamilyRepository
 
     @Autowired
@@ -58,6 +68,8 @@ abstract class BaseControllerTest {
 
     @Autowired
     lateinit var familyEventRepository: PersonEventRepository
+
+    protected val baseUrl = "/api/lineage"
 
     protected fun createPersonModel(gender: Gender): Person {
         val person = Person()
@@ -80,17 +92,23 @@ abstract class BaseControllerTest {
     }
 
     @Before
-    fun loadUser() {
-        val user = createUser()
-        mockMvc.post("/api/user/registration") {
-            content = mapper.writeValueAsString(user)
-            contentType = APPLICATION_JSON
-            accept = APPLICATION_JSON
-        }
-            .andExpect {
-                status { isCreated() }
-                header { string(LOCATION, matchesRegex("/api/user/login")) }
+    fun prepareData() {
+        if (user == null) {
+            user = createUser()
+            mockMvc.post("/api/user/registration") {
+                content = mapper.writeValueAsString(user)
+                contentType = APPLICATION_JSON
+                accept = APPLICATION_JSON
             }
+                .andExpect {
+                    status { isCreated() }
+                    header { string(LOCATION, matchesRegex("/api/user/login")) }
+                }
+        }
+
+        if (lineageId == null) {
+            lineageId = createLineAge()
+        }
     }
 
     @After
@@ -99,39 +117,40 @@ abstract class BaseControllerTest {
         familyEventRepository.deleteAll()
         familyRepository.deleteAll()
         personRepository.deleteAll()
-        userRepository.deleteAll()
     }
 
     protected fun getBearerToken(): String {
-        val credentials = Credentials()
-        credentials.username = "me@koldyr.com"
-        credentials.password = "koldyr"
+        if (accessToken == null) {
+            val credentials = Credentials()
+            credentials.username = "me@koldyr.com"
+            credentials.password = "koldyr"
 
-        val token = mockMvc.post("/api/user/login") {
-            content = mapper.writeValueAsString(credentials)
-            contentType = APPLICATION_JSON
-            accept = APPLICATION_JSON
+            accessToken = mockMvc.post("/api/user/login") {
+                content = mapper.writeValueAsString(credentials)
+                contentType = APPLICATION_JSON
+                accept = APPLICATION_JSON
+            }
+                .andExpect {
+                    status { isOk() }
+                    header { exists(AUTHORIZATION) }
+                }.andReturn().response.getHeader(AUTHORIZATION)
         }
-            .andExpect {
-                status { isOk() }
-                header { exists(AUTHORIZATION) }
-            }.andReturn().response.getHeader(AUTHORIZATION)
-        return token
+        return accessToken!!
     }
 
     protected fun createPersonEventModel(): PersonEvent {
         return PersonEvent(EventType.Birth, EventPrefix.About, LocalDate.now(),
-                createRandomWord(), createRandomWord())
+            createRandomWord(), createRandomWord())
     }
 
     protected fun createFamilyEventModel(): FamilyEvent {
         return FamilyEvent(EventType.Birth, EventPrefix.About, LocalDate.now(),
-                createRandomWord(), createRandomWord());
+            createRandomWord(), createRandomWord());
     }
 
-    protected fun getLastIdFromLocation(location: String): Int {
+    protected fun getLastIdFromLocation(location: String): Long {
         val match = Regex("(\\d+)$").find(location)
-        return Integer.parseInt(match!!.groups.last()!!.value)
+        return java.lang.Long.parseLong(match!!.groups.last()!!.value)
     }
 
     protected fun createPerson(gender: Gender): Person {
@@ -140,7 +159,7 @@ abstract class BaseControllerTest {
     }
 
     protected fun createPerson(person: Person): Person {
-        val location = mockMvc.post("/api/genealogy/persons") {
+        val location = mockMvc.post("$baseUrl/$lineageId/persons") {
             header(AUTHORIZATION, getBearerToken())
             content = mapper.writeValueAsString(person)
             contentType = APPLICATION_JSON
@@ -148,7 +167,7 @@ abstract class BaseControllerTest {
         }
             .andExpect {
                 status { isCreated() }
-                header { string(LOCATION, matchesRegex("/api/genealogy/persons/[\\d]+")) }
+                header { string(LOCATION, matchesRegex("$baseUrl/$lineageId/persons/\\d+")) }
             }.andReturn().response.getHeader(LOCATION)
         person.id = getLastIdFromLocation(location)
         return person
@@ -161,11 +180,11 @@ abstract class BaseControllerTest {
         return familyDTO
     }
 
-    protected fun createFamily(children: List<Int>): FamilyDTO {
+    protected fun createFamily(children: List<Long>): FamilyDTO {
         val familyDTO = createSuccessFamilyModel()
         familyDTO.children = children
 
-        val location = mockMvc.post("/api/genealogy/families") {
+        val location = mockMvc.post("$baseUrl/$lineageId/families") {
             content = mapper.writeValueAsString(familyDTO)
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
@@ -173,7 +192,7 @@ abstract class BaseControllerTest {
         }
             .andExpect {
                 status { isCreated() }
-                header { string(LOCATION, matchesRegex("/api/genealogy/families/[\\d]+")) }
+                header { string(LOCATION, matchesRegex("$baseUrl/$lineageId/families/\\d+")) }
             }.andReturn().response.getHeader(LOCATION)
 
         familyDTO.id = getLastIdFromLocation(location)
@@ -184,5 +203,20 @@ abstract class BaseControllerTest {
 
     protected fun createRandomWord(): String {
         return randomAlphabetic(10)
+    }
+
+    protected fun createLineAge(): Long {
+        val lineage = LineageDTO("Koldyrs", "Test lineage")
+        val location = mockMvc.post("/api/lineage") {
+            header(AUTHORIZATION, getBearerToken())
+            content = mapper.writeValueAsString(lineage)
+            contentType = APPLICATION_JSON
+        }
+            .andExpect {
+                status { isCreated() }
+                header { string(LOCATION, matchesRegex("/api/lineage/\\d+$")) }
+            }
+            .andReturn().response.getHeader(LOCATION)
+        return getLastIdFromLocation(location)
     }
 }

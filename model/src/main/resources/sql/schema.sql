@@ -1,3 +1,13 @@
+CREATE TABLE IF NOT EXISTS T_LINEAGE
+(
+    LINEAGE_ID   INTEGER not null,
+    LINEAGE_NAME VARCHAR(256),
+    NOTE         VARCHAR(256),
+    USER_ID      INTEGER not null,
+    constraint PK_LINEAGE PRIMARY KEY (LINEAGE_ID)
+);
+create sequence SEQ_LINEAGE start with 1;
+
 CREATE TABLE IF NOT EXISTS T_PERSON
 (
     PERSON_ID        INTEGER      not null,
@@ -14,6 +24,7 @@ CREATE TABLE IF NOT EXISTS T_PERSON
     PARENT_FAMILY_ID INTEGER,
     FAMILY_ID        INTEGER,
     USER_ID          INTEGER      not null,
+    LINEAGE_ID       INTEGER      not null,
     constraint PK_PERSON PRIMARY KEY (PERSON_ID)
 );
 create sequence SEQ_PERSON start with 1;
@@ -26,6 +37,7 @@ CREATE TABLE IF NOT EXISTS T_FAMILY
     WIFE_ID    INTEGER,
     NOTE       VARCHAR(256),
     USER_ID    INTEGER not null,
+    LINEAGE_ID INTEGER not null,
     constraint PK_FAMILY PRIMARY KEY (FAMILY_ID)
 );
 create sequence SEQ_FAMILY start with 1;
@@ -81,6 +93,9 @@ CREATE TABLE IF NOT EXISTS T_USER
 );
 
 create sequence SEQ_USER start with 1;
+
+alter table T_LINEAGE
+    add constraint FK_LINEAGE_USER FOREIGN KEY (USER_ID) REFERENCES T_USER (USER_ID);
 
 alter table T_PERSON
     add constraint FK_PERSON_PARENT_FAMILY FOREIGN KEY (PARENT_FAMILY_ID) REFERENCES T_FAMILY (FAMILY_ID);

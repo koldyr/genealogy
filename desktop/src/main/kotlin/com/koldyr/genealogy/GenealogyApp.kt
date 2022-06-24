@@ -9,7 +9,7 @@ import java.awt.event.MouseEvent.*
 import java.io.File
 import java.io.IOException
 import java.util.*
-import java.util.function.ToIntFunction
+import java.util.function.ToLongFunction
 import javax.swing.AbstractAction
 import javax.swing.JFileChooser
 import javax.swing.JFrame
@@ -166,7 +166,7 @@ class GenealogyApp : JFrame, ActionListener {
             .stream()
             .map(Person::id)
             .filter(Objects::nonNull)
-            .mapToInt(ToIntFunction<Int?> { it })
+            .mapToLong(ToLongFunction<Long?> { it })
             .max()
             .orElse(0) + 1
 
@@ -212,7 +212,7 @@ class GenealogyApp : JFrame, ActionListener {
             val extension = it.extension
 
             val exporter = ExporterFactory.create(extension)
-            lineage.persons = personsModel.getAll()
+            lineage.persons = personsModel.getAll().toSet()
             exporter.export(lineage, it.toPath())
 
             showMessageDialog(this, "Saved to ${it.name}")
@@ -236,7 +236,7 @@ class GenealogyApp : JFrame, ActionListener {
                 }
             }
 
-            val persons = personsModel.getAll()
+            val persons = personsModel.getAll().toSet()
             val filter = fileChooser.fileFilter as FileNameExtensionFilter
             val extension = filter.extensions[0]
             val file = handleExportFile(it, extension)
@@ -291,7 +291,7 @@ fun main(args: Array<String>) {
     val lineage: Lineage
     val fileName = if (args.isEmpty()) null else args[0]
     if (fileName == null) {
-        lineage = Lineage(listOf(), setOf())
+        lineage = Lineage(setOf(), setOf())
     } else {
         val file = File(fileName)
         val parser = ImporterFactory.create(file)

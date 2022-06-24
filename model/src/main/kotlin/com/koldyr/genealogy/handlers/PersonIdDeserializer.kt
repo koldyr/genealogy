@@ -8,12 +8,14 @@ import com.koldyr.genealogy.model.Person
 
 /**
  * Description of class PersonSerializer
+ *
+ * @author d.halitski@gmail.com
  * @created: 2019-11-05
  */
 class PersonIdDeserializer : StdDeserializer<Person>(Person::class.java) {
 
-    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Person? {
+    override fun deserialize(p: JsonParser, ctxt: DeserializationContext): Person {
         val node: JsonNode = p.codec.readTree(p)
-        return Person(node.asInt())
+        return Person(node.asLong())
     }
 }

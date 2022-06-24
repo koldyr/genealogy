@@ -109,7 +109,7 @@ class GEDExporter : Exporter {
         return builder.toString()
     }
 
-    private fun id(id: Int, person: Boolean, builder: StringBuilder) {
+    private fun id(id: Long, person: Boolean, builder: StringBuilder) {
         if (person) {
             builder.append("0 @").append(id).append("@ ").append(PERSON).append('\n')
         } else {

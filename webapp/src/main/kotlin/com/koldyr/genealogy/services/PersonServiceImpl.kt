@@ -34,7 +34,7 @@ class PersonServiceImpl(
 
     private val predicateBuilder = PredicateBuilder()
 
-    override fun findAll(): List<Person> = personRepository.findAllByUser(userService.currentUser())
+    override fun findAll(lineageId: Long): List<Person> = personRepository.findAllByUserAndLineageId(userService.currentUser(), lineageId)
 
     override fun search(criteria: SearchDTO): PageResultDTO<Person> {
         val filter = predicateBuilder.personFilter(criteria, userService.currentUser().id!!)
@@ -49,7 +49,7 @@ class PersonServiceImpl(
         return createPageResult(result)
     }
 
-    override fun create(person: Person): Int {
+    override fun create(person: Person): Long {
         person.user = userService.currentUser()
         person.events.forEach { it.person = person }
 
@@ -57,19 +57,19 @@ class PersonServiceImpl(
         return saved.id!!
     }
 
-    override fun findById(personId: Int): Person = findPerson(personId)
+    override fun findById(personId: Long): Person = findPerson(personId)
 
-    override fun update(personId: Int, person: Person) {
+    override fun update(personId: Long, person: Person) {
         val persisted = findPerson(personId)
 
         person.id = persisted.id
         person.user = persisted.user
         mapper.map(person, persisted)
 
-        personRepository.save(persisted);
+        personRepository.save(persisted)
     }
 
-    override fun delete(personId: Int) {
+    override fun delete(personId: Long) {
         val person = findPerson(personId)
 
         val family = if (nonNull(person.familyId)) {
@@ -85,7 +85,7 @@ class PersonServiceImpl(
         personRepository.deleteById(personId)
     }
 
-    override fun createEvent(personId: Int, event: PersonEvent): Int {
+    override fun createEvent(personId: Long, event: PersonEvent): Long {
         event.id = null
 
         val person = findPerson(personId)
@@ -97,12 +97,12 @@ class PersonServiceImpl(
         return event.id!!
     }
 
-    override fun findEvents(personId: Int): Collection<PersonEvent> {
+    override fun findEvents(personId: Long): Collection<PersonEvent> {
         findPerson(personId)
         return personRepository.findEvents(personId)
     }
 
-    override fun deleteEvent(personId: Int, eventId: Int) {
+    override fun deleteEvent(personId: Long, eventId: Long) {
         val person = findPerson(personId)
         findPersonEvent(eventId)
         person.removeEvent(eventId)
@@ -111,28 +111,28 @@ class PersonServiceImpl(
         personRepository.save(person)
     }
 
-    override fun photo(personId: Int): InputStream {
+    override fun photo(personId: Long): InputStream {
         val person = findPerson(personId)
         return person.photo?.inputStream() ?: nullInputStream()
     }
 
-    override fun createPhoto(personId: Int, type: String, photo: ByteArray): String {
+    override fun createPhoto(personId: Long, type: String, photo: ByteArray): String {
         val imageType = if (type.lowercase().contains("jpeg")) "jpeg" else "png"
 
         val person = findPerson(personId)
         person.photo = photo
-        person.photoUrl = "/api/genealogy/persons/$personId/photo.$imageType"
+        person.photoUrl = "/api/lineage/1/persons/$personId/photo.$imageType"
         personRepository.save(person)
         
         return person.photoUrl!!
     }
 
-    private fun findPerson(personId: Int): Person {
+    private fun findPerson(personId: Long): Person {
         return personRepository.findById(personId)
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$personId' is not found") }
     }
 
-    private fun findPersonEvent(personEventId: Int): PersonEvent {
+    private fun findPersonEvent(personEventId: Long): PersonEvent {
         return personEventRepository.findById(personEventId)
                 .orElseThrow { ResponseStatusException(NOT_FOUND, "Event with id '$personEventId' is not found") }
     }

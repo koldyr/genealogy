@@ -21,7 +21,7 @@ import com.koldyr.genealogy.persistence.PersonRepository
  * @created: 2021-09-28
  */
 @Transactional
-open class FamilyServiceImpl(
+class FamilyServiceImpl(
     private val familyRepository: FamilyRepository,
     private val personRepository: PersonRepository,
     private val familyEventRepository: FamilyEventRepository,
@@ -29,11 +29,11 @@ open class FamilyServiceImpl(
     private val userService: UserService
 ) : FamilyService {
 
-    override fun findAll(): List<FamilyDTO> {
-        return familyRepository.findAllByUser(userService.currentUser()).map(this::mapFamily)
+    override fun findAll(lineageId: Long): List<FamilyDTO> {
+        return familyRepository.findAllByUserAndLineageId(userService.currentUser(), lineageId).map(this::mapFamily)
     }
 
-    override fun create(family: FamilyDTO): Int {
+    override fun create(lineageId: Long, family: FamilyDTO): Long {
         family.id = null
         val newFamily = mapper.map(family, Family::class.java)
 
@@ -59,6 +59,7 @@ open class FamilyServiceImpl(
             }
         }
 
+        newFamily.lineageId = lineageId
         newFamily.user = userService.currentUser()
         familyRepository.save(newFamily)
 
@@ -77,13 +78,13 @@ open class FamilyServiceImpl(
         return newFamily.id!!
     }
 
-    override fun findById(familyId: Int): FamilyDTO {
+    override fun findById(familyId: Long): FamilyDTO {
         return familyRepository.findById(familyId)
             .map(this::mapFamily)
             .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
     }
 
-    override fun update(familyId: Int, family: FamilyDTO) {
+    override fun update(familyId: Long, family: FamilyDTO) {
         val persisted = find(familyId)
 
         family.id = persisted.id
@@ -110,7 +111,7 @@ open class FamilyServiceImpl(
         familyRepository.save(persisted);
     }
 
-    override fun delete(familyId: Int) {
+    override fun delete(familyId: Long) {
         val family = find(familyId)
 
         if (nonNull(family.wife)) {
@@ -137,7 +138,7 @@ open class FamilyServiceImpl(
         familyRepository.delete(family)
     }
 
-    override fun createEvent(familyId: Int, event: FamilyEvent): Int {
+    override fun createEvent(familyId: Long, event: FamilyEvent): Long {
         val family = find(familyId)
         
         event.id = null
@@ -149,7 +150,7 @@ open class FamilyServiceImpl(
         return event.id!!
     }
 
-    override fun deleteEvent(familyId: Int, eventId: Int) {
+    override fun deleteEvent(familyId: Long, eventId: Long) {
         val family = find(familyId)
 
         family.removeEvent(eventId)
@@ -158,12 +159,12 @@ open class FamilyServiceImpl(
         familyEventRepository.deleteById(eventId)
     }
 
-    override fun findEvents(familyId: Int): Collection<FamilyEvent> {
+    override fun findEvents(familyId: Long): Collection<FamilyEvent> {
         find(familyId)
         return familyRepository.findEvents(familyId)
     }
 
-    override fun createChild(familyId: Int, child: Person): Int {
+    override fun createChild(familyId: Long, child: Person): Long {
         val family = find(familyId)
 
         child.id = null
@@ -177,7 +178,7 @@ open class FamilyServiceImpl(
         return saved.id!!
     }
 
-    override fun addChild(familyId: Int, childId: Int) {
+    override fun addChild(familyId: Long, childId: Long) {
         val family = find(familyId)
 
         val child = personRepository.findById(childId)
@@ -197,12 +198,12 @@ open class FamilyServiceImpl(
         familyRepository.save(family)
     }
 
-    override fun findChildren(familyId: Int): Collection<Person> {
+    override fun findChildren(familyId: Long): Collection<Person> {
         find(familyId)
         return familyRepository.findChildren(familyId)
     }
 
-    override fun deleteChild(familyId: Int, childId: Int) {
+    override fun deleteChild(familyId: Long, childId: Long) {
         val family = find(familyId)
         if (family.children.none { it.id ==childId }) {
             throw ResponseStatusException(BAD_REQUEST, "Child with id '${childId}' is not found in family")
@@ -212,7 +213,7 @@ open class FamilyServiceImpl(
         familyRepository.save(family)
     }
 
-    private fun find(familyId: Int): Family = familyRepository.findById(familyId)
+    private fun find(familyId: Long): Family = familyRepository.findById(familyId)
             .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
 
     private fun mapFamily(entity: Family): FamilyDTO {
