@@ -71,7 +71,7 @@ class GenealogyConfig {
 
     @Bean
     fun lineageService(mapper: MapperFacade, userService: UserService, lineageRepository: LineageRepository): LineageService {
-        return LineageServiceImpl(lineageRepository, familyRepository, personRepository, userService)
+        return LineageServiceImpl(lineageRepository, userService)
     }
 
     @Bean

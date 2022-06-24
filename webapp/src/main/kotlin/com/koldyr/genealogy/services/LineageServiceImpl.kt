@@ -5,15 +5,11 @@ import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import com.koldyr.genealogy.dto.LineageDTO
 import com.koldyr.genealogy.model.Lineage
-import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.LineageRepository
-import com.koldyr.genealogy.persistence.PersonRepository
 
 @Transactional
 class LineageServiceImpl(
     private val lineageRepository: LineageRepository,
-    private val familyRepository: FamilyRepository,
-    private val personRepository: PersonRepository,
     private val userService: UserService,
 ) : LineageService {
 
