@@ -35,7 +35,8 @@ data class SearchEventDTO (
     var type: String = "",
     var dateFrom: LocalDate? = null,
     var dateTo: LocalDate? = null,
-    var place: String? = null
+    var place: String? = null,
+    var note: String? = null
 )
 
 class PageResultDTO<T>(val result: List<T>) {

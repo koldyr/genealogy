@@ -1,5 +1,7 @@
 package com.koldyr.genealogy.dto
 
+import com.koldyr.genealogy.model.Family
+
 /**
  * Description of class FamilyDTO
  *
@@ -13,6 +15,12 @@ data class FamilyDTO(
     var children: Collection<Long>? = null,
     var events: Collection<Long>? = null
 ) {
+
+    constructor(family: Family) : this() {
+        husband = family.husband?.id
+        wife = family.wife?.id
+        children = family.children.map { it.id!! }.toList()
+    }
 
     override fun toString(): String {
         return "FamilyDTO(id=$id, husband=$husband, wife=$wife, children=$children, events=$events)"
