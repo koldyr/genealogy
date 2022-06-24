@@ -34,6 +34,11 @@ import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import com.koldyr.genealogy.persistence.UserRepository
 
+var lineageId: Long? = null
+var user: User? = null
+var accessToken: String? = null
+
+
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = [Genealogy::class])
 @AutoConfigureMockMvc
@@ -65,9 +70,6 @@ abstract class BaseControllerTest {
     lateinit var familyEventRepository: PersonEventRepository
 
     protected val baseUrl = "/api/lineage"
-    protected var lineageId: Long? = null
-    private var user: User? = null
-    private var accessToken: String? = null
 
     protected fun createPersonModel(gender: Gender): Person {
         val person = Person()

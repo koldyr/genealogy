@@ -11,6 +11,9 @@ import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.genealogy.dto.LineageDTO
 import com.koldyr.genealogy.model.Gender
 
+
+var mainLineageId: Long? = null
+
 /**
  * Description of the LineageControllerTest class
  *
@@ -24,6 +27,7 @@ class LineageControllerTest : BaseControllerTest() {
         val all = allLineages()
         assertTrue(all.isNotEmpty())
 
+        mainLineageId = lineageId
         lineageId = createLineAge()
 
         val result = getLineage(lineageId!!)
@@ -54,6 +58,7 @@ class LineageControllerTest : BaseControllerTest() {
         ).map { it.id!! }
         val family = createFamily(children)
 
+        //delete lineage
         mockMvc.delete("$baseUrl/$lineageId") {
             header(AUTHORIZATION, getBearerToken())
         }
@@ -61,6 +66,7 @@ class LineageControllerTest : BaseControllerTest() {
                 status { isNoContent() }
             }
 
+        //check family is deleted
         mockMvc.get("$baseUrl/$lineageId/families/${family.id}") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
@@ -69,6 +75,34 @@ class LineageControllerTest : BaseControllerTest() {
                 status { isNotFound() }
             }
 
+        //check husband is deleted
+        mockMvc.get("$baseUrl/$lineageId/persons/${family.husband}") {
+            header(AUTHORIZATION, getBearerToken())
+            accept = APPLICATION_JSON
+        }
+            .andExpect {
+                status { isNotFound() }
+            }
+
+        //check husband is deleted
+        mockMvc.get("$baseUrl/$lineageId/persons/${family.wife}") {
+            header(AUTHORIZATION, getBearerToken())
+            accept = APPLICATION_JSON
+        }
+            .andExpect {
+                status { isNotFound() }
+            }
+
+        //check children is deleted
+        mockMvc.get("$baseUrl/$lineageId/persons/${family.children!!.toList()[0]}") {
+            header(AUTHORIZATION, getBearerToken())
+            accept = APPLICATION_JSON
+        }
+            .andExpect {
+                status { isNotFound() }
+            }
+
+        //check lineage is deleted
         mockMvc.get("$baseUrl/$lineageId") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
@@ -76,6 +110,8 @@ class LineageControllerTest : BaseControllerTest() {
             .andExpect {
                 status { isNotFound() }
             }
+
+        lineageId = mainLineageId
     }
 
     private fun allLineages(): List<LineageDTO> {

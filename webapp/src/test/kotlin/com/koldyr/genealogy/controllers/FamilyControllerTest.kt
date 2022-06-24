@@ -2,7 +2,6 @@ package com.koldyr.genealogy.controllers
 
 import org.hamcrest.Matchers
 import org.junit.Test
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpHeaders.*
 import org.springframework.http.MediaType.*
 import org.springframework.test.web.servlet.delete
@@ -19,7 +18,7 @@ class FamilyControllerTest : BaseControllerTest() {
     fun families() {
         mockMvc.get("$baseUrl/$lineageId/families") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -30,7 +29,7 @@ class FamilyControllerTest : BaseControllerTest() {
 
         mockMvc.get("$baseUrl/$lineageId/families/${familyDto.id}") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -45,7 +44,7 @@ class FamilyControllerTest : BaseControllerTest() {
             content = mapper.writeValueAsString(familyDto)
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -54,7 +53,7 @@ class FamilyControllerTest : BaseControllerTest() {
 
         mockMvc.get("$baseUrl/$lineageId/families/${familyDto.id}") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -68,7 +67,7 @@ class FamilyControllerTest : BaseControllerTest() {
             content = mapper.writeValueAsString(familyDto)
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -78,7 +77,7 @@ class FamilyControllerTest : BaseControllerTest() {
 
         mockMvc.delete("$baseUrl/$lineageId/families/${familyDto.id}") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -87,7 +86,7 @@ class FamilyControllerTest : BaseControllerTest() {
 
         mockMvc.get("$baseUrl/$lineageId/families/${familyDto.id}") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -99,7 +98,7 @@ class FamilyControllerTest : BaseControllerTest() {
             content = mapper.writeValueAsString(FamilyDTO())
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -120,7 +119,7 @@ class FamilyControllerTest : BaseControllerTest() {
 
         mockMvc.get("$baseUrl/$lineageId/families/${familyDto.id}") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -131,7 +130,7 @@ class FamilyControllerTest : BaseControllerTest() {
 
         mockMvc.delete("$baseUrl/$lineageId/families/${familyDto.id}") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -140,7 +139,7 @@ class FamilyControllerTest : BaseControllerTest() {
 
         mockMvc.get("$baseUrl/$lineageId/families/${familyDto.id}") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -154,7 +153,7 @@ class FamilyControllerTest : BaseControllerTest() {
         val randomId: Int = (99999..999999).random()
         mockMvc.get("$baseUrl/$lineageId/families/$randomId/events") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -168,7 +167,7 @@ class FamilyControllerTest : BaseControllerTest() {
             content = mapper.writeValueAsString(familyEvent)
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -180,7 +179,7 @@ class FamilyControllerTest : BaseControllerTest() {
 
         mockMvc.get("$baseUrl/1/families/${familyDTO.id}/events") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -191,7 +190,7 @@ class FamilyControllerTest : BaseControllerTest() {
 
         mockMvc.delete("$baseUrl/$lineageId/families/${familyDTO.id}/events/${familyEvent.id}") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -200,7 +199,7 @@ class FamilyControllerTest : BaseControllerTest() {
 
         mockMvc.get("$baseUrl/$lineageId/families/${familyDTO.id}/events") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -215,7 +214,7 @@ class FamilyControllerTest : BaseControllerTest() {
         val randomId: Int = (99999..999999).random()
         mockMvc.get("$baseUrl/$lineageId/families/$randomId/children") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -230,7 +229,7 @@ class FamilyControllerTest : BaseControllerTest() {
             content = mapper.writeValueAsString(child1)
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -243,7 +242,7 @@ class FamilyControllerTest : BaseControllerTest() {
         val child2 = createPerson(Gender.FEMALE)
         val childId2 = mockMvc.patch("$baseUrl/$lineageId/families/${familyDTO.id}/children/${child2.id}") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -255,7 +254,7 @@ class FamilyControllerTest : BaseControllerTest() {
 
         mockMvc.get("$baseUrl/$lineageId/families/${familyDTO.id}/children") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -265,7 +264,7 @@ class FamilyControllerTest : BaseControllerTest() {
 
         mockMvc.delete("$baseUrl/$lineageId/families/${familyDTO.id}/children/${child1.id}") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -274,7 +273,7 @@ class FamilyControllerTest : BaseControllerTest() {
 
         mockMvc.delete("$baseUrl/$lineageId/families/${familyDTO.id}/children/${child1.id}") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
@@ -284,7 +283,7 @@ class FamilyControllerTest : BaseControllerTest() {
 
         mockMvc.get("$baseUrl/$lineageId/families/${familyDTO.id}/children") {
             accept = APPLICATION_JSON
-            header(HttpHeaders.AUTHORIZATION, getBearerToken())
+            header(AUTHORIZATION, getBearerToken())
         }
             .andDo { print() }
             .andExpect {
