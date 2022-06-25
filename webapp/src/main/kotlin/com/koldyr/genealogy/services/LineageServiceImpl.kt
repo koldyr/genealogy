@@ -1,15 +1,25 @@
 package com.koldyr.genealogy.services
 
+import java.util.UUID
 import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import com.koldyr.genealogy.dto.LineageDTO
+import com.koldyr.genealogy.importer.ImporterFactory
 import com.koldyr.genealogy.model.Lineage
+import com.koldyr.genealogy.persistence.ImportRepository
 import com.koldyr.genealogy.persistence.LineageRepository
 
+/**
+ * Description of class LineageServiceImpl
+ *
+ * @author d.halitski@gmail.com
+ * @created: 2022-06-24
+ */
 @Transactional
 class LineageServiceImpl(
     private val lineageRepository: LineageRepository,
+    private val importRepository: ImportRepository,
     private val userService: UserService,
 ) : LineageService {
 
@@ -20,7 +30,7 @@ class LineageServiceImpl(
 
     override fun create(lineage: LineageDTO): Long {
         val entity = Lineage()
-        entity.name = lineage.name
+        entity.name = lineage.name ?: "${userService.currentUser().surName} ${UUID.randomUUID()}"
         entity.note = lineage.note
         entity.user = userService.currentUser()
 
@@ -37,7 +47,8 @@ class LineageServiceImpl(
 
     override fun update(lineageId: Long, lineage: LineageDTO) {
         val entity = findAndCheck(lineageId)
-        entity.name = lineage.name
+
+        lineage.name?.let { entity.name = it }
         entity.note = lineage.note
 
         lineageRepository.save(entity)
@@ -46,6 +57,37 @@ class LineageServiceImpl(
     override fun delete(lineageId: Long) {
         val entity = findAndCheck(lineageId)
         lineageRepository.delete(entity)
+    }
+
+    override fun importLineage(dataType: String, data: ByteArray, name: String, note: String?): Long {
+        val importer = ImporterFactory.create(dataType)
+        val lineage = importer.import(data.inputStream())
+
+        val families = lineage.families
+        val persons = lineage.persons
+        lineage.families = setOf()
+        lineage.persons = setOf()
+
+        lineage.name = name
+        lineage.note = note
+        lineage.user = userService.currentUser()
+        lineageRepository.save(lineage)
+
+        persons.forEach { person ->
+            person.lineageId = lineage.id
+            person.user = lineage.user
+
+            importRepository.save(person)
+        }
+        
+        families.forEach { family ->
+            family.lineageId = lineage.id
+            family.user = lineage.user!!
+
+            importRepository.save(family)
+        }
+
+        return lineage.id!!
     }
 
     private fun findAndCheck(lineageId: Long): Lineage {

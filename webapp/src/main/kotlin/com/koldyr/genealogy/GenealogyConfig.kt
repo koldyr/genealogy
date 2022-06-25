@@ -1,7 +1,5 @@
 package com.koldyr.genealogy
 
-import ma.glasnost.orika.MapperFacade
-import ma.glasnost.orika.impl.DefaultMapperFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -9,6 +7,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.http.HttpHeaders.*
 import org.springframework.http.HttpMethod.*
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -19,6 +18,7 @@ import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.persistence.FamilyEventRepository
 import com.koldyr.genealogy.persistence.FamilyRepository
+import com.koldyr.genealogy.persistence.ImportRepository
 import com.koldyr.genealogy.persistence.LineageRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
@@ -32,6 +32,8 @@ import com.koldyr.genealogy.services.PersonService
 import com.koldyr.genealogy.services.PersonServiceImpl
 import com.koldyr.genealogy.services.UserService
 import com.koldyr.genealogy.services.UserServiceImpl
+import ma.glasnost.orika.MapperFacade
+import ma.glasnost.orika.impl.DefaultMapperFactory
 
 
 /**
@@ -70,8 +72,17 @@ class GenealogyConfig {
     }
 
     @Bean
-    fun lineageService(mapper: MapperFacade, userService: UserService, lineageRepository: LineageRepository): LineageService {
-        return LineageServiceImpl(lineageRepository, userService)
+    fun lineageService(
+        mapper: MapperFacade, userService: UserService,
+        importRepository: ImportRepository,
+        lineageRepository: LineageRepository
+    ): LineageService {
+        return LineageServiceImpl(lineageRepository, importRepository, userService)
+    }
+
+    @Bean
+    fun importRepository(jdbcTemplate: JdbcTemplate): ImportRepository {
+        return ImportRepository(jdbcTemplate)
     }
 
     @Bean

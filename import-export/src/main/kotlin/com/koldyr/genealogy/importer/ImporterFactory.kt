@@ -12,14 +12,19 @@ class ImporterFactory {
         @JvmStatic
         fun create(file: File): Importer {
             if (file.isFile) {
-                return when (file.extension) {
-                    "json" -> JSONImporter()
-                    "ged" -> GEDImporter()
-                    else -> CSVImporter()
-                }
+                return create(file.extension)
             }
 
             throw RuntimeException("Cannot import dir")
+        }
+
+        @JvmStatic
+        fun create(dataType: String): Importer {
+            val type = dataType.lowercase()
+            return if (type.contains("json")) JSONImporter()
+            else if (type.contains("ged")) GEDImporter()
+            else if (type.contains("csv")) CSVImporter()
+            else throw RuntimeException("Cannot import from $dataType")
         }
     }
 }
