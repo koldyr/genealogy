@@ -10,6 +10,12 @@ import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.persistence.ImportRepository
 import com.koldyr.genealogy.persistence.LineageRepository
 
+/**
+ * Description of class LineageServiceImpl
+ *
+ * @author d.halitski@gmail.com
+ * @created: 2022-06-24
+ */
 @Transactional
 class LineageServiceImpl(
     private val lineageRepository: LineageRepository,
@@ -42,9 +48,7 @@ class LineageServiceImpl(
     override fun update(lineageId: Long, lineage: LineageDTO) {
         val entity = findAndCheck(lineageId)
 
-        lineage.name?.let {
-            entity.name = it
-        }
+        lineage.name?.let { entity.name = it }
         entity.note = lineage.note
 
         lineageRepository.save(entity)
@@ -59,8 +63,8 @@ class LineageServiceImpl(
         val importer = ImporterFactory.create(dataType)
         val lineage = importer.import(data.inputStream())
 
-        val families = HashSet(lineage.families)
-        val persons = HashSet(lineage.persons)
+        val families = lineage.families
+        val persons = lineage.persons
         lineage.families = setOf()
         lineage.persons = setOf()
 
@@ -70,9 +74,6 @@ class LineageServiceImpl(
         lineageRepository.save(lineage)
 
         persons.forEach { person ->
-            person.id = importRepository.nextPersonId()
-            person.familyId = null
-            person.parentFamilyId = null
             person.lineageId = lineage.id
             person.user = lineage.user
 
@@ -80,20 +81,8 @@ class LineageServiceImpl(
         }
         
         families.forEach { family ->
-            family.id = importRepository.nextFamilyId()
             family.lineageId = lineage.id
             family.user = lineage.user!!
-
-            family.husband?.let {
-                it.familyId = family.id
-            }
-            family.wife?.let {
-                it.familyId = family.id
-            }
-
-            family.children.forEach {
-                it.parentFamilyId = family.id
-            }
 
             importRepository.save(family)
         }

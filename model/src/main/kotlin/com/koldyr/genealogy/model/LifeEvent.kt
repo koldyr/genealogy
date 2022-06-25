@@ -45,7 +45,7 @@ open class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
     @JsonDeserialize(using = EventPrefixDeserializer::class)
     open var prefix: EventPrefix? = null
 
-    @Column(name = "EVENT_DATE", nullable = false, columnDefinition = "DATE")
+    @Column(name = "EVENT_DATE", columnDefinition = "DATE")
     @JsonSerialize(using = LocalDateSerializer::class)
     @JsonDeserialize(using = LocalDateDeserializer::class)
     open var date: LocalDate? = null
@@ -58,7 +58,7 @@ open class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
         this.type = type
     }
 
-    constructor(type: EventType, prefix: EventPrefix?, date: LocalDate, place: String?, note: String?) : this() {
+    constructor(type: EventType, prefix: EventPrefix?, date: LocalDate?, place: String?, note: String?) : this() {
         this.type = type
         this.prefix = prefix
         this.date = date

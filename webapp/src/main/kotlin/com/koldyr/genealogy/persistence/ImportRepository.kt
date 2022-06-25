@@ -12,11 +12,17 @@ import com.koldyr.genealogy.model.Person
 
 /**
  * Description of class ImportRepository
+ *
+ * @author d.halitski@gmail.com
  * @created: 2022-06-25
  */
 class ImportRepository(private val jdbc: JdbcTemplate) {
 
     fun save(person: Person) {
+        person.id = nextPersonId()
+        person.familyId = null
+        person.parentFamilyId = null
+
         val sql = "insert into T_PERSON (PERSON_ID, PLACE, OCCUPATION, NOTE, GENDER, FIRST_NAME, MIDDLE_NAME, LAST_NAME, MAIDEN_NAME, USER_ID, LINEAGE_ID) " +
             "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
         jdbc.execute(sql) { statement ->
@@ -38,8 +44,12 @@ class ImportRepository(private val jdbc: JdbcTemplate) {
     }
 
     fun save(family: Family) {
-        val sql = "insert into T_FAMILY (FAMILY_ID, HUSBAND_ID, WIFE_ID, NOTE, USER_ID, LINEAGE_ID) " +
-            "values (?, ?, ?, ?, ?, ?)"
+        family.id = nextFamilyId()
+        family.husband?.let { it.familyId = family.id }
+        family.wife?.let { it.familyId = family.id }
+        family.children.forEach { it.parentFamilyId = family.id }
+
+        val sql = "insert into T_FAMILY (FAMILY_ID, HUSBAND_ID, WIFE_ID, NOTE, USER_ID, LINEAGE_ID) values (?, ?, ?, ?, ?, ?)"
         jdbc.execute(sql) { statement ->
             statement.setLong(1, family.id!!)
             setLong(statement, 2, family.husband?.id)
@@ -83,8 +93,7 @@ class ImportRepository(private val jdbc: JdbcTemplate) {
         if (family.events.isEmpty()) return
 
         val events = family.events.iterator()
-        val sql = "insert into T_FAMILY_EVENT (EVENT_ID, TYPE, PLACE, NOTE, EVENT_DATE, FAMILY_ID) " +
-            "values (?, ?, ?, ?, ?, ?)"
+        val sql = "insert into T_FAMILY_EVENT (EVENT_ID, TYPE, PLACE, NOTE, EVENT_DATE, FAMILY_ID) values (?, ?, ?, ?, ?, ?)"
         jdbc.batchUpdate(sql, object : BatchPreparedStatementSetter {
             override fun setValues(statement: PreparedStatement, i: Int) {
                 val event = events.next()
@@ -139,27 +148,19 @@ class ImportRepository(private val jdbc: JdbcTemplate) {
         }
     }
 
-    fun nextPersonId(): Long {
-        return jdbc.query("select NEXTVAL('SEQ_PERSON')", ResultSetExtractor {
+    private fun nextPersonId(): Long = nextId("select NEXTVAL('SEQ_PERSON')")
+
+    private fun nextFamilyId(): Long = nextId("select NEXTVAL('SEQ_FAMILY')")
+
+    private fun nextEventId(): Long = nextId("select NEXTVAL('SEQ_EVENT')")
+
+    private fun nextId(sql: String): Long {
+        return jdbc.query(sql, ResultSetExtractor {
             it.first()
             it.getLong(1)
         })!!
     }
-
-    fun nextFamilyId(): Long {
-        return jdbc.query("select NEXTVAL('SEQ_FAMILY')", ResultSetExtractor {
-            it.first()
-            it.getLong(1)
-        })!!
-    }
-
-    fun nextEventId(): Long {
-        return jdbc.query("select NEXTVAL('SEQ_EVENT')", ResultSetExtractor {
-            it.first()
-            it.getLong(1)
-        })!!
-    }
-
+    
     private fun setLong(statement: PreparedStatement, index: Int, value: Long?) {
         if (value == null) {
             statement.setNull(index, BIGINT)
