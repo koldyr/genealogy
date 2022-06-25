@@ -197,7 +197,6 @@ abstract class BaseControllerTest {
 
         familyDTO.id = getLastIdFromLocation(location)
         familyDTO.children = children
-        familyDTO.events = listOf()
         return familyDTO
     }
 

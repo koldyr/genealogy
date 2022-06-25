@@ -16,11 +16,12 @@ data class FamilyDTO(
     var events: Collection<Long>? = null
 ) {
 
-    constructor(family: Family) : this() {
-        husband = family.husband?.id
-        wife = family.wife?.id
-        children = family.children.map { it.id!! }.toList()
-    }
+    constructor(family: Family) : this(
+        family.id,
+        family.husband?.id,
+        family.wife?.id,
+        family.children.map { it.id!! }.toSet()
+    )
 
     override fun toString(): String {
         return "FamilyDTO(id=$id, husband=$husband, wife=$wife, children=$children, events=$events)"
