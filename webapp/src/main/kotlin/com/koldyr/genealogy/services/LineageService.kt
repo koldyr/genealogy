@@ -14,4 +14,5 @@ interface LineageService {
     fun findById(lineageId: Long): LineageDTO
     fun update(lineageId: Long, lineage: LineageDTO)
     fun delete(lineageId: Long)
+    fun importLineage(dataType: String, data: ByteArray, name: String, note: String?): Long
 }

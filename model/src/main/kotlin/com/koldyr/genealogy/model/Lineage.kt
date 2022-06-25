@@ -30,8 +30,8 @@ class Lineage() {
     @Column(name = "LINEAGE_ID")
     var id: Long? = null
 
-    @Column(name = "LINEAGE_NAME")
-    var name: String? = null
+    @Column(name = "LINEAGE_NAME", nullable = false)
+    var name: String = ""
 
     var note: String? = null
 

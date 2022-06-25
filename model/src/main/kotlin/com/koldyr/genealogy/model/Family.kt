@@ -86,8 +86,7 @@ class Family() {
     }
 
     fun removeEvent(eventId: Long) {
-        val event = events.find { it.id == eventId }
-        if (event != null) {
+        events.find { it.id == eventId }?.let { event ->
             events.remove(event)
             event.family = null
         }

@@ -1,10 +1,11 @@
 CREATE TABLE IF NOT EXISTS T_LINEAGE
 (
-    LINEAGE_ID   INTEGER not null,
-    LINEAGE_NAME VARCHAR(256),
+    LINEAGE_ID   INTEGER      not null,
+    LINEAGE_NAME VARCHAR(256) not null,
     NOTE         VARCHAR(256),
-    USER_ID      INTEGER not null,
-    constraint PK_LINEAGE PRIMARY KEY (LINEAGE_ID)
+    USER_ID      INTEGER      not null,
+    constraint PK_LINEAGE PRIMARY KEY (LINEAGE_ID),
+    constraint UC_LINEAGE UNIQUE (LINEAGE_NAME, USER_ID)
 );
 create sequence SEQ_LINEAGE start with 1;
 
