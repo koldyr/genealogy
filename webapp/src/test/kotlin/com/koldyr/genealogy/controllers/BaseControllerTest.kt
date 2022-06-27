@@ -71,13 +71,19 @@ abstract class BaseControllerTest {
 
     protected val baseUrl = "/api/lineage"
 
-    protected fun createPersonModel(gender: Gender, id: Long? = null): Person {
-        val person = if (id == null ) Person() else Person(id)
+    protected fun createPersonModel(gender: Gender): Person {
+        val person = Person()
         person.name = PersonNames(createRandomWord(), createRandomWord(), createRandomWord(), null)
         person.gender = gender
         person.place = createRandomWord()
         person.occupation = createRandomWord()
         person.note = createRandomWord()
+        return person
+    }
+
+    protected fun createPersonModel(gender: Gender, id: Long): Person {
+        val person = createPersonModel(gender)
+        person.id = id
         person.events.add(newLifeEvent(Birth, 1990))
         return person
     }
