@@ -3,9 +3,17 @@ package com.koldyr.genealogy.export
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import java.time.LocalDate
+import org.apache.commons.lang3.RandomStringUtils.*
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import com.koldyr.genealogy.importer.Importer
+import com.koldyr.genealogy.model.EventType
+import com.koldyr.genealogy.model.Family
+import com.koldyr.genealogy.model.Gender
+import com.koldyr.genealogy.model.Lineage
+import com.koldyr.genealogy.model.Person
+import com.koldyr.genealogy.model.PersonEvent
+import com.koldyr.genealogy.model.PersonNames
 
 /**
  * Description of class BaseExpImpTest
@@ -46,57 +54,92 @@ abstract class BaseExpImpTest {
 
     protected abstract fun getExporter(): Exporter
 
-    private fun createLineage(): com.koldyr.genealogy.model.Lineage {
-        val events1 = mutableSetOf(
-            com.koldyr.genealogy.model.PersonEvent(com.koldyr.genealogy.model.EventType.Birth, null, LocalDate.of(1960, 10, 10), "place11", null),
-            com.koldyr.genealogy.model.PersonEvent(
-                com.koldyr.genealogy.model.EventType.Education,
-                com.koldyr.genealogy.model.EventPrefix.After,
-                LocalDate.of(1970, 1, 1),
-                "place12",
-                null
+    private fun createLineage(): Lineage {
+        val personIds = LongArray(100) { i -> 1000 + i.toLong() }.iterator()
+        val familyIds = LongArray(100) { i -> 2000 + i.toLong() }.iterator()
+
+        val husband = createPerson(Gender.MALE, personIds.next())
+        val wife = createPerson(Gender.FEMALE, personIds.next())
+        val children1 = listOf(
+            createPerson(Gender.FEMALE, personIds.next()),
+            createPerson(Gender.MALE, personIds.next())
+        )
+        val family1 = newFamily(familyIds, wife, husband, children1)
+
+        val family2 = newFamily(familyIds,
+            children1.get(0),
+            createPerson(Gender.MALE, personIds.next()),
+            listOf(
+                createPerson(Gender.FEMALE, personIds.next()),
+                createPerson(Gender.MALE, personIds.next())
             )
         )
-        val name1 = com.koldyr.genealogy.model.PersonNames("p1_name", "p1_middle", "p1_last", "p1_maiden")
-        val person1 = com.koldyr.genealogy.model.Person(1, name1, events1, "place1", "occupation1", "person1\nnote", com.koldyr.genealogy.model.Gender.FEMALE, 1)
 
-        val events2 = mutableSetOf(
-            com.koldyr.genealogy.model.PersonEvent(com.koldyr.genealogy.model.EventType.Birth, null, LocalDate.of(1970, 10, 10), "place21", "person2 birth\nnotes"),
-            com.koldyr.genealogy.model.PersonEvent(
-                com.koldyr.genealogy.model.EventType.Christening,
-                com.koldyr.genealogy.model.EventPrefix.About,
-                LocalDate.of(1980, 1, 1),
-                "place22",
-                null
+        val family3 = newFamily(familyIds,
+            createPerson(Gender.FEMALE, personIds.next()),
+            children1.get(1),
+            listOf(
+                createPerson(Gender.FEMALE, personIds.next()),
+                createPerson(Gender.MALE, personIds.next())
             )
         )
-        val name2 = com.koldyr.genealogy.model.PersonNames("p2_name", "p2_middle", "p2_last", null)
-        val person2 = com.koldyr.genealogy.model.Person(2, name2, events2, "place2", "occupation2", "note2\nnote2n", com.koldyr.genealogy.model.Gender.MALE, 1)
 
-        val events3 = mutableSetOf(
-            com.koldyr.genealogy.model.PersonEvent(com.koldyr.genealogy.model.EventType.Birth, null, LocalDate.of(1995, 10, 10), "place21", null)
-        )
-        val name3 = com.koldyr.genealogy.model.PersonNames("p3_name", "p3_middle", "p3_last", null)
-        val person3 = com.koldyr.genealogy.model.Person(3, name3, events3, "place3", "occupation3", "note3", com.koldyr.genealogy.model.Gender.MALE, 1)
+        val families = setOf(family1, family2, family3)
+        val persons = families
+            .map {
+                val family = mutableSetOf(it.wife, it.husband)
+                family.addAll(it.children)
+                family
+            }
+            .flatten()
+            .filterNotNull()
+            .toSet()
 
-        val familyEvents = mutableSetOf(
-            com.koldyr.genealogy.model.FamilyEvent(com.koldyr.genealogy.model.EventType.Engagement, null, LocalDate.of(1990, 10, 10), "place21", null),
-            com.koldyr.genealogy.model.FamilyEvent(com.koldyr.genealogy.model.EventType.Marriage, null, LocalDate.of(1991, 10, 10), "place21", null)
-        )
-
-        val family = com.koldyr.genealogy.model.Family(1)
-        family.wife = person1
-        family.husband = person2
-        family.children.add(person3)
-        family.events.addAll(familyEvents)
-
-        val persons = setOf(person1, person2, person3)
-        val families = setOf(family)
-
-        return com.koldyr.genealogy.model.Lineage(persons, families)
+        val lineage = Lineage(persons, families, true)
+        lineage.name = "Test Lineage"
+        lineage.note = "Test Lineage"
+        return lineage
     }
 
-    private fun assertPerson(expected: com.koldyr.genealogy.model.Person?, actual: com.koldyr.genealogy.model.Person?) {
+    private fun createRandomWord(): String {
+        return randomAlphabetic(10)
+    }
+
+    private fun createPerson(gender: Gender, id: Long): Person {
+        val person = Person(id)
+        person.name = PersonNames(createRandomWord(), createRandomWord(), createRandomWord(), null)
+        person.gender = gender
+        person.place = createRandomWord()
+        person.occupation = createRandomWord()
+        person.note = createRandomWord()
+        person.events.add(createLifeEvent(EventType.Birth, 1990))
+        return person
+    }
+
+    private fun createLifeEvent(type: EventType, startYear: Int): PersonEvent {
+        val year = (startYear..startYear + 20).random()
+        val month = (1..12).random()
+        val day = (1..28).random()
+        val place = (1..100_000).random()
+        val note = (1..100_000).random()
+        return PersonEvent(type, null, LocalDate.of(year, month, day), "place $place", "note $note")
+    }
+
+    private fun newFamily(familyIds: LongIterator, wife: Person, husband: Person, children: List<Person>): Family {
+        val family = Family(familyIds.next())
+        family.wife = wife
+        family.husband = husband
+        family.children.addAll(children)
+        family.events.add(createLifeEvent(EventType.Marriage, 2020).toFamilyEvent())
+
+        wife.familyId = family.id
+        husband.familyId = family.id
+        children.forEach { it.parentFamilyId = family.id }
+
+        return family
+    }
+
+    private fun assertPerson(expected: Person?, actual: Person?) {
         Assertions.assertEquals(expected!!.name, actual!!.name)
         Assertions.assertEquals(expected.gender, actual.gender)
         Assertions.assertEquals(expected.place, actual.place)
