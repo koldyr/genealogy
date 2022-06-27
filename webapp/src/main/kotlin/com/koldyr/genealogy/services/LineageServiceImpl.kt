@@ -1,6 +1,6 @@
 package com.koldyr.genealogy.services
 
-import java.util.UUID
+import java.util.*
 import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
@@ -69,9 +69,9 @@ class LineageServiceImpl(
         lineage.persons = setOf()
 
         lineage.name = name
-        lineage.note = note
+        note?.let { lineage.note = note }
         lineage.user = userService.currentUser()
-        lineageRepository.save(lineage)
+        lineageRepository.saveAndFlush(lineage)
 
         persons.forEach { person ->
             person.lineageId = lineage.id
@@ -79,7 +79,7 @@ class LineageServiceImpl(
 
             importRepository.save(person)
         }
-        
+
         families.forEach { family ->
             family.lineageId = lineage.id
             family.user = lineage.user!!

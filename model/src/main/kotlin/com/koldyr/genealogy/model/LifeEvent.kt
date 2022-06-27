@@ -98,6 +98,16 @@ open class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
         return event
     }
 
+    fun toFamilyEvent(): FamilyEvent {
+        val event = FamilyEvent(type)
+        event.id = this.id
+        event.date = this.date
+        event.prefix = this.prefix
+        event.place = this.place
+        event.note = this.note
+        return event
+    }
+
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false

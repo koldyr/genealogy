@@ -20,7 +20,8 @@ data class FamilyDTO(
         family.id,
         family.husband?.id,
         family.wife?.id,
-        family.children.map { it.id!! }.toSet()
+        family.children.map { it.id!! }.toSet(),
+        family.events.map { it.id!! }.toSet()
     )
 
     override fun toString(): String {

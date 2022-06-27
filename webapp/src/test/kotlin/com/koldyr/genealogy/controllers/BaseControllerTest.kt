@@ -20,8 +20,8 @@ import com.koldyr.genealogy.Genealogy
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.dto.LineageDTO
 import com.koldyr.genealogy.model.Credentials
-import com.koldyr.genealogy.model.EventPrefix
 import com.koldyr.genealogy.model.EventType
+import com.koldyr.genealogy.model.EventType.*
 import com.koldyr.genealogy.model.FamilyEvent
 import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.Person
@@ -71,15 +71,24 @@ abstract class BaseControllerTest {
 
     protected val baseUrl = "/api/lineage"
 
-    protected fun createPersonModel(gender: Gender): Person {
-        val person = Person()
+    protected fun createPersonModel(gender: Gender, id: Long? = null): Person {
+        val person = if (id == null ) Person() else Person(id)
         person.name = PersonNames(createRandomWord(), createRandomWord(), createRandomWord(), null)
         person.gender = gender
         person.place = createRandomWord()
         person.occupation = createRandomWord()
         person.note = createRandomWord()
-
+        person.events.add(newLifeEvent(Birth, 1990))
         return person
+    }
+
+    protected fun newLifeEvent(type: EventType, startYear: Int): PersonEvent {
+        val year = (startYear..startYear + 20).random()
+        val month = (1..12).random()
+        val day = (1..28).random()
+        val place = (1..100_000).random()
+        val note = (1..100_000).random()
+        return PersonEvent(type, null, LocalDate.of(year, month, day), "place $place", "note $note")
     }
 
     protected fun createUser(): User {
@@ -139,12 +148,12 @@ abstract class BaseControllerTest {
     }
 
     protected fun createPersonEventModel(): PersonEvent {
-        return PersonEvent(EventType.Birth, EventPrefix.About, LocalDate.now(),
+        return PersonEvent(Birth, null, LocalDate.now(),
             createRandomWord(), createRandomWord())
     }
 
     protected fun createFamilyEventModel(): FamilyEvent {
-        return FamilyEvent(EventType.Birth, EventPrefix.About, LocalDate.now(),
+        return FamilyEvent(Marriage, null, LocalDate.now(),
             createRandomWord(), createRandomWord());
     }
 
