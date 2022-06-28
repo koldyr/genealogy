@@ -9,6 +9,7 @@ import com.koldyr.genealogy.importer.ImporterFactory
 import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.persistence.ImportRepository
 import com.koldyr.genealogy.persistence.LineageRepository
+import com.koldyr.genealogy.persistence.PersonRepository
 
 /**
  * Description of class LineageServiceImpl
@@ -20,6 +21,7 @@ import com.koldyr.genealogy.persistence.LineageRepository
 class LineageServiceImpl(
     private val lineageRepository: LineageRepository,
     private val importRepository: ImportRepository,
+    private val personRepository: PersonRepository,
     private val userService: UserService,
 ) : LineageService {
 
@@ -56,6 +58,15 @@ class LineageServiceImpl(
 
     override fun delete(lineageId: Long) {
         val entity = findAndCheck(lineageId)
+
+        val persons = entity.persons
+        persons.forEach {
+            it.parentFamilyId = null
+            it.familyId = null
+        }
+        personRepository.saveAll(persons)
+        personRepository.flush()
+
         lineageRepository.delete(entity)
     }
 

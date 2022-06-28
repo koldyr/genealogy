@@ -1,5 +1,7 @@
 package com.koldyr.genealogy
 
+import ma.glasnost.orika.MapperFacade
+import ma.glasnost.orika.impl.DefaultMapperFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -32,8 +34,6 @@ import com.koldyr.genealogy.services.PersonService
 import com.koldyr.genealogy.services.PersonServiceImpl
 import com.koldyr.genealogy.services.UserService
 import com.koldyr.genealogy.services.UserServiceImpl
-import ma.glasnost.orika.MapperFacade
-import ma.glasnost.orika.impl.DefaultMapperFactory
 
 
 /**
@@ -77,7 +77,7 @@ class GenealogyConfig {
         importRepository: ImportRepository,
         lineageRepository: LineageRepository
     ): LineageService {
-        return LineageServiceImpl(lineageRepository, importRepository, userService)
+        return LineageServiceImpl(lineageRepository, importRepository, personRepository, userService)
     }
 
     @Bean

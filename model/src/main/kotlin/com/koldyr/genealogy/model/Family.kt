@@ -48,7 +48,7 @@ class Family() {
     @JsonDeserialize(using = PersonIdDeserializer::class)
     var wife: Person? = null
 
-    @OneToMany(cascade = [PERSIST, MERGE, REFRESH])
+    @OneToMany(cascade = [PERSIST, MERGE, REFRESH], orphanRemoval = true)
     @JoinTable(
             name = "T_CHILDREN",
             joinColumns = [JoinColumn(name = "family_id", referencedColumnName = "family_id")],

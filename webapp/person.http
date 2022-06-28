@@ -109,11 +109,3 @@ Accept: application/json
 {
   "name": "p3"
 }
-
-### Import Lineage
-POST http://{{server}}/api/lineage/import
-Authorization: Bearer {{authToken}}
-Content-Type: application/json
-Lineage-Name: Galitskie
-
-< ../galitskie.json

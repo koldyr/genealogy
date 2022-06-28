@@ -291,7 +291,7 @@ fun main(args: Array<String>) {
     val lineage: Lineage
     val fileName = if (args.isEmpty()) null else args[0]
     if (fileName == null) {
-        lineage = Lineage(setOf(), setOf())
+        lineage = Lineage()
     } else {
         val file = File(fileName)
         val parser = ImporterFactory.create(file)

@@ -92,4 +92,8 @@ class Lineage() {
             .findFirst()
             .orElse(null)
     }
+
+    override fun toString(): String {
+        return "name=$name, note=$note, persons=${persons.size}, families=${families.size}"
+    }
 }

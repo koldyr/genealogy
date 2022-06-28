@@ -9,6 +9,7 @@ CREATE TABLE IF NOT EXISTS T_LINEAGE
 );
 create sequence SEQ_LINEAGE start with 1;
 
+
 CREATE TABLE IF NOT EXISTS T_PERSON
 (
     PERSON_ID        INTEGER      not null,
@@ -24,8 +25,8 @@ CREATE TABLE IF NOT EXISTS T_PERSON
     PHOTO            BYTEA,
     PARENT_FAMILY_ID INTEGER,
     FAMILY_ID        INTEGER,
+    LINEAGE_ID       INTEGER,
     USER_ID          INTEGER      not null,
-    LINEAGE_ID       INTEGER      not null,
     constraint PK_PERSON PRIMARY KEY (PERSON_ID)
 );
 create sequence SEQ_PERSON start with 1;
@@ -37,8 +38,8 @@ CREATE TABLE IF NOT EXISTS T_FAMILY
     HUSBAND_ID INTEGER,
     WIFE_ID    INTEGER,
     NOTE       VARCHAR(256),
+    LINEAGE_ID INTEGER,
     USER_ID    INTEGER not null,
-    LINEAGE_ID INTEGER not null,
     constraint PK_FAMILY PRIMARY KEY (FAMILY_ID)
 );
 create sequence SEQ_FAMILY start with 1;

@@ -1,0 +1,41 @@
+### User login
+POST http://{{server}}/api/user/login
+Content-Type: application/json
+
+{
+  "username": "me@koldyr.com",
+  "password": "koldyr"
+}
+
+### Import Lineage
+POST http://{{server}}/api/lineage/import
+Authorization: Bearer {{authToken}}
+Content-Type: text/ged
+Lineage-Name: Test Lineage GED
+
+< ../test-lineage.ged
+
+### Get all Lineages
+GET http://{{server}}/api/lineage
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### Get Lineage
+GET http://{{server}}/api/lineage/2
+Authorization: Bearer {{authToken}}
+Accept: application/json
+
+### Delete Lineage
+DELETE http://{{server}}/api/lineage/4
+Authorization: Bearer {{authToken}}
+
+### Update Lineage
+PUT http://{{server}}/api/lineage/import
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+
+{
+  "name": "",
+  "note": ""
+}
+
