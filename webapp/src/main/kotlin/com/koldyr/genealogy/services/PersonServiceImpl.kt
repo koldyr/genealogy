@@ -1,6 +1,5 @@
 package com.koldyr.genealogy.services
 
-import ma.glasnost.orika.MapperFacade
 import java.io.InputStream
 import java.io.InputStream.*
 import java.util.Objects.*
@@ -17,6 +16,7 @@ import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
+import ma.glasnost.orika.MapperFacade
 
 /**
  * Description of class PersonServiceImpl
@@ -36,8 +36,8 @@ class PersonServiceImpl(
 
     override fun findAll(lineageId: Long): List<Person> = personRepository.findAllByUserAndLineageId(userService.currentUser(), lineageId)
 
-    override fun search(criteria: SearchDTO): PageResultDTO<Person> {
-        val filter = predicateBuilder.personFilter(criteria, userService.currentUser().id!!)
+    override fun search(lineageId: Long, criteria: SearchDTO): PageResultDTO<Person> {
+        val filter = predicateBuilder.personFilter(lineageId, criteria, userService.currentUser().id!!)
 
         val page = criteria.page?.index ?: 0
         val size = criteria.page?.size ?: 100

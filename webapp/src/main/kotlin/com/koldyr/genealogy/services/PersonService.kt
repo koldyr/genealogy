@@ -14,7 +14,7 @@ import com.koldyr.genealogy.model.PersonEvent
  */
 interface PersonService {
     fun findAll(lineageId: Long): List<Person>
-    fun search(criteria: SearchDTO): PageResultDTO<Person>
+    fun search(lineageId: Long, criteria: SearchDTO): PageResultDTO<Person>
 
     fun create(person: Person): Long
     fun findById(personId: Long): Person

@@ -25,7 +25,7 @@ import com.koldyr.genealogy.model.User
  */
 class PredicateBuilder {
 
-    fun personFilter(criteria: SearchDTO, userId: Long): Specification<Person>? {
+    fun personFilter(lineageId: Long, criteria: SearchDTO, userId: Long): Specification<Person>? {
         if (!hasCriteria(criteria)) {
             return null
         }
@@ -66,8 +66,8 @@ class PredicateBuilder {
 
             val global = criteria.global ?: false
             if (!global) {
-                val predicate = builder.equal(person.get<User>("user").get<Int>("id"), userId)
-                filters.add(predicate)
+                filters.add(builder.equal(person.get<User>("user").get<Long>("id"), userId))
+                filters.add(builder.equal(person.get<Long>("lineageId"), lineageId))
             }
 
             builder.and(*filters.toTypedArray())

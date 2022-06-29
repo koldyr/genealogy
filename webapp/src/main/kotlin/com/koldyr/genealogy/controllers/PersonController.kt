@@ -38,7 +38,7 @@ import com.koldyr.genealogy.services.PersonService
 class PersonController(private val personService: PersonService) {
 
     @PostMapping("/{lineageId}/persons/search", consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])
-    fun search(@PathVariable lineageId: Long, @RequestBody criteria: SearchDTO): PageResultDTO<Person> = personService.search(criteria)
+    fun search(@PathVariable lineageId: Long, @RequestBody criteria: SearchDTO): PageResultDTO<Person> = personService.search(lineageId, criteria)
 
     @GetMapping("/{lineageId}/persons", produces = [APPLICATION_JSON_VALUE])
     fun persons(@PathVariable lineageId: Long): Collection<Person> = personService.findAll(lineageId)
