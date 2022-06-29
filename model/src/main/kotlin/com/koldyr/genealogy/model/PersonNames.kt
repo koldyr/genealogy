@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.model
 
+import java.util.*
 import java.util.function.Predicate
 import javax.persistence.Embeddable
 
@@ -57,5 +58,16 @@ class PersonNames() : Cloneable {
 
     fun search(checkFn: Predicate<String?>): Boolean {
         return checkFn.test(first) || checkFn.test(middle) || checkFn.test(last) || checkFn.test(maiden)
+    }
+
+    fun toUiString(): CharSequence {
+        val names = StringJoiner(" ")
+            .add(last)
+            .add(first)
+            .add(middle)
+        if (maiden != null) {
+            names.add(" ($maiden)")
+        }
+        return names.toString()
     }
 }
