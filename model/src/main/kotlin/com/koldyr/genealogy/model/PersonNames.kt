@@ -1,6 +1,5 @@
 package com.koldyr.genealogy.model
 
-import java.util.StringJoiner
 import java.util.function.Predicate
 import javax.persistence.Embeddable
 
@@ -24,10 +23,6 @@ class PersonNames() : Cloneable {
         this.middle = middle
         this.last = last
         this.maiden = maiden
-    }
-
-    fun search(checkFn: Predicate<String?>): Boolean {
-        return checkFn.test(first) || checkFn.test(middle) || checkFn.test(last) || checkFn.test(maiden)
     }
 
     public override fun clone(): PersonNames {
@@ -56,18 +51,11 @@ class PersonNames() : Cloneable {
         return result
     }
 
-    fun toUiString(): CharSequence {
-        val names = StringJoiner(" ")
-            .add(last)
-            .add(first)
-            .add(middle)
-        if (maiden != null) {
-            names.add(" ($maiden)")
-        }
-        return names.toString()
-    }
-
     override fun toString(): String {
         return "PersonNames(first=$first, last=$last)"
+    }
+
+    fun search(checkFn: Predicate<String?>): Boolean {
+        return checkFn.test(first) || checkFn.test(middle) || checkFn.test(last) || checkFn.test(maiden)
     }
 }

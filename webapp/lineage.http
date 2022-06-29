@@ -39,3 +39,7 @@ Content-Type: application/json
   "note": ""
 }
 
+### Export Lineage
+GET http://{{server}}/api/lineage/2/export
+Authorization: Bearer {{authToken}}
+Accept: text/ged

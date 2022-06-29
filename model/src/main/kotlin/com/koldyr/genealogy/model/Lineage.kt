@@ -80,17 +80,11 @@ class Lineage() {
     }
 
     fun findFamily(id: Long?): Family? {
-        return families.stream()
-            .filter { it.id == id }
-            .findFirst()
-            .orElse(null)
+        return families.find { it.id == id }
     }
 
     fun findPerson(id: Long?): Person? {
-        return persons.stream()
-            .filter { it.id == id }
-            .findFirst()
-            .orElse(null)
+        return persons.find { it.id == id }
     }
 
     override fun toString(): String {

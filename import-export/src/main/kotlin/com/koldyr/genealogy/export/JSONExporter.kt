@@ -1,12 +1,11 @@
 package com.koldyr.genealogy.export
 
 import java.io.OutputStream
-import java.nio.file.Files
+import java.nio.file.Files.*
 import java.nio.file.Path
-import com.fasterxml.jackson.annotation.JsonInclude.Include
+import com.fasterxml.jackson.annotation.JsonInclude.*
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature.INDENT_OUTPUT
-import com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
+import com.fasterxml.jackson.databind.SerializationFeature.*
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.koldyr.genealogy.model.Lineage
@@ -22,7 +21,9 @@ class JSONExporter : Exporter {
     }
 
     override fun export(lineage: Lineage, file: Path) {
-        export(lineage, Files.newOutputStream(file))
+        newOutputStream(file).use {
+            export(lineage, it)
+        }
     }
 
     private fun mapper(): ObjectMapper {

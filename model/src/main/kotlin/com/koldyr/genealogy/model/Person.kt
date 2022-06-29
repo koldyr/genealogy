@@ -99,20 +99,6 @@ class Person() : Cloneable {
         this.familyId = family
     }
 
-    fun findEvent(type: EventType): LifeEvent? {
-        return events.firstOrNull { it.type == type }
-    }
-
-    fun search(checkFn: Predicate<String?>): Boolean {
-        return checkFn.test(note)
-                || checkFn.test(occupation)
-                || checkFn.test(place)
-                || checkFn.test(note)
-                || checkFn.test(gender.name)
-                || (if (name == null) false else name!!.search(checkFn))
-                || checkEvents(checkFn)
-    }
-
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (other !is Person) return false
@@ -126,6 +112,24 @@ class Person() : Cloneable {
 
     public override fun clone(): Person {
         return super.clone() as Person;
+    }
+
+    override fun toString(): String {
+        return "Person(id=$id, name=$name, place=$place, occupation=$occupation, note=$note, gender=$gender)"
+    }
+
+    fun findEvent(type: EventType): LifeEvent? {
+        return events.firstOrNull { it.type == type }
+    }
+
+    fun search(checkFn: Predicate<String?>): Boolean {
+        return checkFn.test(note)
+                || checkFn.test(occupation)
+                || checkFn.test(place)
+                || checkFn.test(note)
+                || checkFn.test(gender.name)
+                || (if (name == null) false else name!!.search(checkFn))
+                || checkEvents(checkFn)
     }
 
     private fun checkEvents(checkFn: Predicate<String?>): Boolean {
@@ -142,9 +146,5 @@ class Person() : Cloneable {
             events.remove(it)
             it.person = null
         }
-    }
-
-    override fun toString(): String {
-        return "Person(id=$id, name=$name, place=$place, occupation=$occupation, note=$note, gender=$gender)"
     }
 }

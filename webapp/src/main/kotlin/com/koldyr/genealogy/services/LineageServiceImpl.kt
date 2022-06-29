@@ -1,10 +1,12 @@
 package com.koldyr.genealogy.services
 
+import java.io.ByteArrayOutputStream
 import java.util.*
 import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import com.koldyr.genealogy.dto.LineageDTO
+import com.koldyr.genealogy.export.ExporterFactory
 import com.koldyr.genealogy.importer.ImporterFactory
 import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.persistence.ImportRepository
@@ -99,6 +101,16 @@ class LineageServiceImpl(
         }
 
         return lineage.id!!
+    }
+
+    override fun exportLineage(lineageId: Long, dataType: String): ByteArray {
+        val lineage = findAndCheck(lineageId)
+        val importer = ExporterFactory.create(dataType)
+
+        val output = ByteArrayOutputStream()
+        importer.export(lineage, output)
+
+        return output.toByteArray()
     }
 
     private fun findAndCheck(lineageId: Long): Lineage {

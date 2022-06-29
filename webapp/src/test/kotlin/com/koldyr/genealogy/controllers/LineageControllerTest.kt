@@ -10,7 +10,6 @@ import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
-import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.dto.LineageDTO
 import com.koldyr.genealogy.model.EventType.*
 import com.koldyr.genealogy.model.Family
@@ -30,12 +29,13 @@ var mainLineageId: Long? = null
 class LineageControllerTest : BaseControllerTest() {
 
     @Test
-    fun importLineage() {
+    fun importExport() {
         val lineage = newLineage()
 
         val location = mockMvc.post("$baseUrl/import") {
             header(AUTHORIZATION, getBearerToken())
             header("Lineage-Name", lineage.name)
+            header("Lineage-Note", lineage.note!!)
             content = mapper.writeValueAsString(lineage)
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
@@ -45,10 +45,10 @@ class LineageControllerTest : BaseControllerTest() {
                 status { isCreated() }
                 header { string(LOCATION, Matchers.matchesRegex("$baseUrl/\\d+")) }
             }.andReturn().response.getHeader(LOCATION)
-        val id = getLastIdFromLocation(location)
-        assertNotNull(id)
+        lineage.id = getLastIdFromLocation(location)
+        assertNotNull(lineage.id)
 
-        var content = mockMvc.get("$baseUrl/$id/families") {
+        val content = mockMvc.get("$baseUrl/${lineage.id}/export") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
@@ -59,21 +59,12 @@ class LineageControllerTest : BaseControllerTest() {
             }
             .andReturn().response.contentAsString
 
-        val families: List<FamilyDTO> = mapper.readValue(content, jacksonTypeRef())
-        assertEquals(3, families.size)
-
-        content = mockMvc.get("$baseUrl/$id/persons") {
-            header(AUTHORIZATION, getBearerToken())
-            accept = APPLICATION_JSON
-        }
-//            .andDo { print() }
-            .andExpect {
-                status { isOk() }
-                content { contentType(APPLICATION_JSON) }
-            }
-            .andReturn().response.contentAsString
-        val persons: List<Person> = mapper.readValue(content, jacksonTypeRef())
-        assertEquals(10, persons.size)
+        val result: Lineage = mapper.readValue(content, jacksonTypeRef())
+        assertEquals(lineage.id, result.id)
+        assertEquals(lineage.name, result.name)
+        assertEquals(lineage.note, result.note)
+        assertEquals(lineage.families.size, result.families.size)
+        assertEqualsPersons(lineage.persons, result.persons)
     }
 
     @Test
@@ -255,5 +246,22 @@ class LineageControllerTest : BaseControllerTest() {
         children.forEach { it.parentFamilyId = family.id }
 
         return family
+    }
+
+    private fun assertEqualsPersons(persons1: Set<Person>, persons2: Set<Person>) {
+        persons1.forEach { person1 ->
+            val person2 = persons2.first { person2 -> person2.name == person1.name }
+            assertEqualsPerson(person1, person2)
+        }
+    }
+
+    private fun assertEqualsPerson(person1: Person, person2: Person) {
+        assertEquals(person1.gender, person2.gender)
+        assertEquals(person1.note, person2.note)
+        assertEquals(person1.place, person2.place)
+        assertEquals(person1.occupation, person2.occupation)
+        assertEquals(person1.events, person2.events.onEach { it.id = null })
+        assertEquals(person1.photo, person2.photo)
+        assertEquals(person1.photoUrl, person2.photoUrl)
     }
 }

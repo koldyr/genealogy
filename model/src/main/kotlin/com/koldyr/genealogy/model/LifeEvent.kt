@@ -23,6 +23,8 @@ import com.koldyr.genealogy.model.converter.EventTypeConverter
 
 /**
  * Description of class LifeEvent
+ *
+ * @author d.halitski@gmail.com
  * @created: 2019-10-26
  */
 @MappedSuperclass
@@ -80,32 +82,8 @@ open class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
         return date!!.compareTo(other.date)
     }
 
-    fun search(checkFn: Predicate<String?>): Boolean {
-        return checkFn.test(type.name) || checkFn.test(prefix?.name) || checkFn.test(date?.toString()) || checkFn.test(place) || checkFn.test(note)
-    }
-
     public override fun clone(): LifeEvent {
         return super.clone() as LifeEvent
-    }
-
-    fun toPersonEvent(): PersonEvent {
-        val event = PersonEvent(type)
-        event.id = this.id
-        event.date = this.date
-        event.prefix = this.prefix
-        event.place = this.place
-        event.note = this.note
-        return event
-    }
-
-    fun toFamilyEvent(): FamilyEvent {
-        val event = FamilyEvent(type)
-        event.id = this.id
-        event.date = this.date
-        event.prefix = this.prefix
-        event.place = this.place
-        event.note = this.note
-        return event
     }
 
     override fun equals(other: Any?): Boolean {
@@ -136,5 +114,29 @@ open class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
 
     override fun toString(): String {
         return "LifeEvent(id=$id, type=$type, prefix=$prefix, date=$date, place=$place)"
+    }
+
+    fun search(checkFn: Predicate<String?>): Boolean {
+        return checkFn.test(type.name) || checkFn.test(prefix?.name) || checkFn.test(date?.toString()) || checkFn.test(place) || checkFn.test(note)
+    }
+
+    fun toPersonEvent(): PersonEvent {
+        val event = PersonEvent(type)
+        event.id = this.id
+        event.date = this.date
+        event.prefix = this.prefix
+        event.place = this.place
+        event.note = this.note
+        return event
+    }
+
+    fun toFamilyEvent(): FamilyEvent {
+        val event = FamilyEvent(type)
+        event.id = this.id
+        event.date = this.date
+        event.prefix = this.prefix
+        event.place = this.place
+        event.note = this.note
+        return event
     }
 }

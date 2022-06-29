@@ -39,6 +39,8 @@ import com.koldyr.genealogy.ui.SearchPersonPanel
 
 /**
  * Description of class GenealogyApp
+ *
+ * @author d.halitski@gmail.com
  * @created: 2019-10-27
  */
 class GenealogyApp : JFrame, ActionListener {

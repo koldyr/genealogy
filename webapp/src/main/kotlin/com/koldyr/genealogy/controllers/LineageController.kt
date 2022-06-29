@@ -61,14 +61,24 @@ class LineageController(private val lineageService: LineageService) {
 
     @PostMapping("/import", consumes = [APPLICATION_JSON_VALUE, TEXT_CSV, TEXT_GED])
     fun importLineage(
-        @RequestHeader("Content-Type") fileType: String,
+        @RequestHeader("Content-Type") dataType: String,
         @RequestHeader("Lineage-Name") name: String,
         @RequestHeader("Lineage-Note", required = false) note: String?,
         @RequestBody lineage: ByteArray
     ): ResponseEntity<Unit> {
-        val lineageId = lineageService.importLineage(fileType, lineage, name, note)
+        val lineageId = lineageService.importLineage(dataType, lineage, name, note)
 
         val uri = URI.create("/api/lineage/${lineageId}")
         return created(uri).build()
+    }
+
+    @GetMapping("/{lineageId}/export", produces = [APPLICATION_JSON_VALUE, TEXT_CSV, TEXT_GED])
+    fun exportLineage(
+        @PathVariable lineageId: Long,
+        @RequestHeader("Accept") dataType: String,
+    ): ResponseEntity<ByteArray> {
+        val lineage: ByteArray = lineageService.exportLineage(lineageId, dataType)
+
+        return ok(lineage)
     }
 }

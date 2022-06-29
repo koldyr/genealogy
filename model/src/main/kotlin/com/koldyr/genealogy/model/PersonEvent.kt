@@ -1,12 +1,12 @@
 package com.koldyr.genealogy.model
 
-import com.fasterxml.jackson.annotation.JsonIgnore
 import java.time.LocalDate
 import javax.persistence.Entity
 import javax.persistence.FetchType
 import javax.persistence.JoinColumn
 import javax.persistence.ManyToOne
 import javax.persistence.Table
+import com.fasterxml.jackson.annotation.JsonIgnore
 
 /**
  * Description of class PersonEvent
@@ -32,7 +32,7 @@ class PersonEvent() : LifeEvent() {
         this.note = note
     }
 
-    override fun clone(): PersonEvent {
+    public override fun clone(): PersonEvent {
         return super.clone() as PersonEvent
     }
 }
