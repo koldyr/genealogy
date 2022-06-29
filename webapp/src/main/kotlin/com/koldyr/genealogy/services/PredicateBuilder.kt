@@ -96,18 +96,37 @@ class PredicateBuilder {
     }
 
     private fun eventPredicate(person: Root<Person>, builder: CriteriaBuilder, event: SearchEventDTO): Predicate {
+        val eventFilters = mutableListOf<Predicate>()
+
         val eventsJoin = person.join<Person, PersonEvent>("events")
         val typePath = eventsJoin.get<EventType>("type")
 
         val eventType = EventType.parse(event.type.uppercase())
         val type = builder.equal(typePath, eventType)
+        eventFilters.add(type)
 
-        val datePath = eventsJoin.get<LocalDate>("date")
-        val from = event.dateFrom ?: LocalDate.of(1, JANUARY, 1)
-        val till = event.dateTo ?: LocalDate.of(9999, JANUARY, 1)
-        val betweenDate = builder.between(datePath, from, till)
+        if (nonNull(event.dateFrom) || nonNull(event.dateTo)) {
+            val datePath = eventsJoin.get<LocalDate>("date")
+            val from = event.dateFrom ?: LocalDate.of(1, JANUARY, 1)
+            val till = event.dateTo ?: LocalDate.of(9999, JANUARY, 1)
+            val betweenDate = builder.between(datePath, from, till)
+            val between = builder.and(type, betweenDate)
+            eventFilters.add(between)
+        }
 
-        return builder.and(type, betweenDate)
+        event.note?.let {
+            val pattern = "%${it.lowercase()}%"
+            val note = builder.like(builder.lower(eventsJoin.get("note")), pattern)
+            eventFilters.add(note)
+        }
+
+        event.place?.let {
+            val pattern = "%${it.lowercase()}%"
+            val place = builder.like(builder.lower(eventsJoin.get("place")), pattern)
+            eventFilters.add(place)
+        }
+
+        return builder.and(*eventFilters.toTypedArray())
     }
 
     private fun hasCriteria(criteria: SearchDTO?): Boolean {

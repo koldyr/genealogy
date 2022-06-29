@@ -1,7 +1,7 @@
 package com.koldyr.genealogy.controllers
 
 import java.time.LocalDate
-import java.time.Month
+import java.time.Month.*
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import org.hamcrest.Matchers
@@ -16,7 +16,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.genealogy.dto.PageResultDTO
 import com.koldyr.genealogy.dto.SearchDTO
 import com.koldyr.genealogy.dto.SearchEventDTO
-import com.koldyr.genealogy.model.EventType
+import com.koldyr.genealogy.model.EventType.*
 import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
@@ -220,13 +220,29 @@ class PersonControllerTest : BaseControllerTest() {
         assertTrue(result.size == 5)
 
         criteria = SearchDTO(event = SearchEventDTO(
-            type = EventType.Birth.getCode(),
-            dateFrom = LocalDate.of(1993, Month.JANUARY, 1),
-            dateTo = LocalDate.of(1996, Month.JANUARY, 1)
+            type = Birth.getCode(),
+            dateFrom = LocalDate.of(1993, JANUARY, 1),
+            dateTo = LocalDate.of(1996, JANUARY, 1)
         ))
         result = searchPerson(criteria)
         assertNotNull(result)
         assertTrue(result.size == 4)
+
+        criteria = SearchDTO(event = SearchEventDTO(
+            type = Birth.getCode(),
+            note = "note-8"
+        ))
+        result = searchPerson(criteria)
+        assertNotNull(result)
+        assertTrue(result.size == 1)
+
+        criteria = SearchDTO(event = SearchEventDTO(
+            type = Birth.getCode(),
+            place = "place-9"
+        ))
+        result = searchPerson(criteria)
+        assertNotNull(result)
+        assertTrue(result.size == 1)
     }
 
     private fun searchPerson(criteria: SearchDTO): List<Person> {
@@ -253,7 +269,7 @@ class PersonControllerTest : BaseControllerTest() {
         person.note = "note-$i"
         person.occupation = "occupation-$i"
         person.events.add(
-            PersonEvent(EventType.Birth, null, LocalDate.of(1990 + i, Month.JANUARY, 1), "place-$i", "note-$i")
+            PersonEvent(Birth, null, LocalDate.of(1990 + i, JANUARY, 1), "place-$i", "note-$i")
         )
         return person
     }
