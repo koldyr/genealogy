@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.services
 
+import ma.glasnost.orika.MapperFacade
 import java.io.InputStream
 import java.io.InputStream.*
 import java.util.Objects.*
@@ -16,7 +17,6 @@ import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
-import ma.glasnost.orika.MapperFacade
 
 /**
  * Description of class PersonServiceImpl
@@ -64,6 +64,7 @@ class PersonServiceImpl(
 
         person.id = persisted.id
         person.user = persisted.user
+        person.lineageId = persisted.lineageId
         mapper.map(person, persisted)
 
         personRepository.save(persisted)
@@ -116,12 +117,12 @@ class PersonServiceImpl(
         return person.photo?.inputStream() ?: nullInputStream()
     }
 
-    override fun createPhoto(personId: Long, type: String, photo: ByteArray): String {
+    override fun createPhoto(lineageId: Long, personId: Long, type: String, photo: ByteArray): String {
         val imageType = if (type.lowercase().contains("jpeg")) "jpeg" else "png"
 
         val person = findPerson(personId)
         person.photo = photo
-        person.photoUrl = "/api/lineage/1/persons/$personId/photo.$imageType"
+        person.photoUrl = "/api/lineage/$lineageId/persons/$personId/photo.$imageType"
         personRepository.save(person)
         
         return person.photoUrl!!

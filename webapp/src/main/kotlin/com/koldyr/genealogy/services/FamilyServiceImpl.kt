@@ -87,8 +87,10 @@ class FamilyServiceImpl(
     override fun update(familyId: Long, family: FamilyDTO) {
         val persisted = find(familyId)
 
+        val lineageId = persisted.lineageId
         family.id = persisted.id
         mapper.map(family, persisted)
+        persisted.lineageId = lineageId
 
         if (nonNull(persisted.husband)) {
             if (nonNull(persisted.husband?.familyId) && persisted.husband!!.familyId != persisted.id) {

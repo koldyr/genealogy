@@ -26,5 +26,5 @@ interface PersonService {
     fun deleteEvent(personId: Long, eventId: Long)
     
     fun photo(personId: Long): InputStream
-    fun createPhoto(personId: Long, type: String, photo: ByteArray): String
+    fun createPhoto(lineageId: Long, personId: Long, type: String, photo: ByteArray): String
 }

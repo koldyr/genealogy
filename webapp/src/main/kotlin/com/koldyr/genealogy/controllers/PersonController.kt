@@ -26,6 +26,8 @@ import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.services.PersonService
 
 
+const val IMAGE_JPG_VALUE = "image/jpg"
+
 /**
  * Description of class PersonController
  *
@@ -87,27 +89,27 @@ class PersonController(private val personService: PersonService) {
         return noContent().build()
     }
 
-    @PostMapping("/{lineageId}/persons/{personId}/photo", consumes = [IMAGE_JPEG_VALUE, IMAGE_PNG_VALUE])
+    @PostMapping("/{lineageId}/persons/{personId}/photo", consumes = [IMAGE_JPEG_VALUE, IMAGE_JPG_VALUE, IMAGE_PNG_VALUE])
     fun createPhoto(
         @PathVariable lineageId: Long,
         @PathVariable personId: Long,
         @RequestHeader("Content-Type") imageType: String,
         @RequestBody photo: ByteArray
     ): ResponseEntity<Unit> {
-        if (!(imageType == IMAGE_JPEG_VALUE || imageType == IMAGE_PNG_VALUE)) {
+        if (!(imageType == IMAGE_JPEG_VALUE || imageType == IMAGE_JPG_VALUE || imageType == IMAGE_PNG_VALUE)) {
             throw ResponseStatusException(BAD_REQUEST, "Supported image types: jpeg/png")
         }
         if (photo.size > 100 * 1024) {
             throw ResponseStatusException(BAD_REQUEST, "Supported image size < 100 kB")
         }
 
-        val photoUrl = personService.createPhoto(personId, imageType, photo)
+        val photoUrl = personService.createPhoto(lineageId, personId, imageType, photo)
 
         val uri = URI.create(photoUrl)
         return created(uri).build()
     }
 
-    @GetMapping("/{lineageId}/persons/{personId}/photo", produces = [IMAGE_JPEG_VALUE, IMAGE_PNG_VALUE])
+    @GetMapping("/{lineageId}/persons/{personId}/photo", produces = [IMAGE_JPEG_VALUE, IMAGE_JPG_VALUE, IMAGE_PNG_VALUE])
     @ResponseBody
     fun photo(@PathVariable lineageId: Long, @PathVariable personId: Long): ResponseEntity<Resource> {
         val personPhoto = personService.photo(personId)
