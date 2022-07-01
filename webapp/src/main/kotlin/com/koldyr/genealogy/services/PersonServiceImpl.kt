@@ -118,11 +118,9 @@ class PersonServiceImpl(
     }
 
     override fun createPhoto(lineageId: Long, personId: Long, type: String, photo: ByteArray): String {
-        val imageType = if (type.lowercase().contains("jpeg")) "jpeg" else "png"
-
         val person = findPerson(personId)
         person.photo = photo
-        person.photoUrl = "/api/lineage/$lineageId/persons/$personId/photo.$imageType"
+        person.photoUrl = "lineage/$lineageId/persons/$personId/photo"
         personRepository.save(person)
         
         return person.photoUrl!!
