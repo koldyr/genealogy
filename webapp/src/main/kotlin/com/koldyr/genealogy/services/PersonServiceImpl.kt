@@ -1,6 +1,5 @@
 package com.koldyr.genealogy.services
 
-import ma.glasnost.orika.MapperFacade
 import java.io.InputStream
 import java.io.InputStream.*
 import java.util.Objects.*
@@ -17,6 +16,7 @@ import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
+import ma.glasnost.orika.MapperFacade
 
 /**
  * Description of class PersonServiceImpl
@@ -50,6 +50,7 @@ class PersonServiceImpl(
     }
 
     override fun create(person: Person): Long {
+        person.id = null
         person.user = userService.currentUser()
         person.events.forEach { it.person = person }
 
