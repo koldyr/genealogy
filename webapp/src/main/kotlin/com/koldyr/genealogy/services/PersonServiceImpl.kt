@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.services
 
+import ma.glasnost.orika.MapperFacade
 import java.io.InputStream
 import java.io.InputStream.*
 import java.util.Objects.*
@@ -16,7 +17,6 @@ import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
-import ma.glasnost.orika.MapperFacade
 
 /**
  * Description of class PersonServiceImpl
@@ -65,6 +65,7 @@ class PersonServiceImpl(
 
         person.id = persisted.id
         person.user = persisted.user
+        person.photo = persisted.photo
         person.lineageId = persisted.lineageId
         mapper.map(person, persisted)
 
