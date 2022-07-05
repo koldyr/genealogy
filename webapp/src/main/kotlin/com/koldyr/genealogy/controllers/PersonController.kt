@@ -99,8 +99,8 @@ class PersonController(private val personService: PersonService) {
         if (!(imageType == IMAGE_JPEG_VALUE || imageType == IMAGE_JPG_VALUE || imageType == IMAGE_PNG_VALUE)) {
             throw ResponseStatusException(BAD_REQUEST, "Supported image types: jpeg/png")
         }
-        if (photo.size > 100 * 1024) {
-            throw ResponseStatusException(BAD_REQUEST, "Supported image size < 100 kB")
+        if (photo.size > 300 * 1024) {
+            throw ResponseStatusException(BAD_REQUEST, "Supported image size < 300 kB")
         }
 
         val photoUrl = personService.createPhoto(lineageId, personId, imageType, photo)
