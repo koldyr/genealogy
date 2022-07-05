@@ -1,6 +1,7 @@
 package com.koldyr.genealogy.controllers
 
 import java.net.URI
+import org.springframework.http.HttpHeaders.*
 import org.springframework.http.MediaType.*
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.*
@@ -61,7 +62,7 @@ class LineageController(private val lineageService: LineageService) {
 
     @PostMapping("/import", consumes = [APPLICATION_JSON_VALUE, TEXT_CSV, TEXT_GED])
     fun importLineage(
-        @RequestHeader("Content-Type") dataType: String,
+        @RequestHeader(CONTENT_TYPE) dataType: String,
         @RequestHeader("Lineage-Name") name: String,
         @RequestHeader("Lineage-Note", required = false) note: String?,
         @RequestBody lineage: ByteArray
@@ -75,9 +76,9 @@ class LineageController(private val lineageService: LineageService) {
     @GetMapping("/{lineageId}/export", produces = [APPLICATION_JSON_VALUE, TEXT_CSV, TEXT_GED])
     fun exportLineage(
         @PathVariable lineageId: Long,
-        @RequestHeader("Accept") dataType: String,
+        @RequestHeader(ACCEPT) dataType: String,
     ): ResponseEntity<ByteArray> {
-        val lineage: ByteArray = lineageService.exportLineage(lineageId, dataType)
+        val lineage = lineageService.exportLineage(lineageId, dataType)
 
         return ok(lineage)
     }

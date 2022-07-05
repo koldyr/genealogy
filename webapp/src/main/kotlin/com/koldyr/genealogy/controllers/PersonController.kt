@@ -3,6 +3,7 @@ package com.koldyr.genealogy.controllers
 import java.net.URI
 import org.springframework.core.io.InputStreamResource
 import org.springframework.core.io.Resource
+import org.springframework.http.HttpHeaders.*
 import org.springframework.http.HttpStatus.*
 import org.springframework.http.MediaType.*
 import org.springframework.http.ResponseEntity
@@ -48,7 +49,7 @@ class PersonController(private val personService: PersonService) {
     @PostMapping("/{lineageId}/persons", consumes = [APPLICATION_JSON_VALUE])
     fun create(@PathVariable lineageId: Long, @RequestBody person: Person): ResponseEntity<Unit> {
         person.lineageId = lineageId
-        val personId: Long = personService.create(person)
+        val personId = personService.create(person)
 
         val uri = URI.create("/api/lineage/$lineageId/persons/$personId")
         return created(uri).build()
@@ -93,7 +94,7 @@ class PersonController(private val personService: PersonService) {
     fun createPhoto(
         @PathVariable lineageId: Long,
         @PathVariable personId: Long,
-        @RequestHeader("Content-Type") imageType: String,
+        @RequestHeader(CONTENT_TYPE) imageType: String,
         @RequestBody photo: ByteArray
     ): ResponseEntity<Unit> {
         if (!(imageType == IMAGE_JPEG_VALUE || imageType == IMAGE_JPG_VALUE || imageType == IMAGE_PNG_VALUE)) {
@@ -113,9 +114,9 @@ class PersonController(private val personService: PersonService) {
     @ResponseBody
     fun photo(@PathVariable lineageId: Long, @PathVariable personId: Long): ResponseEntity<Resource> {
         val personPhoto = personService.photo(personId)
-        return status(OK)
-            .header("Content-Type", IMAGE_JPEG_VALUE)
-            .header("Content-Disposition", "inline; filename=\"avatar${personId}.jpg\"")
+        return ok()
+            .header(CONTENT_TYPE, IMAGE_JPEG_VALUE)
+            .header(CONTENT_DISPOSITION, "inline; filename=\"avatar${personId}.jpg\"")
             .body(InputStreamResource(personPhoto))
     }
 }
