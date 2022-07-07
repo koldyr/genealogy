@@ -42,7 +42,7 @@ class PersonServiceImpl(
         val page = criteria.page?.index ?: 0
         val size = criteria.page?.size ?: 100
         val direction = if (criteria.sort == null) Sort.Direction.ASC else Sort.Direction.fromString(criteria.sort!!.order)
-        val property = if (criteria.sort == null) "id" else criteria.sort!!.name
+        val property = criteria.sort?.name ?: "id"
         val pageSelector = PageRequest.of(page, size, direction, property)
 
         val result = personRepository.findAll(filter, pageSelector)
