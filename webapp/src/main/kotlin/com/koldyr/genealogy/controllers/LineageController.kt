@@ -76,7 +76,7 @@ class LineageController(private val lineageService: LineageService) {
     @GetMapping("/{lineageId}/export", produces = [APPLICATION_JSON_VALUE, TEXT_CSV, TEXT_GED])
     fun exportLineage(
         @PathVariable lineageId: Long,
-        @RequestHeader(ACCEPT) dataType: String,
+        @RequestHeader(ACCEPT, required = false) dataType: String?,
     ): ResponseEntity<ByteArray> {
         val lineage = lineageService.exportLineage(lineageId, dataType)
 

@@ -10,9 +10,9 @@ class ExporterFactory {
 
     companion object {
         @JvmStatic
-        fun create(type: String): Exporter {
-            return if (type.contains("json")) JSONExporter()
-            else if (type.contains("ged")) GEDExporter()
+        fun create(type: String?): Exporter {
+            return if (type == null || type.contains("ged")) GEDExporter()
+            else if (type.contains("json")) JSONExporter()
             else CSVExporter()
         }
     }

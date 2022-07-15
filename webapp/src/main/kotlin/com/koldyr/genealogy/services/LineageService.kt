@@ -16,5 +16,5 @@ interface LineageService {
     fun delete(lineageId: Long)
     
     fun importLineage(dataType: String, data: ByteArray, name: String, note: String?): Long
-    fun exportLineage(lineageId: Long, dataType: String): ByteArray
+    fun exportLineage(lineageId: Long, dataType: String?): ByteArray
 }
