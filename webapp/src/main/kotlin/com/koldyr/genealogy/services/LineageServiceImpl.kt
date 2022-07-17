@@ -89,16 +89,14 @@ class LineageServiceImpl(
         persons.forEach { person ->
             person.lineageId = lineage.id
             person.user = lineage.user
-
-            importRepository.save(person)
         }
+        importRepository.savePersons(persons)
 
         families.forEach { family ->
             family.lineageId = lineage.id
             family.user = lineage.user!!
-
-            importRepository.save(family)
         }
+        importRepository.saveFamilies(families)
 
         return lineage.id!!
     }

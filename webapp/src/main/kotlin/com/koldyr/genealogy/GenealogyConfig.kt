@@ -1,7 +1,5 @@
 package com.koldyr.genealogy
 
-import ma.glasnost.orika.MapperFacade
-import ma.glasnost.orika.impl.DefaultMapperFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -21,6 +19,7 @@ import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.persistence.FamilyEventRepository
 import com.koldyr.genealogy.persistence.FamilyRepository
 import com.koldyr.genealogy.persistence.ImportRepository
+import com.koldyr.genealogy.persistence.ImportRepositoryImpl
 import com.koldyr.genealogy.persistence.LineageRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
@@ -34,6 +33,8 @@ import com.koldyr.genealogy.services.PersonService
 import com.koldyr.genealogy.services.PersonServiceImpl
 import com.koldyr.genealogy.services.UserService
 import com.koldyr.genealogy.services.UserServiceImpl
+import ma.glasnost.orika.MapperFacade
+import ma.glasnost.orika.impl.DefaultMapperFactory
 
 
 /**
@@ -82,7 +83,7 @@ class GenealogyConfig {
 
     @Bean
     fun importRepository(jdbcTemplate: JdbcTemplate): ImportRepository {
-        return ImportRepository(jdbcTemplate)
+        return ImportRepositoryImpl(jdbcTemplate)
     }
 
     @Bean
