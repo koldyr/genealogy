@@ -11,9 +11,12 @@ class ExporterFactory {
     companion object {
         @JvmStatic
         fun create(type: String?): Exporter {
-            return if (type == null || type.contains("ged")) GEDExporter()
-            else if (type.contains("json")) JSONExporter()
-            else CSVExporter()
+            return when {
+                type == null || type.contains("ged") -> GEDExporter()
+                type.contains("json") -> JSONExporter()
+                type.contains("csv") -> CSVExporter()
+                else -> throw UnsupportedExportFormatException("Unsupported format $type")
+            }
         }
     }
 }

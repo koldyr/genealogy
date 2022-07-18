@@ -41,7 +41,7 @@ class GEDExporter : Exporter {
             "2 VERS 2.31\n" +
             "2 CORP Genery Software\n" +
             "3 ADDR www.genery.com\n" +
-            "1 CHAR windows-1251\n" +
+            "1 CHAR UTF-8\n" +
             "1 DATE DD MMM YYYY\n" +
             "1 GEDC\n" +
             "2 VERS 5.5\n" +

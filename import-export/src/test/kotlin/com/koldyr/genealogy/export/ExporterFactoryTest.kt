@@ -1,6 +1,6 @@
 package com.koldyr.genealogy.export
 
-import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 /**
@@ -13,15 +13,19 @@ class ExporterFactoryTest {
     @Test
     fun create() {
         var exporter = ExporterFactory.create("json")
-        Assertions.assertTrue(exporter is JSONExporter)
-
-        exporter = ExporterFactory.create("ged")
-        Assertions.assertTrue(exporter is GEDExporter)
+        assertTrue(exporter is JSONExporter)
 
         exporter = ExporterFactory.create("csv")
-        Assertions.assertTrue(exporter is CSVExporter)
+        assertTrue(exporter is CSVExporter)
 
-        exporter = ExporterFactory.create("")
-        Assertions.assertTrue(exporter is CSVExporter)
+        exporter = ExporterFactory.create("ged")
+        assertTrue(exporter is GEDExporter)
+
+        exporter = ExporterFactory.create(null)
+        assertTrue(exporter is GEDExporter)
+
+        assertThrows(UnsupportedExportFormatException::class.java) {
+            ExporterFactory.create("xml")
+        }
     }
 }
