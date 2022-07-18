@@ -1,7 +1,7 @@
 package com.koldyr.genealogy.services
 
 import java.io.ByteArrayOutputStream
-import java.util.UUID
+import java.util.*
 import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
@@ -101,6 +101,7 @@ class LineageServiceImpl(
         return lineage.id!!
     }
 
+    @Transactional(readOnly = true)
     override fun exportLineage(lineageId: Long, dataType: String?): ByteArray {
         val lineage = findAndCheck(lineageId)
         val importer = ExporterFactory.create(dataType)

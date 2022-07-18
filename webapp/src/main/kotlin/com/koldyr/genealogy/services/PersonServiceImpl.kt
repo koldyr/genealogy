@@ -26,16 +26,19 @@ import com.koldyr.genealogy.persistence.PersonRepository
  */
 @Transactional
 class PersonServiceImpl(
-        private val personRepository: PersonRepository,
-        private val personEventRepository: PersonEventRepository,
-        private val familyRepository: FamilyRepository,
-        private val mapper: MapperFacade,
-        private val userService: UserService) : PersonService {
+    private val personRepository: PersonRepository,
+    private val personEventRepository: PersonEventRepository,
+    private val familyRepository: FamilyRepository,
+    private val mapper: MapperFacade,
+    private val userService: UserService
+) : PersonService {
 
     private val predicateBuilder = PredicateBuilder()
 
+    @Transactional(readOnly = true)
     override fun findAll(lineageId: Long): List<Person> = personRepository.findAllByUserAndLineageId(userService.currentUser(), lineageId)
 
+    @Transactional(readOnly = true)
     override fun search(lineageId: Long, criteria: SearchDTO): PageResultDTO<Person> {
         val filter = predicateBuilder.personFilter(lineageId, criteria, userService.currentUser().id!!)
 
@@ -58,6 +61,7 @@ class PersonServiceImpl(
         return saved.id!!
     }
 
+    @Transactional(readOnly = true)
     override fun findById(personId: Long): Person = findPerson(personId)
 
     override fun update(personId: Long, person: Person) {
@@ -100,6 +104,7 @@ class PersonServiceImpl(
         return event.id!!
     }
 
+    @Transactional(readOnly = true)
     override fun findEvents(personId: Long): Collection<PersonEvent> {
         findPerson(personId)
         return personRepository.findEvents(personId)
@@ -114,6 +119,7 @@ class PersonServiceImpl(
         personRepository.save(person)
     }
 
+    @Transactional(readOnly = true)
     override fun photo(personId: Long): InputStream {
         val person = findPerson(personId)
         return person.photo?.inputStream() ?: nullInputStream()
@@ -124,18 +130,18 @@ class PersonServiceImpl(
         person.photo = photo
         person.photoUrl = "lineage/$lineageId/persons/$personId/photo"
         personRepository.save(person)
-        
+
         return person.photoUrl!!
     }
 
     private fun findPerson(personId: Long): Person {
         return personRepository.findById(personId)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$personId' is not found") }
+            .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$personId' is not found") }
     }
 
     private fun findPersonEvent(personEventId: Long): PersonEvent {
         return personEventRepository.findById(personEventId)
-                .orElseThrow { ResponseStatusException(NOT_FOUND, "Event with id '$personEventId' is not found") }
+            .orElseThrow { ResponseStatusException(NOT_FOUND, "Event with id '$personEventId' is not found") }
     }
 
     private fun <I> createPageResult(contentPage: Page<I>): PageResultDTO<I> {

@@ -12,6 +12,7 @@ import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
@@ -27,9 +28,10 @@ import com.koldyr.genealogy.persistence.UserRepository
  * @created: 2021-11-04
  */
 open class UserServiceImpl(
-        private val userRepository: UserRepository,
-        private val passwordEncoder: PasswordEncoder,
-        secret: String) : UserService {
+    private val userRepository: UserRepository,
+    private val passwordEncoder: PasswordEncoder,
+    secret: String
+) : UserService {
 
     @Autowired
     lateinit var authenticationManager: AuthenticationManager
@@ -39,6 +41,7 @@ open class UserServiceImpl(
 
     private val algorithm: Algorithm = Algorithm.HMAC512(secret.toByteArray())
 
+    @Transactional
     override fun createUser(userModel: User) {
         if (userModel.email.isBlank() || userModel.password.isBlank() || userModel.name.isBlank() || userModel.surName.isBlank()) {
             throw ResponseStatusException(BAD_REQUEST, "invalid data")
@@ -50,13 +53,15 @@ open class UserServiceImpl(
         userModel.password = passwordEncoder.encode(userModel.password)
         userRepository.save(userModel)
     }
-    
+
+    @Transactional(readOnly = true)
     override fun currentUser(): User {
         val username: String = SecurityContextHolder.getContext().authentication.principal.toString()
         return userRepository.findByEmail(username)
-                .orElseThrow { EntityNotFoundException() }
+            .orElseThrow { EntityNotFoundException() }
     }
 
+    @Transactional(readOnly = true)
     override fun login(credentials: Credentials): AuthenticatedUser {
         try {
             val usernamePassword = UsernamePasswordAuthenticationToken(credentials.username, credentials.password, listOf())
@@ -74,8 +79,8 @@ open class UserServiceImpl(
     private fun generateToken(username: String): String {
         val tokenLive = LocalDateTime.now().plusMinutes(expiration.toLong())
         return JWT.create()
-                .withSubject(username)
-                .withExpiresAt(Date.from(tokenLive.atZone(ZoneId.systemDefault()).toInstant()))
-                .sign(algorithm)
+            .withSubject(username)
+            .withExpiresAt(Date.from(tokenLive.atZone(ZoneId.systemDefault()).toInstant()))
+            .sign(algorithm)
     }
 }
