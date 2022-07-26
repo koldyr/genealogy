@@ -20,7 +20,10 @@ import com.koldyr.genealogy.model.Person
 class ImportRepositoryImpl(private val jdbc: JdbcTemplate) : ImportRepository {
 
     private val insertPerson = "insert into T_PERSON (PERSON_ID, PLACE, OCCUPATION, NOTE, GENDER, FIRST_NAME, MIDDLE_NAME, LAST_NAME, MAIDEN_NAME, USER_ID, LINEAGE_ID) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    private val insertPersonEvent = "insert into T_PERSON_EVENT (EVENT_ID, TYPE, PLACE, NOTE, EVENT_DATE, PERSON_ID) values (?, ?, ?, ?, ?, ?)"
+
     private val insertFamily = "insert into T_FAMILY (FAMILY_ID, HUSBAND_ID, WIFE_ID, NOTE, USER_ID, LINEAGE_ID) values (?, ?, ?, ?, ?, ?)"
+    private val insertFamilyEvent = "insert into T_FAMILY_EVENT (EVENT_ID, TYPE, PLACE, NOTE, EVENT_DATE, FAMILY_ID) values (?, ?, ?, ?, ?, ?)"
 
     override fun save(person: Person) {
         preparePerson(person)
@@ -47,10 +50,10 @@ class ImportRepositoryImpl(private val jdbc: JdbcTemplate) : ImportRepository {
     }
 
     override fun savePersons(persons: Collection<Person>) {
-        val iterator = persons.iterator()
+        val personIt = persons.iterator()
         jdbc.batchUpdate(insertPerson, object : BatchPreparedStatementSetter {
             override fun setValues(statement: PreparedStatement, i: Int) {
-                val person = iterator.next()
+                val person = personIt.next()
                 preparePerson(person)
                 personToStatement(statement, person)
             }
@@ -58,14 +61,28 @@ class ImportRepositoryImpl(private val jdbc: JdbcTemplate) : ImportRepository {
             override fun getBatchSize(): Int = persons.size
         })
 
-        persons.forEach { saveEvents(it) }
+        persons.forEach { person ->
+            person.events.forEach { it.person = person }
+        }
+
+        val events = persons.flatMap { it.events }
+        val eventsIt = events.iterator()
+        jdbc.batchUpdate(insertPersonEvent, object : BatchPreparedStatementSetter {
+            override fun setValues(statement: PreparedStatement, i: Int) {
+                val event = eventsIt.next()
+                eventToStatement(statement, event)
+                statement.setLong(6, event.person!!.id!!)
+            }
+
+            override fun getBatchSize(): Int = events.size
+        })
     }
 
     override fun saveFamilies(families: Collection<Family>) {
-        val iterator = families.iterator()
+        val familiesIt = families.iterator()
         jdbc.batchUpdate(insertFamily, object : BatchPreparedStatementSetter {
             override fun setValues(statement: PreparedStatement, i: Int) {
-                val family = iterator.next()
+                val family = familiesIt.next()
                 prepareFamily(family)
                 familyToStatement(statement, family)
             }
@@ -74,9 +91,24 @@ class ImportRepositoryImpl(private val jdbc: JdbcTemplate) : ImportRepository {
         })
 
         families.forEach { family ->
+            family.events.forEach { it.family = family }
+        }
+
+        val events = families.flatMap { it.events }
+        val eventsIt = events.iterator()
+        jdbc.batchUpdate(insertFamilyEvent, object : BatchPreparedStatementSetter {
+            override fun setValues(statement: PreparedStatement, i: Int) {
+                val event = eventsIt.next()
+                eventToStatement(statement, event)
+                statement.setLong(6, event.family!!.id!!)
+            }
+
+            override fun getBatchSize(): Int = events.size
+        })
+
+        families.forEach { family ->
             setFamilyIds(family)
             saveChildren(family)
-            saveEvents(family)
         }
     }
 
@@ -207,7 +239,7 @@ class ImportRepositoryImpl(private val jdbc: JdbcTemplate) : ImportRepository {
             it.getLong(1)
         })!!
     }
-    
+
     private fun setLong(statement: PreparedStatement, index: Int, value: Long?) {
         if (value == null) {
             statement.setNull(index, BIGINT)

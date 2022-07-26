@@ -1,5 +1,5 @@
 insert into T_USER (USER_ID, EMAIL, PASSWORD, NAME, SURNAME)
-values (next value for SEQ_USER, 'me@koldyr.com', '$2a$10$g8xdFAgZI.ZK2YsyhFSfMuyDHIlFBvRWEe25uR1G0NLR2gT0PMM9a', 'me', 'koldyr');
+values (NEXTVAL('SEQ_USER'), 'me@koldyr.com', '$2a$10$g8xdFAgZI.ZK2YsyhFSfMuyDHIlFBvRWEe25uR1G0NLR2gT0PMM9a', 'me', 'koldyr');
 
 insert into T_LINEAGE (LINEAGE_ID, LINEAGE_NAME, NOTE, USER_ID)
 values (NEXTVAL('SEQ_LINEAGE'), 'Koldyrs', 'Demo lineage', CURRVAL('SEQ_USER'));
