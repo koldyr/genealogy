@@ -18,10 +18,11 @@
         <kotlin.version>1.7.20</kotlin.version>
 
         <spring.boot.version>2.7.4</spring.boot.version>
-        <spring.version>5.3.20</spring.version>
-        <spring.security.version>5.7.0</spring.security.version>
+        <spring.version>5.3.23</spring.version>
+        <spring.security.version>5.7.3</spring.security.version>
         <jackson.version>2.13.4</jackson.version>
-        <java-jwt.version>4.0.0</java-jwt.version>
+        <jackson.databind.version>2.13.4.2</jackson.databind.version>
+        <java-jwt.version>4.1.0</java-jwt.version>
         <spring-fox.version>3.0.0</spring-fox.version>
     </properties>
 
@@ -47,7 +48,7 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
+            <version>${jackson.databind.version}</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -63,7 +64,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-text</artifactId>
-            <version>1.9</version>
+            <version>1.10.0</version>
         </dependency>
         <dependency>
             <groupId>io.github.lzh0379</groupId>
