@@ -3,9 +3,9 @@ package com.koldyr.genealogy.services
 import java.time.LocalDate
 import java.time.Month.*
 import java.util.Objects.*
-import javax.persistence.criteria.CriteriaBuilder
-import javax.persistence.criteria.Predicate
-import javax.persistence.criteria.Root
+import jakarta.persistence.criteria.CriteriaBuilder
+import jakarta.persistence.criteria.Predicate
+import jakarta.persistence.criteria.Root
 import kotlin.reflect.full.declaredMemberProperties
 import org.springframework.data.jpa.domain.Specification
 import com.koldyr.genealogy.dto.SearchDTO

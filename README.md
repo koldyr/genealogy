@@ -2,7 +2,7 @@
 Demonstration project for FrontEnd students
 
 ### Tooling
-Java 11, Kotlin 1.7, Spring-Boot 2.7.0, H2 db, Maven, Tomcat, OpenAPI
+Java 17, Kotlin 1.7, Spring-Boot 3.0.0, H2 db, Maven, Tomcat, OpenAPI
 
 ### Build
 execute: `mvn clean install`

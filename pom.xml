@@ -13,15 +13,15 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <kotlin.version>1.7.20</kotlin.version>
 
-        <spring.boot.version>2.7.4</spring.boot.version>
-        <spring.version>5.3.23</spring.version>
-        <spring.security.version>5.7.3</spring.security.version>
-        <jackson.version>2.13.4</jackson.version>
-        <jackson.databind.version>2.13.4.2</jackson.databind.version>
+        <spring.boot.version>3.0.0</spring.boot.version>
+        <spring.version>6.0.0</spring.version>
+        <spring.security.version>6.0.0</spring.security.version>
+        <jackson.version>2.14.0</jackson.version>
+        <jackson.databind.version>2.14.0</jackson.databind.version>
         <java-jwt.version>4.1.0</java-jwt.version>
         <spring-fox.version>3.0.0</spring-fox.version>
     </properties>
@@ -71,6 +71,16 @@
             <artifactId>jdatepicker</artifactId>
             <version>2.0.3</version>
         </dependency>
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.4.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.4</version>
+        </dependency>
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
@@ -97,7 +107,7 @@
                 <version>${kotlin.version}</version>
                 <configuration>
                     <nowarn>true</nowarn>
-                    <jvmTarget>11</jvmTarget>
+                    <jvmTarget>17</jvmTarget>
                     <compilerPlugins>
                         <plugin>spring</plugin>
                     </compilerPlugins>
@@ -156,10 +166,14 @@
                     </execution>
                 </executions>
             </plugin>
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.0.0-M7</version>
+                <configuration>
+                    <argLine>--add-opens java.base/java.lang=ALL-UNNAMED</argLine>
+                </configuration>
             </plugin>
         </plugins>
     </build>

@@ -1,24 +1,24 @@
 package com.koldyr.genealogy.model
 
 import java.util.function.Predicate
-import javax.persistence.AttributeOverride
-import javax.persistence.AttributeOverrides
-import javax.persistence.Basic
-import javax.persistence.CascadeType.*
-import javax.persistence.Column
-import javax.persistence.Convert
-import javax.persistence.Embedded
-import javax.persistence.Entity
-import javax.persistence.FetchType.*
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType.*
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.Lob
-import javax.persistence.ManyToOne
-import javax.persistence.OneToMany
-import javax.persistence.SequenceGenerator
-import javax.persistence.Table
+import jakarta.persistence.AttributeOverride
+import jakarta.persistence.AttributeOverrides
+import jakarta.persistence.Basic
+import jakarta.persistence.CascadeType
+import jakarta.persistence.Column
+import jakarta.persistence.Convert
+import jakarta.persistence.Embedded
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.Lob
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
+import jakarta.persistence.SequenceGenerator
+import jakarta.persistence.Table
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.koldyr.genealogy.model.converter.GenderConverter
@@ -36,7 +36,7 @@ import com.koldyr.genealogy.model.converter.GenderConverter
 class Person() : Cloneable {
 
     @Id
-    @GeneratedValue(strategy = SEQUENCE, generator = "PersonIds")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "PersonIds")
     @Column(name = "PERSON_ID")
     var id: Long? = null
 
@@ -49,7 +49,7 @@ class Person() : Cloneable {
     ])
     var name: PersonNames? = null
 
-    @OneToMany(mappedBy = "person", cascade = [ALL], fetch = EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true)
     var events: MutableSet<PersonEvent> = mutableSetOf()
 
     var place: String? = null
@@ -71,7 +71,7 @@ class Person() : Cloneable {
     @Column(name = "PHOTO_URL", nullable = true)
     var photoUrl: String? = null
 
-    @Lob @Basic(fetch = LAZY)
+    @Lob @Basic(fetch = FetchType.LAZY)
     @JsonIgnore
     var photo: ByteArray? = null
 
@@ -142,7 +142,7 @@ class Person() : Cloneable {
     }
 
     fun removeEvent(eventId: Long) {
-        events.find { it.id == eventId }?.let {
+        events.find { it.id == eventId }?.also {
             events.remove(it)
             it.person = null
         }

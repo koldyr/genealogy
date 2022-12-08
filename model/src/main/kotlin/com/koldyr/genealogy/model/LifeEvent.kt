@@ -2,14 +2,14 @@ package com.koldyr.genealogy.model
 
 import java.time.LocalDate
 import java.util.function.Predicate
-import javax.persistence.Basic
-import javax.persistence.Column
-import javax.persistence.Convert
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType.*
-import javax.persistence.Id
-import javax.persistence.MappedSuperclass
-import javax.persistence.SequenceGenerator
+import jakarta.persistence.Basic
+import jakarta.persistence.Column
+import jakarta.persistence.Convert
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.MappedSuperclass
+import jakarta.persistence.SequenceGenerator
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
@@ -31,7 +31,7 @@ import com.koldyr.genealogy.model.converter.EventTypeConverter
 open class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
 
     @Id
-    @GeneratedValue(strategy = SEQUENCE, generator = "SEQ_EVENT")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SEQ_EVENT")
     @SequenceGenerator(name = "SEQ_EVENT", sequenceName = "SEQ_EVENT", allocationSize = 1)
     @Column(name = "EVENT_ID")
     open var id: Long? = null

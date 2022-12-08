@@ -1,19 +1,19 @@
 package com.koldyr.genealogy.model
 
-import javax.persistence.CascadeType.*
-import javax.persistence.Column
-import javax.persistence.Entity
-import javax.persistence.FetchType.*
-import javax.persistence.GeneratedValue
-import javax.persistence.GenerationType.*
-import javax.persistence.Id
-import javax.persistence.JoinColumn
-import javax.persistence.JoinTable
-import javax.persistence.ManyToOne
-import javax.persistence.OneToMany
-import javax.persistence.OneToOne
-import javax.persistence.SequenceGenerator
-import javax.persistence.Table
+import jakarta.persistence.CascadeType
+import jakarta.persistence.Column
+import jakarta.persistence.Entity
+import jakarta.persistence.FetchType
+import jakarta.persistence.GeneratedValue
+import jakarta.persistence.GenerationType
+import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.JoinTable
+import jakarta.persistence.ManyToOne
+import jakarta.persistence.OneToMany
+import jakarta.persistence.OneToOne
+import jakarta.persistence.SequenceGenerator
+import jakarta.persistence.Table
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
@@ -32,7 +32,7 @@ import com.koldyr.genealogy.handlers.PersonIdSerializer
 class Family() {
 
     @Id
-    @GeneratedValue(strategy = SEQUENCE, generator = "FamilyIds")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "FamilyIds")
     @Column(name = "FAMILY_ID")
     var id: Long? = null
 
@@ -48,7 +48,7 @@ class Family() {
     @JsonDeserialize(using = PersonIdDeserializer::class)
     var wife: Person? = null
 
-    @OneToMany(cascade = [PERSIST, MERGE, REFRESH], orphanRemoval = true)
+    @OneToMany(cascade = [CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH], orphanRemoval = true)
     @JoinTable(
             name = "T_CHILDREN",
             joinColumns = [JoinColumn(name = "family_id", referencedColumnName = "family_id")],
@@ -58,7 +58,7 @@ class Family() {
     @JsonDeserialize(using = ChildrenDeserializer::class)
     val children: MutableSet<Person> = mutableSetOf()
 
-    @OneToMany(mappedBy = "family",cascade = [ALL], fetch = EAGER, orphanRemoval = true)
+    @OneToMany(mappedBy = "family",cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true)
     val events: MutableSet<FamilyEvent> = mutableSetOf()
 
     @Column(name = "LINEAGE_ID")

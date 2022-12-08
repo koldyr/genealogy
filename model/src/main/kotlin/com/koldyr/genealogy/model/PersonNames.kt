@@ -1,8 +1,8 @@
 package com.koldyr.genealogy.model
 
-import java.util.*
+import java.util.StringJoiner
 import java.util.function.Predicate
-import javax.persistence.Embeddable
+import jakarta.persistence.Embeddable
 
 /**
  * Description of class PersonNames

@@ -1,8 +1,8 @@
 package com.koldyr.genealogy.model.converter
 
+import jakarta.persistence.AttributeConverter
+import jakarta.persistence.Converter
 import com.koldyr.genealogy.model.EventPrefix
-import javax.persistence.AttributeConverter
-import javax.persistence.Converter
 
 /**
  * Description of class EventPrefixConverter

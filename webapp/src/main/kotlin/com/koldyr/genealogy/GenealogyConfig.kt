@@ -11,6 +11,8 @@ import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
+import ma.glasnost.orika.MapperFacade
+import ma.glasnost.orika.impl.DefaultMapperFactory
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.mapper.FamilyEventConverter
 import com.koldyr.genealogy.mapper.PersonConverter
@@ -33,8 +35,6 @@ import com.koldyr.genealogy.services.PersonService
 import com.koldyr.genealogy.services.PersonServiceImpl
 import com.koldyr.genealogy.services.UserService
 import com.koldyr.genealogy.services.UserServiceImpl
-import ma.glasnost.orika.MapperFacade
-import ma.glasnost.orika.impl.DefaultMapperFactory
 
 
 /**
@@ -121,7 +121,7 @@ class GenealogyConfig {
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry.addMapping("/**")
                     .allowedOrigins("*")
-                    .allowedMethods(GET.name, HEAD.name, POST.name, PUT.name, DELETE.name, PATCH.name)
+                    .allowedMethods(GET.name(), HEAD.name(), POST.name(), PUT.name(), DELETE.name(), PATCH.name())
                     .exposedHeaders(AUTHORIZATION)
             }
         }

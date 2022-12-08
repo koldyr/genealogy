@@ -3,7 +3,7 @@ package com.koldyr.genealogy.services
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
-import javax.persistence.EntityNotFoundException
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.http.HttpStatus.*
