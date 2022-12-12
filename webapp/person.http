@@ -6,7 +6,7 @@ Content-Type: application/json
   "name": "me",
   "surName": "koldyr",
   "email": "me@koldyr.com",
-  "password": "koldyr"
+  "password": {{testUserPwd}}
 }
 
 ### User login
@@ -15,7 +15,7 @@ Content-Type: application/json
 
 {
   "username": "me@koldyr.com",
-  "password": "koldyr"
+  "password": {{testUserPwd}}
 }
 
 ### Get All Persons
