@@ -199,7 +199,7 @@ class GenealogyApp : JFrame, ActionListener {
         fileChooser.addChoosableFileFilter(FileNameExtensionFilter("JSON genealogy file", "json"))
         fileChooser.showOpenDialog(this)
 
-        fileChooser.selectedFile?.let {
+        fileChooser.selectedFile?.also {
             val importer = ImporterFactory.create(it)
             lineage = importer.import(it.toPath())
             personsModel.setPersons(lineage.persons)
@@ -210,10 +210,8 @@ class GenealogyApp : JFrame, ActionListener {
     }
 
     private fun saveFile() {
-        file?.let {
-            val extension = it.extension
-
-            val exporter = ExporterFactory.create(extension)
+        file?.also {
+            val exporter = ExporterFactory.create(it.extension)
             lineage.persons = personsModel.getAll().toSet()
             exporter.export(lineage, it.toPath())
 
@@ -230,7 +228,7 @@ class GenealogyApp : JFrame, ActionListener {
         fileChooser.addChoosableFileFilter(FileNameExtensionFilter("AgelongTree genealogy file", "ged"))
         fileChooser.showSaveDialog(this)
 
-        fileChooser.selectedFile?.let {
+        fileChooser.selectedFile?.also {
             if (it.exists()) {
                 val replace = showConfirmDialog(this, "Replace existing file", "File exists", YES_NO_OPTION)
                 if (replace == NO_OPTION) {

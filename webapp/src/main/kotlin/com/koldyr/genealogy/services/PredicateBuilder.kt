@@ -33,33 +33,33 @@ class PredicateBuilder {
         return Specification<Person> { person, _, builder ->
             val filters = mutableListOf<Predicate>()
 
-            criteria.name?.let {
+            criteria.name?.also {
                 val namePredicate = namePredicate(person, builder, it)
                 filters.add(namePredicate)
             }
 
-            criteria.gender?.let {
+            criteria.gender?.also {
                 val gender = Gender.parse(it)
                 val predicate = builder.equal(person.get<Gender>("gender"), gender)
                 filters.add(predicate)
             }
 
-            criteria.occupation?.let {
+            criteria.occupation?.also {
                 val predicate = builder.like(builder.lower(person.get("occupation")), "%${it.lowercase()}%")
                 filters.add(predicate)
             }
 
-            criteria.note?.let {
+            criteria.note?.also {
                 val predicate = builder.like(builder.lower(person.get("note")), "%${it.lowercase()}%")
                 filters.add(predicate)
             }
 
-            criteria.place?.let {
+            criteria.place?.also {
                 val predicate = builder.like(builder.lower(person.get("place")), "%${it.lowercase()}%")
                 filters.add(predicate)
             }
 
-            criteria.event?.let {
+            criteria.event?.also {
                 val eventPredicate = eventPredicate(person, builder, it)
                 filters.add(eventPredicate)
             }
@@ -114,13 +114,13 @@ class PredicateBuilder {
             eventFilters.add(between)
         }
 
-        event.note?.let {
+        event.note?.also {
             val pattern = "%${it.lowercase()}%"
             val note = builder.like(builder.lower(eventsJoin.get("note")), pattern)
             eventFilters.add(note)
         }
 
-        event.place?.let {
+        event.place?.also {
             val pattern = "%${it.lowercase()}%"
             val place = builder.like(builder.lower(eventsJoin.get("place")), pattern)
             eventFilters.add(place)

@@ -1,10 +1,10 @@
 package com.koldyr.genealogy.services
 
-import ma.glasnost.orika.MapperFacade
 import java.util.Objects.*
 import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
+import ma.glasnost.orika.MapperFacade
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.FamilyEvent
@@ -44,20 +44,20 @@ class FamilyServiceImpl(
             throw ResponseStatusException(BAD_REQUEST, "husband or wife must be is not empty")
         }
 
-        if (nonNull(newFamily.husband)) {
-            if (nonNull(newFamily.husband?.familyId)) {
-                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.husband}' already in family ${newFamily.husband?.familyId}")
+        newFamily.husband?.also {
+            if (nonNull(it.familyId)) {
+                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.husband}' already in family ${it.familyId}")
             }
-            if (newFamily.husband?.gender == Gender.FEMALE) {
+            if (it.gender == Gender.FEMALE) {
                 throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.husband}' is woman and can not be husband")
             }
         }
 
-        if (nonNull(newFamily.wife)) {
-            if (nonNull(newFamily.wife?.familyId)) {
-                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' already in family ${newFamily.wife?.familyId}")
+        newFamily.wife?.also {
+            if (nonNull(it.familyId)) {
+                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' already in family ${it.familyId}")
             }
-            if (newFamily.wife?.gender == Gender.MALE) {
+            if (it.gender == Gender.MALE) {
                 throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' is man and can not be wife")
             }
         }
@@ -66,13 +66,13 @@ class FamilyServiceImpl(
         newFamily.user = userService.currentUser()
         familyRepository.save(newFamily)
 
-        if (nonNull(newFamily.husband)) {
-            newFamily.husband?.familyId = newFamily.id
-            personRepository.save(newFamily.husband!!)
+        newFamily.husband?.also {
+            it.familyId = newFamily.id
+            personRepository.save(it)
         }
-        if (nonNull(newFamily.wife)) {
-            newFamily.wife?.familyId = newFamily.id
-            personRepository.save(newFamily.wife!!)
+        newFamily.wife?.also {
+            it.familyId = newFamily.id
+            personRepository.save(it)
         }
 
         newFamily.children.forEach { it.parentFamilyId = newFamily.id }
@@ -96,20 +96,20 @@ class FamilyServiceImpl(
         mapper.map(family, persisted)
         persisted.lineageId = lineageId
 
-        if (nonNull(persisted.husband)) {
-            if (nonNull(persisted.husband?.familyId) && persisted.husband!!.familyId != persisted.id) {
-                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.husband}' already in family ${persisted.husband?.familyId}")
+        persisted.husband?.also {
+            if (nonNull(it.familyId) && it.familyId != persisted.id) {
+                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.husband}' already in family ${it.familyId}")
             }
-            if (persisted.husband?.gender == Gender.FEMALE) {
+            if (it.gender == Gender.FEMALE) {
                 throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.husband}' is woman and can not be husband")
             }
         }
 
-        if (nonNull(persisted.wife)) {
-            if (nonNull(persisted.wife?.familyId) && persisted.wife!!.familyId != persisted.id) {
-                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' already in family ${persisted.wife?.familyId}")
+        persisted.wife?.also {
+            if (nonNull(it.familyId) && it.familyId != persisted.id) {
+                throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' already in family ${it.familyId}")
             }
-            if (persisted.wife?.gender == Gender.MALE) {
+            if (it.gender == Gender.MALE) {
                 throw ResponseStatusException(BAD_REQUEST, "Person with id '${family.wife}' is man and can not be wife")
             }
         }
@@ -120,15 +120,15 @@ class FamilyServiceImpl(
     override fun delete(familyId: Long) {
         val family = find(familyId)
 
-        if (nonNull(family.wife)) {
-            family.wife!!.familyId = null
-            personRepository.save(family.wife!!)
+        family.wife?.also {
+            it.familyId = null
+            personRepository.save(it)
             family.wife = null
         }
 
-        if (nonNull(family.husband)) {
-            family.husband!!.familyId = null
-            personRepository.save(family.husband!!)
+        family.husband?.also {
+            it.familyId = null
+            personRepository.save(it)
             family.husband = null
         }
 

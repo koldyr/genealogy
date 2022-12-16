@@ -1,7 +1,7 @@
 package com.koldyr.genealogy.export
 
 import com.koldyr.genealogy.importer.Importer
-import com.koldyr.genealogy.importer.JSONImporter
+import com.koldyr.genealogy.importer.ImporterFactory
 
 /**
  * Description of class JSONExporterTest
@@ -10,11 +10,7 @@ import com.koldyr.genealogy.importer.JSONImporter
  */
 class JSONExporterTest : BaseExpImpTest() {
 
-    override fun getImporter(): Importer {
-        return JSONImporter()
-    }
+    override fun getImporter(): Importer = ImporterFactory.create("json")
 
-    override fun getExporter(): Exporter {
-        return JSONExporter()
-    }
+    override fun getExporter(): Exporter = ExporterFactory.create("json")
 }

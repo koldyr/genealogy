@@ -1,7 +1,7 @@
 package com.koldyr.genealogy.export
 
-import com.koldyr.genealogy.importer.GEDImporter
 import com.koldyr.genealogy.importer.Importer
+import com.koldyr.genealogy.importer.ImporterFactory
 
 /**
  * Description of class GEDExporterTest
@@ -10,11 +10,7 @@ import com.koldyr.genealogy.importer.Importer
  */
 class GEDExporterTest : BaseExpImpTest() {
 
-    override fun getImporter(): Importer {
-        return GEDImporter()
-    }
+    override fun getImporter(): Importer = ImporterFactory.create("ged")
 
-    override fun getExporter(): Exporter {
-        return GEDExporter()
-    }
+    override fun getExporter(): Exporter = ExporterFactory.create("ged")
 }

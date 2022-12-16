@@ -113,8 +113,8 @@ class ImportRepositoryImpl(private val jdbc: JdbcTemplate) : ImportRepository {
     }
 
     private fun setFamilyIds(family: Family) {
-        family.husband?.let { setFamily(family.id!!, it.id!!) }
-        family.wife?.let { setFamily(family.id!!, it.id!!) }
+        family.husband?.also { setFamily(family.id!!, it.id!!) }
+        family.wife?.also { setFamily(family.id!!, it.id!!) }
         family.children.forEach { setParentFamily(family.id!!, it.id!!) }
     }
 
@@ -140,8 +140,8 @@ class ImportRepositoryImpl(private val jdbc: JdbcTemplate) : ImportRepository {
 
     private fun prepareFamily(family: Family) {
         family.id = nextFamilyId()
-        family.husband?.let { it.familyId = family.id }
-        family.wife?.let { it.familyId = family.id }
+        family.husband?.also { it.familyId = family.id }
+        family.wife?.also { it.familyId = family.id }
         family.children.forEach { it.parentFamilyId = family.id }
     }
 

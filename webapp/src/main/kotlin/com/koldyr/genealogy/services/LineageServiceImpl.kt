@@ -1,7 +1,7 @@
 package com.koldyr.genealogy.services
 
 import java.io.ByteArrayOutputStream
-import java.util.*
+import java.util.UUID
 import org.springframework.http.HttpStatus.*
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
@@ -52,7 +52,7 @@ class LineageServiceImpl(
     override fun update(lineageId: Long, lineage: LineageDTO) {
         val entity = findAndCheck(lineageId)
 
-        lineage.name?.let { entity.name = it }
+        lineage.name?.also { entity.name = it }
         entity.note = lineage.note
 
         lineageRepository.save(entity)
@@ -82,7 +82,7 @@ class LineageServiceImpl(
         lineage.persons = setOf()
 
         lineage.name = name
-        note?.let { lineage.note = note }
+        note?.also { lineage.note = note }
         lineage.user = userService.currentUser()
         lineageRepository.saveAndFlush(lineage)
 

@@ -1,7 +1,7 @@
 package com.koldyr.genealogy.export
 
-import com.koldyr.genealogy.importer.CSVImporter
 import com.koldyr.genealogy.importer.Importer
+import com.koldyr.genealogy.importer.ImporterFactory
 
 /**
  * Description of class CSVExporterTest
@@ -10,11 +10,7 @@ import com.koldyr.genealogy.importer.Importer
  */
 class CSVExporterTest : BaseExpImpTest() {
 
-    override fun getImporter(): Importer {
-        return CSVImporter()
-    }
+    override fun getImporter(): Importer = ImporterFactory.create("csv")
 
-    override fun getExporter(): Exporter {
-        return CSVExporter()
-    }
+    override fun getExporter(): Exporter = ExporterFactory.create("csv")
 }
