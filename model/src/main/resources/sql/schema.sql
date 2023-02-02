@@ -91,10 +91,20 @@ CREATE TABLE IF NOT EXISTS T_USER
     EMAIL    VARCHAR(100) not null unique,
     PASSWORD VARCHAR(256) not null,
     NAME     VARCHAR(32)  not null,
-    SURNAME  VARCHAR(32)  not null
+    SURNAME  VARCHAR(32)  not null,
+    ROLE_ID  INTEGER      not null default 1,
+    constraint FK_USER_ROLE FOREIGN KEY (ROLE_ID) REFERENCES T_ROLE (ROLE_ID)
 );
 
 create sequence SEQ_USER start with 1;
+
+--
+CREATE TABLE T_ROLE
+(
+    ROLE_ID   INTEGER     not null,
+    ROLE_NAME VARCHAR(32) not null unique,
+    CONSTRAINT PK_ROLE PRIMARY KEY (ROLE_ID)
+);
 
 alter table T_LINEAGE
     add constraint FK_LINEAGE_USER FOREIGN KEY (USER_ID) REFERENCES T_USER (USER_ID);

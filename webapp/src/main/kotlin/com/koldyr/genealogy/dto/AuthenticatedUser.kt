@@ -1,6 +1,7 @@
 package com.koldyr.genealogy.dto
 
 import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.UserDetails
 import com.koldyr.genealogy.model.User
 
@@ -14,7 +15,7 @@ class AuthenticatedUser(private val user: User) : UserDetails {
 
     var token: String = ""
 
-    override fun getAuthorities(): List<GrantedAuthority> = listOf()
+    override fun getAuthorities(): List<GrantedAuthority> = listOf(SimpleGrantedAuthority(user.role?.name))
 
     override fun getPassword(): String = user.password
 
@@ -31,4 +32,6 @@ class AuthenticatedUser(private val user: User) : UserDetails {
     override fun toString(): String {
         return "${user.name} ${user.surName}"
     }
+
+    fun hasRole(role: String): Boolean = user.role?.name == role
 }

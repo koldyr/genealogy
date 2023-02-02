@@ -1,5 +1,10 @@
-insert into T_USER (USER_ID, EMAIL, PASSWORD, NAME, SURNAME)
-values (NEXTVAL('SEQ_USER'), 'me@koldyr.com', '$2a$10$g8xdFAgZI.ZK2YsyhFSfMuyDHIlFBvRWEe25uR1G0NLR2gT0PMM9a', 'me', 'koldyr');
+insert into T_ROLE (ROLE_ID, ROLE_NAME)
+values (0, 'admin');
+insert into T_ROLE (ROLE_ID, ROLE_NAME)
+values (1, 'user');
+
+insert into T_USER (USER_ID, EMAIL, PASSWORD, NAME, SURNAME, ROLE_ID)
+values (NEXTVAL('SEQ_USER'), 'me@koldyr.com', '$2a$10$g8xdFAgZI.ZK2YsyhFSfMuyDHIlFBvRWEe25uR1G0NLR2gT0PMM9a', 'me', 'koldyr', 0);
 
 insert into T_LINEAGE (LINEAGE_ID, LINEAGE_NAME, NOTE, USER_ID)
 values (NEXTVAL('SEQ_LINEAGE'), 'Koldyrs', 'Demo lineage', CURRVAL('SEQ_USER'));
@@ -55,3 +60,6 @@ values (CURRVAL('SEQ_FAMILY'), 3);
 
 insert into T_CHILDREN (FAMILY_ID, PERSON_ID)
 values (CURRVAL('SEQ_FAMILY'), 4);
+
+insert into T_USER (USER_ID, EMAIL, PASSWORD, NAME, SURNAME)
+values (NEXTVAL('SEQ_USER'), 'lemming@koldyr.com', '$2a$10$g8xdFAgZI.ZK2YsyhFSfMuyDHIlFBvRWEe25uR1G0NLR2gT0PMM9a', 'lemming', 'koldyr');

@@ -5,7 +5,7 @@ Accept: */*
 
 {
   "username": "me@koldyr.com",
-  "password": {{testUserPwd}}
+  "password": "{{testUserPwd}}"
 }
 
 ### Get Families

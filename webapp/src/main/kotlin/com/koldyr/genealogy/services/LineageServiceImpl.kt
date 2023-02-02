@@ -3,6 +3,7 @@ package com.koldyr.genealogy.services
 import java.io.ByteArrayOutputStream
 import java.util.UUID
 import org.springframework.http.HttpStatus.*
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import com.koldyr.genealogy.dto.LineageDTO
@@ -32,6 +33,7 @@ class LineageServiceImpl(
         .findAllByUser(userService.currentUser())
         .map { LineageDTO(it.name, it.note, it.id) }
 
+    @PreAuthorize("hasRole('user')")
     override fun create(lineage: LineageDTO): Long {
         val entity = Lineage()
         entity.name = lineage.name ?: "${userService.currentUser().surName} ${UUID.randomUUID()}"
@@ -117,7 +119,8 @@ class LineageServiceImpl(
             .findById(lineageId)
             .orElseThrow { ResponseStatusException(NOT_FOUND, "Lineage with id '$lineageId' is not found") }
 
-        if (entity.user != userService.currentUser()) {
+        val currentUser = userService.currentUser()
+        if (currentUser.hasRole("user") && entity.user != currentUser) {
             throw ResponseStatusException(UNAUTHORIZED, "You don't have access to Lineage with id '$lineageId'")
         }
 

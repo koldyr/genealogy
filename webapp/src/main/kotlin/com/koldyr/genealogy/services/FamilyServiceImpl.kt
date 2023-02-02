@@ -2,6 +2,7 @@ package com.koldyr.genealogy.services
 
 import java.util.Objects.*
 import org.springframework.http.HttpStatus.*
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import ma.glasnost.orika.MapperFacade
@@ -36,6 +37,7 @@ class FamilyServiceImpl(
             .map(this::mapFamily)
     }
 
+    @PreAuthorize("hasRole('user')")
     override fun create(lineageId: Long, family: FamilyDTO): Long {
         family.id = null
         val newFamily = mapper.map(family, Family::class.java)
@@ -221,9 +223,18 @@ class FamilyServiceImpl(
         familyRepository.save(family)
     }
 
-    private fun find(familyId: Long): Family = familyRepository
-        .findById(familyId)
-        .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
+    private fun find(familyId: Long): Family {
+        val family = familyRepository
+            .findById(familyId)
+            .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
+
+        val currentUser = userService.currentUser()
+        if (currentUser.hasRole("user") && family.user != currentUser) {
+            throw ResponseStatusException(UNAUTHORIZED, "You don't have access to Family with id '$familyId'")
+        }
+
+        return family
+    }
 
     private fun mapFamily(entity: Family): FamilyDTO {
         return mapper.map(entity, FamilyDTO::class.java)

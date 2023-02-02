@@ -4,7 +4,7 @@ Content-Type: application/json
 
 {
   "username": "me@koldyr.com",
-  "password": {{testUserPwd}}
+  "password": "{{testUserPwd}}"
 }
 
 ### Import Lineage
@@ -24,6 +24,17 @@ Accept: application/json
 GET http://{{server}}/api/lineage/2
 Authorization: Bearer {{authToken}}
 Accept: application/json
+
+### Create new Lineage
+POST http://{{server}}/api/lineage
+Authorization: Bearer {{authToken}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Test 3",
+  "note": "Test 3"
+}
 
 ### Delete Lineage
 DELETE http://{{server}}/api/lineage/4

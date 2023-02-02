@@ -5,6 +5,8 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.OneToOne
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 
@@ -30,6 +32,9 @@ class User {
     @Column(name = "SURNAME", nullable = false)
     var surName: String = ""
 
+    @OneToOne(optional = false) @JoinColumn(name = "ROLE_ID")
+    var role: Role? = null
+
     override fun toString(): String {
         return "User(id=$id, email='$email', password='***', name='$name', surName='$surName')"
     }
@@ -48,4 +53,6 @@ class User {
     override fun hashCode(): Int {
         return id?.hashCode() ?: 0
     }
+
+    fun hasRole(role: String): Boolean = this.role?.name == role
 }
