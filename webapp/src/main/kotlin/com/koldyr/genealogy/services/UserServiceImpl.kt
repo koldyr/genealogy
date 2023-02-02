@@ -6,12 +6,14 @@ import java.util.*
 import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus.*
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.BadCredentialsException
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
 import com.auth0.jwt.JWT
@@ -19,6 +21,7 @@ import com.auth0.jwt.algorithms.Algorithm
 import com.koldyr.genealogy.dto.AuthenticatedUser
 import com.koldyr.genealogy.model.Credentials
 import com.koldyr.genealogy.model.User
+import com.koldyr.genealogy.persistence.RoleRepository
 import com.koldyr.genealogy.persistence.UserRepository
 
 /**
@@ -27,10 +30,12 @@ import com.koldyr.genealogy.persistence.UserRepository
  * @author d.halitski@gmail.com
  * @created: 2021-11-04
  */
+@Service
 open class UserServiceImpl(
     private val userRepository: UserRepository,
     private val passwordEncoder: PasswordEncoder,
-    secret: String
+    private val roleRepository: RoleRepository,
+    @Value("\${security.secret}") secret: String
 ) : UserService {
 
     @Autowired
@@ -51,6 +56,7 @@ open class UserServiceImpl(
         }
         userModel.id = null
         userModel.password = passwordEncoder.encode(userModel.password)
+        userModel.role = roleRepository.findByIdOrNull(1)
         userRepository.save(userModel)
     }
 

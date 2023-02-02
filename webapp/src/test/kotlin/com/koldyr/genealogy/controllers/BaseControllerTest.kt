@@ -27,12 +27,12 @@ import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.model.PersonNames
+import com.koldyr.genealogy.model.Role
 import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.persistence.FamilyRepository
-import com.koldyr.genealogy.persistence.LineageRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
-import com.koldyr.genealogy.persistence.UserRepository
+import com.koldyr.genealogy.persistence.RoleRepository
 
 var lineageId: Long? = null
 var user: User? = null
@@ -52,13 +52,10 @@ abstract class BaseControllerTest {
     lateinit var mapper: ObjectMapper
 
     @Autowired
-    lateinit var userRepository: UserRepository
+    lateinit var roleRepository: RoleRepository
 
     @Autowired
     lateinit var personRepository: PersonRepository
-
-    @Autowired
-    lateinit var lineageRepository: LineageRepository
 
     @Autowired
     lateinit var familyRepository: FamilyRepository
@@ -109,6 +106,9 @@ abstract class BaseControllerTest {
     @Before
     fun prepareData() {
         if (user == null) {
+            roleRepository.save(Role(0, "admin"));
+            roleRepository.save(Role(1, "user"));
+
             user = createUser()
             mockMvc.post("/api/user/registration") {
                 content = mapper.writeValueAsString(user)
