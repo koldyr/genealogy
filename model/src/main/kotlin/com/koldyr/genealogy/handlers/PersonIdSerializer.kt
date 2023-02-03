@@ -7,6 +7,8 @@ import com.koldyr.genealogy.model.Person
 
 /**
  * Description of class PersonSerializer
+ *
+ * @author d.halitski@gmail.com
  * @created: 2019-11-05
  */
 class PersonIdSerializer : StdSerializer<Person>(Person::class.java) {
@@ -14,7 +16,8 @@ class PersonIdSerializer : StdSerializer<Person>(Person::class.java) {
     override fun serialize(value: Person?, gen: JsonGenerator, provider: SerializerProvider) {
         if (value == null) {
             gen.writeNull()
+        } else {
+            gen.writeNumber(value.id!!)
         }
-        gen.writeNumber(value?.id!!)
     }
 }

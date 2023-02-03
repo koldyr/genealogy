@@ -7,6 +7,8 @@ import com.koldyr.genealogy.model.Person
 
 /**
  * Description of class ChildrenSerializer
+ *
+ * @author d.halitski@gmail.com
  * @created: 2019-11-05
  */
 class ChildrenSerializer : StdSerializer<Set<*>>(Set::class.java) {

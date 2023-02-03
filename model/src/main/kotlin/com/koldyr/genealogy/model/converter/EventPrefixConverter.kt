@@ -6,6 +6,8 @@ import com.koldyr.genealogy.model.EventPrefix
 
 /**
  * Description of class EventPrefixConverter
+ *
+ * @author d.halitski@gmail.com
  * @created: 2021-09-27
  */
 @Converter

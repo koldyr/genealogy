@@ -7,6 +7,8 @@ import com.koldyr.genealogy.model.EventPrefix
 
 /**
  * Description of class EventPrefixSerializer
+ *
+ * @author d.halitski@gmail.com
  * @created: 2021-09-29
  */
 class EventPrefixSerializer : StdSerializer<EventPrefix>(EventPrefix::class.java) {
@@ -14,7 +16,8 @@ class EventPrefixSerializer : StdSerializer<EventPrefix>(EventPrefix::class.java
     override fun serialize(value: EventPrefix?, gen: JsonGenerator, provider: SerializerProvider) {
         if (value == null) {
             gen.writeNull()
+        } else {
+            gen.writeString(value.code)
         }
-        gen.writeString(value?.code!!)
     }
 }

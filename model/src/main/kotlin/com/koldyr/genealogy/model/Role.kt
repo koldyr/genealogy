@@ -5,6 +5,12 @@ import jakarta.persistence.Entity
 import jakarta.persistence.Id
 import jakarta.persistence.Table
 
+/**
+ * Description of class Role
+ *
+ * @author d.halitski@gmail.com
+ * @created: 2023-02-02
+ */
 @Entity
 @Table(name = "T_ROLE")
 data class Role(

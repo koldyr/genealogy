@@ -6,6 +6,8 @@ import com.koldyr.genealogy.model.Gender
 
 /**
  * Description of class GenderConverter
+ *
+ * @author d.halitski@gmail.com
  * @created: 2021-09-27
  */
 @Converter
