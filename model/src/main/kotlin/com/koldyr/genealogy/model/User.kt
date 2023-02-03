@@ -5,9 +5,18 @@ import jakarta.persistence.Entity
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
+import jakarta.persistence.JoinColumn
+import jakarta.persistence.OneToOne
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
+import com.fasterxml.jackson.annotation.JsonIgnore
 
+/**
+ * Description of class User
+ *
+ * @author d.halitski@gmail.com
+ * @created: 2021-11-04
+ */
 @Entity
 @Table(name = "T_USER")
 @SequenceGenerator(name = "userIds", sequenceName = "SEQ_USER", allocationSize = 1)
@@ -30,9 +39,10 @@ class User {
     @Column(name = "SURNAME", nullable = false)
     var surName: String = ""
 
-    override fun toString(): String {
-        return "User(id=$id, email='$email', password='***', name='$name', surName='$surName')"
-    }
+    @OneToOne(optional = false) @JoinColumn(name = "ROLE_ID") @JsonIgnore
+    var role: Role? = null
+
+    override fun toString(): String = "User(id=$id, email='$email', password='***', name='$name', surName='$surName')"
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -45,7 +55,7 @@ class User {
         return true
     }
 
-    override fun hashCode(): Int {
-        return id?.hashCode() ?: 0
-    }
+    override fun hashCode(): Int = id?.hashCode() ?: 0
+
+    fun hasRole(role: String): Boolean = this.role?.name == role
 }

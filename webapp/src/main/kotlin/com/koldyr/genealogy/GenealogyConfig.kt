@@ -1,14 +1,12 @@
 package com.koldyr.genealogy
 
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy
 import org.springframework.http.HttpHeaders.*
 import org.springframework.http.HttpMethod.*
 import org.springframework.jdbc.core.JdbcTemplate
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import ma.glasnost.orika.MapperFacade
@@ -34,7 +32,6 @@ import com.koldyr.genealogy.services.LineageServiceImpl
 import com.koldyr.genealogy.services.PersonService
 import com.koldyr.genealogy.services.PersonServiceImpl
 import com.koldyr.genealogy.services.UserService
-import com.koldyr.genealogy.services.UserServiceImpl
 
 
 /**
@@ -59,9 +56,6 @@ class GenealogyConfig {
     @Autowired
     lateinit var userRepository: UserRepository
 
-    @Value("\${security.secret}")
-    private lateinit var secret: String
-
     @Bean
     fun personService(mapper: MapperFacade, userService: UserService, personEventRepository: PersonEventRepository): PersonService {
         return PersonServiceImpl(personRepository, personEventRepository, familyRepository, mapper, userService)
@@ -85,12 +79,7 @@ class GenealogyConfig {
     fun importRepository(jdbcTemplate: JdbcTemplate): ImportRepository {
         return ImportRepositoryImpl(jdbcTemplate)
     }
-
-    @Bean
-    fun userService(passwordEncoder: PasswordEncoder): UserService {
-        return UserServiceImpl(userRepository, passwordEncoder, secret)
-    }
-
+    
     @Bean
     fun authenticationUserDetailsService(): AuthenticationUserDetailsService {
         return AuthenticationUserDetailsService(userRepository)

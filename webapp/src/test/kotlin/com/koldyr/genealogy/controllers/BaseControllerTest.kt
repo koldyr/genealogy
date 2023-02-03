@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.controllers
 
+import java.lang.Long.*
 import java.time.LocalDate
 import org.apache.commons.lang3.RandomStringUtils.*
 import org.hamcrest.Matchers.*
@@ -27,12 +28,12 @@ import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.model.PersonNames
+import com.koldyr.genealogy.model.Role
 import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.persistence.FamilyRepository
-import com.koldyr.genealogy.persistence.LineageRepository
 import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
-import com.koldyr.genealogy.persistence.UserRepository
+import com.koldyr.genealogy.persistence.RoleRepository
 
 var lineageId: Long? = null
 var user: User? = null
@@ -52,13 +53,10 @@ abstract class BaseControllerTest {
     lateinit var mapper: ObjectMapper
 
     @Autowired
-    lateinit var userRepository: UserRepository
+    lateinit var roleRepository: RoleRepository
 
     @Autowired
     lateinit var personRepository: PersonRepository
-
-    @Autowired
-    lateinit var lineageRepository: LineageRepository
 
     @Autowired
     lateinit var familyRepository: FamilyRepository
@@ -109,6 +107,9 @@ abstract class BaseControllerTest {
     @Before
     fun prepareData() {
         if (user == null) {
+            roleRepository.save(Role(0, "admin"));
+            roleRepository.save(Role(1, "user"));
+
             user = createUser()
             mockMvc.post("/api/user/registration") {
                 content = mapper.writeValueAsString(user)
@@ -154,18 +155,16 @@ abstract class BaseControllerTest {
     }
 
     protected fun createPersonEventModel(): PersonEvent {
-        return PersonEvent(Birth, null, LocalDate.now(),
-            createRandomWord(), createRandomWord())
+        return PersonEvent(Birth, null, LocalDate.now(), createRandomWord(), createRandomWord())
     }
 
     protected fun createFamilyEventModel(): FamilyEvent {
-        return FamilyEvent(Marriage, null, LocalDate.now(),
-            createRandomWord(), createRandomWord());
+        return FamilyEvent(Marriage, null, LocalDate.now(), createRandomWord(), createRandomWord())
     }
 
     protected fun getLastIdFromLocation(location: String): Long {
         val match = Regex("(\\d+)$").find(location)
-        return java.lang.Long.parseLong(match!!.groups.last()!!.value)
+        return parseLong(match!!.groups.last()!!.value)
     }
 
     protected fun createPerson(gender: Gender): Person {

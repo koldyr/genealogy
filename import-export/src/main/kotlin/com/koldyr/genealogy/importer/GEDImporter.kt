@@ -41,6 +41,8 @@ const val CHILD = "CHIL"
 
 /**
  * Description of class GEDImporter
+ *
+ * @author d.halitski@gmail.com
  * @created: 2019.10.31
  */
 class GEDImporter : Importer {

@@ -1,5 +1,11 @@
 package com.koldyr.genealogy.model
 
+/**
+ * Description of class Credentials
+ *
+ * @author d.halitski@gmail.com
+ * @created: 2021-11-04
+ */
 class Credentials {
     var username: String = ""
     var password: String = ""

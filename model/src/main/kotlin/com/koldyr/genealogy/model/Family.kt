@@ -24,6 +24,8 @@ import com.koldyr.genealogy.handlers.PersonIdSerializer
 
 /**
  * Description of class Family
+ *
+ * @author d.halitski@gmail.com
  * @created: 2019-10-25
  */
 @Entity

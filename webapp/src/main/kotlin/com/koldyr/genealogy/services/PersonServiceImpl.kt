@@ -1,6 +1,5 @@
 package com.koldyr.genealogy.services
 
-import ma.glasnost.orika.MapperFacade
 import java.io.InputStream
 import java.io.InputStream.*
 import java.util.Objects.*
@@ -8,8 +7,10 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.HttpStatus.*
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
+import ma.glasnost.orika.MapperFacade
 import com.koldyr.genealogy.dto.PageResultDTO
 import com.koldyr.genealogy.dto.SearchDTO
 import com.koldyr.genealogy.model.Person
@@ -52,6 +53,7 @@ class PersonServiceImpl(
         return createPageResult(result)
     }
 
+    @PreAuthorize("hasRole('user')")
     override fun create(person: Person): Long {
         person.id = null
         person.user = userService.currentUser()
@@ -135,8 +137,15 @@ class PersonServiceImpl(
     }
 
     private fun findPerson(personId: Long): Person {
-        return personRepository.findById(personId)
+        val person = personRepository.findById(personId)
             .orElseThrow { ResponseStatusException(NOT_FOUND, "Person with id '$personId' is not found") }
+
+        val currentUser = userService.currentUser()
+        if (currentUser.hasRole("user") && person.user != currentUser) {
+            throw ResponseStatusException(UNAUTHORIZED, "You don't have access to Person with id '$personId'")
+        }
+
+        return person
     }
 
     private fun findPersonEvent(personEventId: Long): PersonEvent {

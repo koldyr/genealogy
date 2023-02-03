@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 
 /**
  * Description of class PersonEvent
+ *
+ * @author d.halitski@gmail.com
  * @created: 2021-09-28
  */
 @Entity

@@ -6,6 +6,8 @@ import com.koldyr.genealogy.model.Lineage
 
 /**
  * Description of class Exporter
+ *
+ * @author d.halitski@gmail.com
  * @created: 2019.10.31
  */
 interface Exporter {

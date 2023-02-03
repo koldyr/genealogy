@@ -6,12 +6,15 @@ import java.nio.file.Path
 import com.fasterxml.jackson.annotation.JsonInclude.*
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.databind.SerializationFeature.*
+import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.koldyr.genealogy.model.Lineage
 
 /**
  * Description of class JSONExporter
+ *
+ * @author d.halitski@gmail.com
  * @created: 2019.10.31
  */
 class JSONExporter : Exporter {
@@ -27,12 +30,12 @@ class JSONExporter : Exporter {
     }
 
     private fun mapper(): ObjectMapper {
-        val mapper = ObjectMapper()
-        mapper.registerModule(JavaTimeModule())
-        mapper.registerModule(KotlinModule.Builder().build())
-        mapper.setSerializationInclusion(Include.NON_EMPTY)
-        mapper.enable(INDENT_OUTPUT)
-        mapper.disable(WRITE_DATES_AS_TIMESTAMPS)
-        return mapper
+        return JsonMapper.builder()
+            .addModule(JavaTimeModule())
+            .addModule(KotlinModule.Builder().build())
+            .serializationInclusion(Include.NON_EMPTY)
+            .enable(INDENT_OUTPUT)
+            .disable(WRITE_DATES_AS_TIMESTAMPS)
+            .build()
     }
 }

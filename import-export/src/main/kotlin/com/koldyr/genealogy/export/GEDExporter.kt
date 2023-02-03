@@ -29,6 +29,8 @@ import com.koldyr.genealogy.model.PersonNames
 
 /**
  * Description of class GEDExporter
+ *
+ * @author d.halitski@gmail.com
  * @created: 2019.10.31
  */
 class GEDExporter : Exporter {

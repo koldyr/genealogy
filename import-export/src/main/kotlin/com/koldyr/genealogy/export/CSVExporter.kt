@@ -3,20 +3,21 @@ package com.koldyr.genealogy.export
 import java.io.OutputStream
 import java.nio.file.Files
 import java.nio.file.Path
-import java.time.format.DateTimeFormatter.ISO_LOCAL_DATE
+import java.time.format.DateTimeFormatter.*
 import java.util.StringJoiner
 import java.util.regex.Pattern
+import org.apache.commons.lang3.StringUtils.*
+import org.apache.commons.text.StringEscapeUtils.*
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
-import org.apache.commons.lang3.StringUtils.EMPTY
-import org.apache.commons.lang3.StringUtils.isEmpty
-import org.apache.commons.text.StringEscapeUtils.escapeCsv
 
 /**
  * Description of class CSVExporter
+ *
+ * @author d.halitski@gmail.com
  * @created: 2019.10.31
  */
 class CSVExporter : Exporter {
@@ -85,9 +86,7 @@ class CSVExporter : Exporter {
             return EMPTY
         }
 
-        return events
-                .map { event(it) }
-                .joinToString("!")
+        return events.joinToString("!") { event(it) }
     }
 
     private fun event(it: LifeEvent): String {
@@ -105,13 +104,11 @@ class CSVExporter : Exporter {
     }
 
     private fun persons(children: Set<Person>?): String {
-        if (children == null || children.isEmpty()) {
+        if (children.isNullOrEmpty()) {
             return EMPTY
         }
 
-        return children
-                .map { it.id.toString() }
-                .joinToString("|")
+        return children.joinToString("|") { it.id.toString() }
     }
 
     private fun note(note: String?): String? {

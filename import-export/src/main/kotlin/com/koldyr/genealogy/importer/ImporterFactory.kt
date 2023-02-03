@@ -4,6 +4,8 @@ import java.io.File
 
 /**
  * Description of class ImporterFactory
+ *
+ * @author d.halitski@gmail.com
  * @created: 2019.10.31
  */
 object ImporterFactory {

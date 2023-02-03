@@ -5,10 +5,17 @@ import java.nio.file.Files
 import java.nio.file.Path
 import com.fasterxml.jackson.databind.DeserializationFeature.*
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.databind.json.JsonMapper
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import com.fasterxml.jackson.module.kotlin.KotlinModule
 import com.koldyr.genealogy.model.Lineage
 
+/**
+ * Description of the JSONImporter class
+ *
+ * @author d.halitski@gmail.com
+ * @created 2019-10-31
+ */
 class JSONImporter : Importer {
 
     override fun import(file: Path): Lineage {
@@ -23,11 +30,10 @@ class JSONImporter : Importer {
     }
 
     private fun mapper(): ObjectMapper {
-        val mapper = ObjectMapper()
-        mapper.registerModule(JavaTimeModule())
-        mapper.registerModule(KotlinModule.Builder().build())
-        mapper.enable(ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
-        mapper.disable(FAIL_ON_UNKNOWN_PROPERTIES)
-        return mapper
+        return JsonMapper.builder()
+            .addModules(JavaTimeModule(), KotlinModule.Builder().build())
+            .enable(ACCEPT_EMPTY_STRING_AS_NULL_OBJECT)
+            .disable(FAIL_ON_UNKNOWN_PROPERTIES)
+            .build()
     }
 }

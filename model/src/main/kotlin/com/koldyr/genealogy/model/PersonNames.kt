@@ -6,6 +6,8 @@ import jakarta.persistence.Embeddable
 
 /**
  * Description of class PersonNames
+ *
+ * @author d.halitski@gmail.com
  * @created: 2019-10-26
  */
 @Embeddable

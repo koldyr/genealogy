@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
+import org.springframework.security.config.core.GrantedAuthorityDefaults
 import org.springframework.security.config.http.SessionCreationPolicy.*
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -46,7 +47,7 @@ class SecurityConfig {
 
     @Bean
     fun jwtAuthorizationFilter(): JWTAuthorizationFilter {
-        return JWTAuthorizationFilter(secret, authenticationConfiguration.authenticationManager)
+        return JWTAuthorizationFilter(secret, authenticationConfiguration.authenticationManager, authenticationUserDetailsService)
     }
 
     @Bean
@@ -66,6 +67,11 @@ class SecurityConfig {
             .sessionManagement().sessionCreationPolicy(STATELESS)
 
         return http.build()
+    }
+
+    @Bean
+    fun grantedAuthorityDefaults(): GrantedAuthorityDefaults {
+        return GrantedAuthorityDefaults("")
     }
 
     @Bean

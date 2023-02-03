@@ -19,6 +19,12 @@ import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.model.PersonNames
 
+/**
+ * Description of the CSVImporter class
+ *
+ * @author d.halitski@gmail.com
+ * @created 2019-10-31
+ */
 class CSVImporter : Importer {
     private val pattern = Pattern.compile("\\\\n")
     private val persons = mutableSetOf<Person>()

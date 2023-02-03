@@ -8,6 +8,8 @@ import com.koldyr.genealogy.model.EventType
 
 /**
  * Description of class EventTypeDeserializer
+ *
+ * @author d.halitski@gmail.com
  * @created: 2021-09-29
  */
 class EventTypeDeserializer : StdDeserializer<EventType>(EventType::class.java) {

@@ -2,6 +2,8 @@ package com.koldyr.genealogy.model
 
 /**
  * Description of class EventType
+ *
+ * @author d.halitski@gmail.com
  * @created: 2019-11-07
  */
 @Suppress("SpellCheckingInspection")
@@ -11,9 +13,7 @@ enum class EventType(
     Birth("BIRT"), Death("DEAT"), Engagement("ENGA"), Marriage("MARR"), Divorce("DIV"), Adoption("ADOP"), Christening("CHRI"),
     Relocation("RESI"), Education("EDUC"), Emigration("EMIG"), GetJob("OCCU"), Graduation("GRAD"), Retirement("RETI"), Immigration("IMMI");
 
-    fun getCode(): String {
-        return code
-    }
+    fun getCode(): String = code
 
     companion object {
         fun isEvent(value: String): Boolean {
