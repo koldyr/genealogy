@@ -29,9 +29,5 @@ class AuthenticatedUser(private val user: User) : UserDetails {
 
     override fun isEnabled(): Boolean = true
 
-    override fun toString(): String {
-        return "${user.name} ${user.surName}"
-    }
-
-    fun hasRole(role: String): Boolean = user.role?.name == role
+    override fun toString(): String = "${user.name} ${user.surName}"
 }

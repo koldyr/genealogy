@@ -11,23 +11,27 @@ import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter
 import com.auth0.jwt.JWT
 import com.auth0.jwt.algorithms.Algorithm
 import com.auth0.jwt.exceptions.JWTVerificationException
+import com.auth0.jwt.interfaces.JWTVerifier
 
 private const val PREFIX_BEARER = "Bearer "
 private const val PATH_USER = "user"
 
 open class JWTAuthorizationFilter(
     secret: String,
-    authenticationManager: AuthenticationManager
+    authenticationManager: AuthenticationManager,
+    private val userDetailsService: UserDetailsService
 ) : BasicAuthenticationFilter(authenticationManager) {
 
-    private val algorithm: Algorithm
-
+    private val jwtVerifier: JWTVerifier
+    
     init {
-        algorithm = Algorithm.HMAC512(secret.toByteArray())
+        val algorithm = Algorithm.HMAC512(secret.toByteArray())
+        jwtVerifier = JWT.require(algorithm).build()
     }
 
     @Throws(IOException::class, ServletException::class)
@@ -57,10 +61,9 @@ open class JWTAuthorizationFilter(
     }
 
     private fun getAuthentication(token: String): Authentication {
-        val user = JWT.require(algorithm)
-                .build()
-                .verify(token.replace(PREFIX_BEARER, ""))
-                .subject
-        return UsernamePasswordAuthenticationToken(user, null, listOf())
+        val jwt = jwtVerifier.verify(token.replace(PREFIX_BEARER, ""))
+
+        val user = userDetailsService.loadUserByUsername(jwt.subject)
+        return UsernamePasswordAuthenticationToken(user.username, null, user.authorities)
     }
 }
