@@ -85,6 +85,13 @@ CREATE TABLE IF NOT EXISTS T_FAMILY_EVENT
 create sequence SEQ_EVENT start with 1;
 
 
+CREATE TABLE T_ROLE
+(
+    ROLE_ID   INTEGER     not null,
+    ROLE_NAME VARCHAR(32) not null unique,
+    CONSTRAINT PK_ROLE PRIMARY KEY (ROLE_ID)
+);
+
 CREATE TABLE IF NOT EXISTS T_USER
 (
     USER_ID  INTEGER      not null primary key,
@@ -97,14 +104,6 @@ CREATE TABLE IF NOT EXISTS T_USER
 );
 
 create sequence SEQ_USER start with 1;
-
---
-CREATE TABLE T_ROLE
-(
-    ROLE_ID   INTEGER     not null,
-    ROLE_NAME VARCHAR(32) not null unique,
-    CONSTRAINT PK_ROLE PRIMARY KEY (ROLE_ID)
-);
 
 alter table T_LINEAGE
     add constraint FK_LINEAGE_USER FOREIGN KEY (USER_ID) REFERENCES T_USER (USER_ID);

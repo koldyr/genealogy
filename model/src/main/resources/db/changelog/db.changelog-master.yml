@@ -1,0 +1,6 @@
+databaseChangeLog:
+  - include:
+      id: Init
+      author: Denis Halitsky
+      file: db.changelog-r000.yml
+      relativeToChangelogFile: true
