@@ -47,7 +47,7 @@ open class JWTAuthorizationFilter(
 
             chain.doFilter(request, response)
         } catch (ex: JWTVerificationException) {
-            response.sendError(FORBIDDEN.value(), "invalid token")
+            response.sendError(FORBIDDEN.value(), "Invalid token: ${ex.message}")
         }
     }
 

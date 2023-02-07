@@ -39,7 +39,7 @@ data class SearchEventDTO (
     var note: String? = null
 )
 
-class PageResultDTO<T>(val result: List<T>) {
+class PageResultDTO<T>(val result: MutableList<T>) {
     var page: Int? = null
     var size: Int? = null
     var total: Long? = null

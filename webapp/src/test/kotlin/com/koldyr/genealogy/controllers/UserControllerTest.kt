@@ -89,7 +89,7 @@ class UserControllerTest : BaseControllerTest() {
             .andDo { print() }
             .andExpect {
                 status { isForbidden() }
-                status { reason("invalid token") }
+                status { reason("Invalid token: The token was expected to have 3 parts, but got 1.") }
             }
 
         mockMvc.get("$baseUrl/$lineageId/persons/${person.id}") {
