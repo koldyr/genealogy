@@ -5,7 +5,7 @@ import org.springframework.http.HttpHeaders.*
 import org.springframework.http.MediaType.*
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
-import com.koldyr.genealogy.model.Credentials
+import com.koldyr.genealogy.dto.Credentials
 import com.koldyr.genealogy.model.Gender
 
 class UserControllerTest : BaseControllerTest() {

@@ -1,4 +1,4 @@
-package com.koldyr.genealogy.model
+package com.koldyr.genealogy.dto
 
 /**
  * Description of class Credentials

@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import com.koldyr.genealogy.UnSecured
+import com.koldyr.genealogy.dto.Credentials
 import com.koldyr.genealogy.dto.UserDTO
-import com.koldyr.genealogy.model.Credentials
 import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.services.UserService
 
@@ -21,7 +21,7 @@ class UserController(private val userService: UserService) {
 
     @PostMapping("/registration")
     fun create(@RequestBody user: User): ResponseEntity<Unit> {
-        userService.createUser(user)
+        userService.create(user)
 
         val uri = URI.create("/api/user/login")
         return created(uri).build()

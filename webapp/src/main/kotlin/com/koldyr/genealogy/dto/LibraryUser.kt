@@ -6,12 +6,12 @@ import org.springframework.security.core.userdetails.UserDetails
 import com.koldyr.genealogy.model.User
 
 /**
- * Description of the AuthenticatedUser class
+ * Description of the LibraryUser class
  *
  * @author d.halitski@gmail.com
  * @created 2022-06-17
  */
-class AuthenticatedUser(private val user: User) : UserDetails {
+class LibraryUser(private val user: User) : UserDetails {
 
     var token: String = ""
 

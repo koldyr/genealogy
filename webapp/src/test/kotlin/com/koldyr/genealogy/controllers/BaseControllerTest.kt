@@ -18,9 +18,9 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.koldyr.genealogy.Genealogy
+import com.koldyr.genealogy.dto.Credentials
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.dto.LineageDTO
-import com.koldyr.genealogy.model.Credentials
 import com.koldyr.genealogy.model.EventType
 import com.koldyr.genealogy.model.EventType.*
 import com.koldyr.genealogy.model.FamilyEvent
