@@ -2,10 +2,13 @@ package com.koldyr.genealogy.services
 
 import java.io.ByteArrayOutputStream
 import java.util.UUID
+import org.slf4j.LoggerFactory
+import org.springframework.dao.DataAccessException
 import org.springframework.http.HttpStatus.*
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.server.ServerErrorException
 import com.koldyr.genealogy.dto.LineageDTO
 import com.koldyr.genealogy.export.ExporterFactory
 import com.koldyr.genealogy.importer.ImporterFactory
@@ -75,43 +78,59 @@ class LineageServiceImpl(
     }
 
     override fun importLineage(dataType: String, data: ByteArray, name: String, note: String?): Long {
-        val importer = ImporterFactory.create(dataType)
-        val lineage = importer.import(data.inputStream())
+        try {
+            val importer = ImporterFactory.create(dataType)
+            val lineage = importer.import(data.inputStream())
 
-        val families = lineage.families
-        val persons = lineage.persons
-        lineage.families = setOf()
-        lineage.persons = setOf()
+            val families = lineage.families
+            val persons = lineage.persons
+            lineage.families = setOf()
+            lineage.persons = setOf()
 
-        lineage.name = name
-        note?.also { lineage.note = note }
-        lineage.user = userService.currentUser()
-        lineageRepository.saveAndFlush(lineage)
+            lineage.name = name
+            note?.also { lineage.note = note }
+            lineage.user = userService.currentUser()
+            lineageRepository.saveAndFlush(lineage)
 
-        persons.forEach { person ->
-            person.lineageId = lineage.id
-            person.user = lineage.user
+            persons.forEach { person ->
+                person.lineageId = lineage.id
+                person.user = lineage.user
+            }
+            importRepository.savePersons(persons)
+
+            families.forEach { family ->
+                family.lineageId = lineage.id
+                family.user = lineage.user!!
+            }
+            importRepository.saveFamilies(families)
+
+            return lineage.id!!
+        } catch (e: DataAccessException) {
+            LoggerFactory.getLogger(javaClass).error("", e)
+            throw ServerErrorException("Unable to import lineage", e)
+        } catch (e: IllegalArgumentException) {
+            LoggerFactory.getLogger(javaClass).error("", e)
+            throw ServerErrorException("Import failed: ${e.message}", e)
         }
-        importRepository.savePersons(persons)
-
-        families.forEach { family ->
-            family.lineageId = lineage.id
-            family.user = lineage.user!!
-        }
-        importRepository.saveFamilies(families)
-
-        return lineage.id!!
     }
 
     @Transactional(readOnly = true)
     override fun exportLineage(lineageId: Long, dataType: String?): ByteArray {
-        val lineage = findAndCheck(lineageId)
-        val importer = ExporterFactory.create(dataType)
+        try {
+            val lineage = findAndCheck(lineageId)
+            val importer = ExporterFactory.create(dataType)
 
-        val output = ByteArrayOutputStream()
-        importer.export(lineage, output)
+            val output = ByteArrayOutputStream()
+            importer.export(lineage, output)
 
-        return output.toByteArray()
+            return output.toByteArray()
+        } catch (e: DataAccessException) {
+            LoggerFactory.getLogger(javaClass).error("", e)
+            throw ServerErrorException("Unable to export lineage", e)
+        } catch (e: IllegalArgumentException) {
+            LoggerFactory.getLogger(javaClass).error("", e)
+            throw ServerErrorException("Export failed: ${e.message}", e)
+        }
     }
 
     private fun findAndCheck(lineageId: Long): Lineage {

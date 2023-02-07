@@ -9,11 +9,10 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import com.koldyr.genealogy.UnSecured
+import com.koldyr.genealogy.dto.UserDTO
 import com.koldyr.genealogy.model.Credentials
 import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.services.UserService
-
-private const val USER_NAME = "User-Name"
 
 @RestController
 @RequestMapping("/api/user")
@@ -29,12 +28,11 @@ class UserController(private val userService: UserService) {
     }
 
     @PostMapping("/login")
-    fun login(@RequestBody credentials: Credentials): ResponseEntity<Unit> {
-        val login = userService.login(credentials)
+    fun login(@RequestBody credentials: Credentials): ResponseEntity<UserDTO> {
+        val user = userService.login(credentials)
 
         return ok()
-            .header(AUTHORIZATION, login.token)
-            .header(USER_NAME, login.toString())
-            .build()
+            .header(AUTHORIZATION, user.token)
+            .body(UserDTO(user.userId(), user.toString()))
     }
 }

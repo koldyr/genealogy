@@ -8,7 +8,7 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.HttpHeaders.*
 import org.springframework.http.HttpStatus.*
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken.*
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -64,6 +64,6 @@ open class JWTAuthorizationFilter(
         val jwt = jwtVerifier.verify(token.replace(PREFIX_BEARER, ""))
 
         val user = userDetailsService.loadUserByUsername(jwt.subject)
-        return UsernamePasswordAuthenticationToken(user.username, null, user.authorities)
+        return authenticated(user.username, user, user.authorities)
     }
 }

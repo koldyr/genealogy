@@ -3,7 +3,6 @@ package com.koldyr.genealogy.services
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
-import jakarta.persistence.EntityNotFoundException
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.data.repository.findByIdOrNull
@@ -60,11 +59,9 @@ open class UserServiceImpl(
         userRepository.save(userModel)
     }
 
-    @Transactional(readOnly = true)
     override fun currentUser(): User {
-        val username: String = SecurityContextHolder.getContext().authentication.principal.toString()
-        return userRepository.findByEmail(username)
-            .orElseThrow { EntityNotFoundException() }
+        val authUser = SecurityContextHolder.getContext().authentication.credentials as AuthenticatedUser
+        return authUser.getUser()
     }
 
     @Transactional(readOnly = true)

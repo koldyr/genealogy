@@ -235,7 +235,7 @@ class ImportRepositoryImpl(private val jdbc: JdbcTemplate) : ImportRepository {
 
     private fun nextId(sql: String): Long {
         return jdbc.query(sql, ResultSetExtractor {
-            it.first()
+            it.next()
             it.getLong(1)
         })!!
     }

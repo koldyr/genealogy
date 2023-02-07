@@ -30,4 +30,8 @@ class AuthenticatedUser(private val user: User) : UserDetails {
     override fun isEnabled(): Boolean = true
 
     override fun toString(): String = "${user.name} ${user.surName}"
+
+    fun userId(): Long = user.id!!
+
+    fun getUser(): User = user
 }
