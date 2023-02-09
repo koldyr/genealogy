@@ -14,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import com.koldyr.genealogy.Secured
+import io.swagger.v3.oas.annotations.tags.Tag
+import io.swagger.v3.oas.annotations.tags.Tags
 import com.koldyr.genealogy.dto.LineageDTO
 import com.koldyr.genealogy.services.LineageService
 
@@ -29,7 +30,7 @@ const val TEXT_GED = "text/ged"
  */
 @RestController
 @RequestMapping("/api/lineage")
-@Secured
+@Tags(value = [Tag(name = "LineageController")])
 class LineageController(private val lineageService: LineageService) {
 
     @GetMapping(produces = [APPLICATION_JSON_VALUE])

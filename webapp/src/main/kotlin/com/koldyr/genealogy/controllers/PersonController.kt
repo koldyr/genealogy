@@ -19,7 +19,8 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
-import com.koldyr.genealogy.Secured
+import io.swagger.v3.oas.annotations.tags.Tag
+import io.swagger.v3.oas.annotations.tags.Tags
 import com.koldyr.genealogy.dto.PageResultDTO
 import com.koldyr.genealogy.dto.SearchDTO
 import com.koldyr.genealogy.model.Person
@@ -37,7 +38,7 @@ const val IMAGE_JPG_VALUE = "image/jpg"
  */
 @RestController
 @RequestMapping("/api/lineage")
-@Secured
+@Tags(value = [Tag(name = "PersonController")])
 class PersonController(private val personService: PersonService) {
 
     @PostMapping("/{lineageId}/persons/search", consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])

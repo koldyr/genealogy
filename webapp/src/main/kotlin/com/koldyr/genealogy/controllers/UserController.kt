@@ -8,7 +8,8 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import com.koldyr.genealogy.UnSecured
+import io.swagger.v3.oas.annotations.tags.Tag
+import io.swagger.v3.oas.annotations.tags.Tags
 import com.koldyr.genealogy.dto.Credentials
 import com.koldyr.genealogy.dto.UserDTO
 import com.koldyr.genealogy.model.User
@@ -16,7 +17,7 @@ import com.koldyr.genealogy.services.UserService
 
 @RestController
 @RequestMapping("/api/user")
-@UnSecured
+@Tags(value = [Tag(name = "UserController")])
 class UserController(private val userService: UserService) {
 
     @PostMapping("/registration")

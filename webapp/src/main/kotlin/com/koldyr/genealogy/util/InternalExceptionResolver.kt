@@ -4,10 +4,9 @@ import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.servlet.http.HttpServletResponse.*
 import org.springframework.dao.DataAccessException
-import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerErrorException
+import org.springframework.web.servlet.HandlerExceptionResolver
 import org.springframework.web.servlet.ModelAndView
-import org.springframework.web.servlet.handler.AbstractHandlerExceptionResolver
 import com.koldyr.genealogy.export.UnsupportedExportFormatException
 
 /**
@@ -16,10 +15,9 @@ import com.koldyr.genealogy.export.UnsupportedExportFormatException
  * @author d.halitski@gmail.com
  * @created 2023-02-07
  */
-@Component
-class InternalExceptionResolver : AbstractHandlerExceptionResolver() {
+class InternalExceptionResolver : HandlerExceptionResolver {
 
-    override fun doResolveException(request: HttpServletRequest, response: HttpServletResponse, handler: Any?, ex: Exception): ModelAndView? {
+    override fun resolveException(request: HttpServletRequest, response: HttpServletResponse, handler: Any?, ex: Exception): ModelAndView? {
         when (ex) {
             is UnsupportedExportFormatException, is ServerErrorException -> {
                 response.sendError(SC_INTERNAL_SERVER_ERROR, ex.message)
@@ -27,10 +25,7 @@ class InternalExceptionResolver : AbstractHandlerExceptionResolver() {
             is DataAccessException -> {
                 response.sendError(SC_INTERNAL_SERVER_ERROR, ex.javaClass.simpleName)
             }
-            else -> {
-                return super.resolveException(request, response, handler, ex)
-            }
         }
-        return ModelAndView()
+        return null
     }
 }

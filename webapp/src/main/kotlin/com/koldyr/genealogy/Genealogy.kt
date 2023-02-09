@@ -15,7 +15,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories
 @SpringBootApplication
 @EnableJpaRepositories(basePackages = ["com.koldyr.genealogy.persistence"])
 @EntityScan("com.koldyr.genealogy.model")
-open class Genealogy
+class Genealogy
 
 fun main(args: Array<String>) {
     runApplication<Genealogy>(*args)

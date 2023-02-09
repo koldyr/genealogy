@@ -9,6 +9,7 @@ spring:
     username: xxx
     password: xxx
   jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: false
     properties:
       hibernate:
@@ -49,5 +50,6 @@ spring:
     username: sa
     password: xxx
   jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
     generate-ddl: true
