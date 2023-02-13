@@ -35,8 +35,6 @@ class OpenAPIConfig {
                             .`in`(SecurityScheme.In.HEADER)
                     )
             )
-//            .addTagsItem(Tag().name("Authenticated").description("Requires user to login"))
-//            .addTagsItem(Tag().name("Anonymous").description("User might be anonymous"))
             .addSecurityItem(SecurityRequirement().addList(securitySchemeName))
             .info(apiInfo())
     }
