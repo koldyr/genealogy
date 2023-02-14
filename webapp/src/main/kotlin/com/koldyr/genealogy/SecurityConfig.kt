@@ -1,5 +1,6 @@
 package com.koldyr.genealogy
 
+import javax.security.auth.kerberos.EncryptionKey
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
@@ -14,9 +15,12 @@ import org.springframework.security.config.core.GrantedAuthorityDefaults
 import org.springframework.security.config.http.SessionCreationPolicy.*
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.crypto.password.PasswordEncoder
+import org.springframework.security.oauth2.jose.jws.MacAlgorithm
+import org.springframework.security.oauth2.jwt.JwtDecoder
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
+import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
 import org.springframework.security.web.SecurityFilterChain
-import com.koldyr.genealogy.security.JWTAuthorizationFilter
-import com.koldyr.genealogy.services.AuthenticationUserDetailsService
 
 
 /**
@@ -30,25 +34,37 @@ import com.koldyr.genealogy.services.AuthenticationUserDetailsService
 @EnableMethodSecurity(prePostEnabled = true)
 class SecurityConfig {
 
-    @Value("\${security.secret}")
-    lateinit var secret: String
-
     @Autowired
     lateinit var authenticationConfiguration: AuthenticationConfiguration
 
-    @Autowired
-    lateinit var authenticationUserDetailsService: AuthenticationUserDetailsService
+    @Bean
+    fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
     @Bean
     @Throws(java.lang.Exception::class)
-    fun authenticationManager(): AuthenticationManager {
-        return authenticationConfiguration.authenticationManager
+    fun authenticationManager(): AuthenticationManager = authenticationConfiguration.authenticationManager
+
+    @Bean
+    fun grantedAuthorityDefaults(): GrantedAuthorityDefaults = GrantedAuthorityDefaults("")
+
+    @Bean
+    fun jwtDecoder(
+        @Value("\${spring.security.secret}") secret: String,
+        @Value("\${spring.security.oauth2.resourceserver.jwt.jws-algorithms}") algorithm: String
+    ): JwtDecoder {
+        return NimbusJwtDecoder
+            .withSecretKey(EncryptionKey(secret.toByteArray(), 1))
+            .macAlgorithm(MacAlgorithm.from(algorithm))
+            .build()
     }
 
     @Bean
-    fun jwtAuthorizationFilter(): JWTAuthorizationFilter {
-        return JWTAuthorizationFilter(secret, authenticationConfiguration.authenticationManager, authenticationUserDetailsService)
-    }
+    fun authenticationConverter(): JwtAuthenticationConverter = JwtAuthenticationConverter()
+        .also {
+            val grantedAuthoritiesConverter = JwtGrantedAuthoritiesConverter()
+            grantedAuthoritiesConverter.setAuthorityPrefix("")
+            it.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter)
+        }
 
     @Bean
     @Throws(Exception::class)
@@ -65,20 +81,8 @@ class SecurityConfig {
             .requestMatchers(POST, "/api/user/**").permitAll()
             .requestMatchers("/api/**").authenticated()
             .and()
-            .addFilter(jwtAuthorizationFilter())
-            .userDetailsService(authenticationUserDetailsService)
-            .sessionManagement().sessionCreationPolicy(STATELESS)
+            .oauth2ResourceServer().jwt()
 
         return http.build()
-    }
-
-    @Bean
-    fun grantedAuthorityDefaults(): GrantedAuthorityDefaults {
-        return GrantedAuthorityDefaults("")
-    }
-
-    @Bean
-    fun passwordEncoder(): PasswordEncoder {
-        return BCryptPasswordEncoder()
     }
 }

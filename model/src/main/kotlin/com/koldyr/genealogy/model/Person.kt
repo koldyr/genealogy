@@ -75,9 +75,7 @@ class Person() : Cloneable {
     @JsonIgnore
     var photo: ByteArray? = null
 
-    @JoinColumn(name = "USER_ID", nullable = false)
-    @ManyToOne
-    @JsonIgnore
+    @ManyToOne @JoinColumn(name = "USER_ID", nullable = false) @JsonIgnore
     var user: User? = null
 
     @Column(name = "LINEAGE_ID")

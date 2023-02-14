@@ -18,8 +18,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 @Table(name = "T_FAMILY_EVENT")
 class FamilyEvent() : LifeEvent() {
 
-    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "FAMILY_ID")
-    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY) @JoinColumn(name = "FAMILY_ID") @JsonIgnore
     var family: Family? = null
 
     constructor(type: EventType) : this() {

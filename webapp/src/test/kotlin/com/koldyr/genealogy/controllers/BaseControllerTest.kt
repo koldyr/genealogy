@@ -8,6 +8,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.HttpHeaders.*
@@ -67,6 +68,9 @@ abstract class BaseControllerTest {
     @Autowired
     lateinit var familyEventRepository: PersonEventRepository
 
+    @Value("\${spring.test.username}") lateinit var testUser: String
+    @Value("\${spring.test.password}") lateinit var testPassword: String
+
     protected val baseUrl = "/api/lineage"
 
     protected fun createPersonModel(gender: Gender): Person {
@@ -95,10 +99,10 @@ abstract class BaseControllerTest {
         return PersonEvent(type, null, LocalDate.of(year, month, day), "place $place", "note $note")
     }
 
-    protected fun createUser(): User {
+    protected fun createUser(userName: String = testUser, userPwd: String = testPassword): User {
         val user = User()
-        user.password = "koldyr"
-        user.email = "me@koldyr.com"
+        user.email = userName
+        user.password = userPwd
         user.name = "me"
         user.surName = "koldyr"
         return user
@@ -111,20 +115,26 @@ abstract class BaseControllerTest {
             roleRepository.save(Role(1, "user"));
 
             user = createUser()
-            mockMvc.post("/api/user/registration") {
-                content = mapper.writeValueAsString(user)
-                contentType = APPLICATION_JSON
-                accept = APPLICATION_JSON
+            user?.also {
+                register(it)
             }
-                .andExpect {
-                    status { isCreated() }
-                    header { string(LOCATION, matchesRegex("/api/user/login")) }
-                }
         }
 
         if (lineageId == null) {
             lineageId = createLineAge()
         }
+    }
+
+    protected fun register(user: User) {
+        mockMvc.post("/api/user/registration") {
+            content = mapper.writeValueAsString(user)
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
+        }
+            .andExpect {
+                status { isCreated() }
+                header { string(LOCATION, matchesRegex("/api/user/login")) }
+            }
     }
 
     @After
@@ -138,20 +148,24 @@ abstract class BaseControllerTest {
     protected fun getBearerToken(): String {
         if (accessToken == null) {
             val credentials = Credentials()
-            credentials.username = "me@koldyr.com"
-            credentials.password = "koldyr"
+            credentials.username = testUser
+            credentials.password = testPassword
 
-            accessToken = mockMvc.post("/api/user/login") {
-                content = mapper.writeValueAsString(credentials)
-                contentType = APPLICATION_JSON
-                accept = APPLICATION_JSON
-            }
-                .andExpect {
-                    status { isOk() }
-                    header { exists(AUTHORIZATION) }
-                }.andReturn().response.getHeader(AUTHORIZATION)
+            accessToken = login(credentials)
         }
         return accessToken!!
+    }
+
+    protected fun login(credentials: Credentials): String {
+        return mockMvc.post("/api/user/login") {
+            content = mapper.writeValueAsString(credentials)
+            contentType = APPLICATION_JSON
+            accept = APPLICATION_JSON
+        }
+            .andExpect {
+                status { isOk() }
+                header { exists(AUTHORIZATION) }
+            }.andReturn().response.getHeader(AUTHORIZATION)!!
     }
 
     protected fun createPersonEventModel(): PersonEvent {
