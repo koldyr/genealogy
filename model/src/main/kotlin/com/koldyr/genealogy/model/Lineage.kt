@@ -3,7 +3,7 @@ package com.koldyr.genealogy.model
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.FetchType.*
+import jakarta.persistence.FetchType.LAZY
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -43,9 +43,7 @@ class Lineage() {
     @JoinColumn(name = "LINEAGE_ID")
     var families: Set<Family> = setOf()
 
-    @JoinColumn(name = "USER_ID", nullable = false)
-    @ManyToOne(fetch = LAZY)
-    @JsonIgnore
+    @ManyToOne(fetch = LAZY) @JoinColumn(name = "USER_ID", nullable = false) @JsonIgnore
     var user: User? = null
 
     constructor(persons: Set<Person>, families: Set<Family>, rebuild: Boolean = false) : this() {

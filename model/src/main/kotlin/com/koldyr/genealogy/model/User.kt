@@ -6,7 +6,7 @@ import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
-import jakarta.persistence.OneToOne
+import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -39,7 +39,7 @@ class User {
     @Column(name = "SURNAME", nullable = false)
     var surName: String = ""
 
-    @OneToOne(optional = false) @JoinColumn(name = "ROLE_ID") @JsonIgnore
+    @ManyToOne(optional = false) @JoinColumn(name = "ROLE_ID") @JsonIgnore
     var role: Role? = null
 
     override fun toString(): String = "User(id=$id, email='$email', password='***', name='$name', surName='$surName')"

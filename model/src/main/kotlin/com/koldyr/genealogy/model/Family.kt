@@ -66,9 +66,7 @@ class Family() {
     @Column(name = "LINEAGE_ID")
     var lineageId: Long? = null
 
-    @JoinColumn(name = "USER_ID", nullable = false)
-    @ManyToOne
-    @JsonIgnore
+    @ManyToOne @JoinColumn(name = "USER_ID", nullable = false) @JsonIgnore
     lateinit var user: User
 
     var note: String? = null

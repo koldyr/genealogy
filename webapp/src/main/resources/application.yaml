@@ -24,10 +24,15 @@ spring:
       matching-strategy: ant_path_matcher
   jackson:
     default-property-inclusion: non_null
-security:
-  secret: kdskliojfsdl32r3hhkjdfdf
-  token:
-    exp: 10 #minutes
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jws-algorithms: HS256
+          jwk-set-uri: http://localhost/.well-known/jwk.json
+    secret: f4adc177-5aa5-4011-8c23-d6601bbbc94e
+    token:
+      exp: 10 #minutes
 
 #    schema: classpath:sql/schema.sql
 #    initialization-mode: always
@@ -53,3 +58,6 @@ spring:
     database-platform: org.hibernate.dialect.H2Dialect
     show-sql: true
     generate-ddl: true
+  test:
+    username: xxx
+    password: xxx
