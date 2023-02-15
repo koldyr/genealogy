@@ -3,7 +3,7 @@ package com.koldyr.genealogy.services
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
 import org.springframework.security.core.userdetails.UsernameNotFoundException
-import com.koldyr.genealogy.dto.LibraryUser
+import com.koldyr.genealogy.dto.LineageUser
 import com.koldyr.genealogy.persistence.UserRepository
 
 /**
@@ -18,6 +18,6 @@ class AuthenticationUserDetailsService(
 
     override fun loadUserByUsername(email: String): UserDetails = userRepository
         .findByEmail(email)
-        .map { LibraryUser(it) }
+        .map { LineageUser(it) }
         .orElseThrow { UsernameNotFoundException("Wrong username: $email") }
 }

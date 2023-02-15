@@ -33,11 +33,9 @@ class FamilyServiceImpl(
 ) : FamilyService {
 
     @Transactional(readOnly = true)
-    override fun findAll(lineageId: Long): List<FamilyDTO> {
-        return familyRepository
-            .findAllByUserAndLineageId(userService.currentUser(), lineageId)
-            .map(this::mapFamily)
-    }
+    override fun findAll(lineageId: Long): List<FamilyDTO> = familyRepository
+        .findAllByUserAndLineageId(userService.currentUser(), lineageId)
+        .map(this::mapFamily)
 
     @PreAuthorize("hasRole('user')")
     override fun create(lineageId: Long, family: FamilyDTO): Long {
@@ -86,11 +84,10 @@ class FamilyServiceImpl(
     }
 
     @Transactional(readOnly = true)
-    override fun findById(familyId: Long): FamilyDTO {
-        return familyRepository.findById(familyId)
-            .map(this::mapFamily)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
-    }
+    override fun findById(familyId: Long): FamilyDTO = familyRepository
+        .findById(familyId)
+        .map(this::mapFamily)
+        .orElseThrow { ResponseStatusException(NOT_FOUND, "Family with id '$familyId' is not found") }
 
     override fun update(familyId: Long, family: FamilyDTO) {
         val persisted = find(familyId)
@@ -238,7 +235,5 @@ class FamilyServiceImpl(
         return family
     }
 
-    private fun mapFamily(entity: Family): FamilyDTO {
-        return mapper.map(entity, FamilyDTO::class.java)
-    }
+    private fun mapFamily(entity: Family): FamilyDTO = mapper.map(entity, FamilyDTO::class.java)
 }

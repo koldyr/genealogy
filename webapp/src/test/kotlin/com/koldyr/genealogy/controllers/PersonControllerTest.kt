@@ -1,13 +1,14 @@
 package com.koldyr.genealogy.controllers
 
 import java.time.LocalDate
-import java.time.Month.*
+import java.time.Month.JANUARY
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import org.hamcrest.Matchers
 import org.junit.Test
-import org.springframework.http.HttpHeaders.*
-import org.springframework.http.MediaType.*
+import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.HttpHeaders.LOCATION
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
@@ -16,7 +17,7 @@ import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.genealogy.dto.PageResultDTO
 import com.koldyr.genealogy.dto.SearchDTO
 import com.koldyr.genealogy.dto.SearchEventDTO
-import com.koldyr.genealogy.model.EventType.*
+import com.koldyr.genealogy.model.EventType.Birth
 import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonEvent
@@ -51,11 +52,13 @@ class PersonControllerTest : BaseControllerTest() {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
-                content { contentType(APPLICATION_JSON) }
-                content { json(mapper.writeValueAsString(personModel)) }
+                content {
+                    contentType(APPLICATION_JSON)
+                    json(mapper.writeValueAsString(personModel))
+                }
             }
 
         val personEntityChange = getUpdatePersonModel(personModel)
@@ -65,7 +68,7 @@ class PersonControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             contentType = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
             }
@@ -74,18 +77,20 @@ class PersonControllerTest : BaseControllerTest() {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
-                content { contentType(APPLICATION_JSON) }
-                content { json(mapper.writeValueAsString(personEntityChange)) }
+                content {
+                    contentType(APPLICATION_JSON)
+                    json(mapper.writeValueAsString(personEntityChange))
+                }
             }
 
         mockMvc.delete("$baseUrl/$lineageId/persons/${personModel.id}") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isNoContent() }
             }
@@ -94,10 +99,12 @@ class PersonControllerTest : BaseControllerTest() {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
-                status { isNotFound() }
-                status { reason("Person with id '${personModel.id}' is not found") }
+                status {
+                    isNotFound()
+                    reason("Person with id '${personModel.id}' is not found")
+                }
             }
     }
 
@@ -108,10 +115,12 @@ class PersonControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
-                status { isNotFound() }
-                status { reason("Person with id '$randomId' is not found") }
+                status {
+                    isNotFound()
+                    reason("Person with id '$randomId' is not found")
+                }
             }
 
         val person = createPerson(Gender.FEMALE)
@@ -119,7 +128,7 @@ class PersonControllerTest : BaseControllerTest() {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
                 content { contentType(APPLICATION_JSON) }
@@ -132,7 +141,7 @@ class PersonControllerTest : BaseControllerTest() {
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isCreated() }
                 header { exists(LOCATION) }
@@ -144,31 +153,34 @@ class PersonControllerTest : BaseControllerTest() {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
-                content { contentType(APPLICATION_JSON) }
-                content { json(mapper.writeValueAsString(listOf(personEvent))) }
+                content {
+                    contentType(APPLICATION_JSON)
+                    json(mapper.writeValueAsString(listOf(personEvent)))
+                }
             }
 
         mockMvc.delete("$baseUrl/$lineageId/persons/${person.id}/events/${personEvent.id}") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isNoContent() }
-
             }
 
         mockMvc.delete("$baseUrl/$lineageId/persons/${person.id}/events/${personEvent.id}") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
-                status { isNotFound() }
-                status { reason("Event with id '${personEvent.id}' is not found") }
+                status {
+                    isNotFound()
+                    reason("Event with id '${personEvent.id}' is not found")
+                }
             }
     }
 

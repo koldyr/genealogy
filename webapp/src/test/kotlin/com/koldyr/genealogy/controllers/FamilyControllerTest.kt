@@ -2,8 +2,9 @@ package com.koldyr.genealogy.controllers
 
 import org.hamcrest.Matchers
 import org.junit.Test
-import org.springframework.http.HttpHeaders.*
-import org.springframework.http.MediaType.*
+import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.HttpHeaders.LOCATION
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.patch
@@ -20,7 +21,7 @@ class FamilyControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
             }
@@ -31,11 +32,13 @@ class FamilyControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
-                content { contentType(APPLICATION_JSON) }
-                content { json(mapper.writeValueAsString(familyDto)) }
+                content {
+                    contentType(APPLICATION_JSON)
+                    json(mapper.writeValueAsString(familyDto))
+                }
             }
 
         familyDto.wife = createPerson(Gender.FEMALE).id
@@ -46,7 +49,7 @@ class FamilyControllerTest : BaseControllerTest() {
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
             }
@@ -55,11 +58,13 @@ class FamilyControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
-                content { contentType(APPLICATION_JSON) }
-                content { json(mapper.writeValueAsString(familyDto)) }
+                content {
+                    contentType(APPLICATION_JSON)
+                    json(mapper.writeValueAsString(familyDto))
+                }
             }
 
         familyDto.wife = createPerson(Gender.MALE).id
@@ -69,17 +74,19 @@ class FamilyControllerTest : BaseControllerTest() {
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
-                status { isBadRequest() }
-                status { reason("Person with id '${familyDto.wife}' is man and can not be wife") }
+                status {
+                    isBadRequest()
+                    reason("Person with id '${familyDto.wife}' is man and can not be wife")
+                }
             }
 
         mockMvc.delete("$baseUrl/$lineageId/families/${familyDto.id}") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isNoContent() }
             }
@@ -88,10 +95,12 @@ class FamilyControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
-                status { isNotFound() }
-                status { reason("Family with id '${familyDto.id}' is not found") }
+                status {
+                    isNotFound()
+                    reason("Family with id '${familyDto.id}' is not found")
+                }
             }
 
         mockMvc.post("$baseUrl/$lineageId/families") {
@@ -100,12 +109,13 @@ class FamilyControllerTest : BaseControllerTest() {
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
-                status { isBadRequest() }
-                status { reason("husband or wife must be is not empty") }
+                status {
+                    isBadRequest()
+                    reason("husband or wife must be is not empty")
+                }
             }
-
     }
 
     @Test
@@ -121,18 +131,20 @@ class FamilyControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
-                content { contentType(APPLICATION_JSON) }
-                content { json(mapper.writeValueAsString(familyDto)) }
+                content {
+                    contentType(APPLICATION_JSON)
+                    json(mapper.writeValueAsString(familyDto))
+                }
             }
 
         mockMvc.delete("$baseUrl/$lineageId/families/${familyDto.id}") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isNoContent() }
             }
@@ -141,10 +153,12 @@ class FamilyControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
-                status { isNotFound() }
-                status { reason("Family with id '${familyDto.id}' is not found") }
+                status {
+                    isNotFound()
+                    reason("Family with id '${familyDto.id}' is not found")
+                }
             }
     }
 
@@ -155,10 +169,12 @@ class FamilyControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
-                status { isNotFound() }
-                status { reason("Family with id '${randomId}' is not found") }
+                status {
+                    isNotFound()
+                    reason("Family with id '${randomId}' is not found")
+                }
             }
 
         val familyDTO = createFamily(listOf())
@@ -169,7 +185,7 @@ class FamilyControllerTest : BaseControllerTest() {
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isCreated() }
                 header { exists(LOCATION) }
@@ -181,18 +197,17 @@ class FamilyControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
                 content { json(mapper.writeValueAsString(listOf(familyEvent))) }
-
             }
 
         mockMvc.delete("$baseUrl/$lineageId/families/${familyDTO.id}/events/${familyEvent.id}") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isNoContent() }
             }
@@ -201,11 +216,10 @@ class FamilyControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
                 content { json("[]") }
-
             }
     }
 
@@ -216,10 +230,12 @@ class FamilyControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
-                status { isNotFound() }
-                status { reason("Family with id '${randomId}' is not found") }
+                status {
+                    isNotFound()
+                    reason("Family with id '${randomId}' is not found")
+                }
             }
 
         val familyDTO = createFamily(listOf())
@@ -231,7 +247,7 @@ class FamilyControllerTest : BaseControllerTest() {
             contentType = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isCreated() }
                 header { string(LOCATION, Matchers.matchesRegex("$baseUrl/$lineageId/persons/[\\d]+")) }
@@ -244,7 +260,7 @@ class FamilyControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isCreated() }
                 header { string(LOCATION, Matchers.matchesRegex("$baseUrl/$lineageId/persons/[\\d]+")) }
@@ -256,7 +272,7 @@ class FamilyControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
                 content { json(mapper.writeValueAsString(listOf(child1, child2))) }
@@ -266,7 +282,7 @@ class FamilyControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isNoContent() }
             }
@@ -275,17 +291,19 @@ class FamilyControllerTest : BaseControllerTest() {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
-                status { isBadRequest() }
-                status { reason("Child with id '${child1.id}' is not found in family") }
+                status {
+                    isBadRequest()
+                    reason("Child with id '${child1.id}' is not found in family")
+                }
             }
 
         mockMvc.get("$baseUrl/$lineageId/families/${familyDTO.id}/children") {
             accept = APPLICATION_JSON
             header(AUTHORIZATION, getBearerToken())
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isOk() }
                 content { json(mapper.writeValueAsString(listOf(child2))) }

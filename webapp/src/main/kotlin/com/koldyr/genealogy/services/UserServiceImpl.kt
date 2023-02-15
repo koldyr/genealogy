@@ -5,10 +5,9 @@ import java.time.ZoneId
 import java.util.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpStatus.*
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken.unauthenticated
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
 import org.springframework.security.core.context.SecurityContextHolder
@@ -22,7 +21,7 @@ import com.nimbusds.jose.crypto.MACSigner
 import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import com.koldyr.genealogy.dto.Credentials
-import com.koldyr.genealogy.dto.LibraryUser
+import com.koldyr.genealogy.dto.LineageUser
 import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.persistence.RoleRepository
 import com.koldyr.genealogy.persistence.UserRepository
@@ -60,7 +59,7 @@ class UserServiceImpl(
         }
         user.id = null
         user.password = passwordEncoder.encode(user.password)
-        user.role = roleRepository.findByIdOrNull(1)
+        user.role = roleRepository.findById(1).get()
         userRepository.save(user)
     }
 
@@ -72,12 +71,12 @@ class UserServiceImpl(
     }
 
     @Transactional(readOnly = true)
-    override fun login(credentials: Credentials): LibraryUser {
+    override fun login(credentials: Credentials): LineageUser {
         try {
-            val usernamePassword = UsernamePasswordAuthenticationToken(credentials.username, credentials.password, listOf())
+            val usernamePassword = unauthenticated(credentials.username, credentials.password)
             val authentication = authenticationManager.authenticate(usernamePassword)
 
-            val user = authentication.principal as LibraryUser
+            val user = authentication.principal as LineageUser
             user.token = "Bearer " + generateToken(authentication)
             
             return user

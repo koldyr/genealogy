@@ -150,10 +150,9 @@ class PersonServiceImpl(
         return person
     }
 
-    private fun findPersonEvent(personEventId: Long): PersonEvent {
-        return personEventRepository.findById(personEventId)
-            .orElseThrow { ResponseStatusException(NOT_FOUND, "Event with id '$personEventId' is not found") }
-    }
+    private fun findPersonEvent(personEventId: Long): PersonEvent = personEventRepository
+        .findById(personEventId)
+        .orElseThrow { ResponseStatusException(NOT_FOUND, "Event with id '$personEventId' is not found") }
 
     private fun <I> createPageResult(contentPage: Page<I>): PageResultDTO<I> {
         val pageResult = PageResultDTO<I>(contentPage.content)

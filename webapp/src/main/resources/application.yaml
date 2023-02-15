@@ -52,11 +52,11 @@ spring:
       on-profile: int-test
   datasource:
     url: jdbc:h2:mem:test;DB_CLOSE_ON_EXIT=FALSE
-    username: sa
+    username: xxx
     password: xxx
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
-    show-sql: true
+    show-sql: false
     generate-ddl: true
   test:
     username: xxx

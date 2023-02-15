@@ -40,7 +40,7 @@ class User {
     var surName: String = ""
 
     @ManyToOne(optional = false) @JoinColumn(name = "ROLE_ID") @JsonIgnore
-    var role: Role? = null
+    var role: Role = Role()
 
     override fun toString(): String = "User(id=$id, email='$email', password='***', name='$name', surName='$surName')"
 
@@ -57,5 +57,5 @@ class User {
 
     override fun hashCode(): Int = id?.hashCode() ?: 0
 
-    fun hasRole(role: String): Boolean = this.role?.name == role
+    fun hasRole(role: String): Boolean = this.role.name == role
 }

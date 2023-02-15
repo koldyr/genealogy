@@ -4,7 +4,6 @@ import org.hamcrest.CoreMatchers.containsString
 import org.hamcrest.CoreMatchers.`is`
 import org.junit.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.data.repository.findByIdOrNull
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.HttpHeaders.WWW_AUTHENTICATE
 import org.springframework.http.MediaType.APPLICATION_JSON
@@ -27,10 +26,12 @@ class UserControllerTest : BaseControllerTest() {
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
-                status { isBadRequest() }
-                status { reason("User already registered. Please use different email.") }
+                status {
+                    isBadRequest()
+                    reason("User already registered. Please use different email.")
+                }
             }
     }
 
@@ -44,10 +45,12 @@ class UserControllerTest : BaseControllerTest() {
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
-                status { isBadRequest() }
-                status { reason("invalid data") }
+                status {
+                    isBadRequest()
+                    reason("invalid data")
+                }
             }
     }
 
@@ -63,10 +66,12 @@ class UserControllerTest : BaseControllerTest() {
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
-                status { isForbidden() }
-                status { reason("username or password invalid") }
+                status {
+                    isForbidden()
+                    reason("username or password invalid")
+                }
             }
     }
 
@@ -82,10 +87,12 @@ class UserControllerTest : BaseControllerTest() {
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
-                status { isForbidden() }
-                status { reason("username or password invalid") }
+                status {
+                    isForbidden()
+                    reason("username or password invalid")
+                }
             }
     }
 
@@ -96,7 +103,7 @@ class UserControllerTest : BaseControllerTest() {
             header(AUTHORIZATION, "Bearer 12345")
             accept = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isUnauthorized() }
                 header {
@@ -107,7 +114,7 @@ class UserControllerTest : BaseControllerTest() {
         mockMvc.get("$baseUrl/$lineageId/persons/${person.id}") {
             accept = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isUnauthorized() }
                 header {
@@ -123,7 +130,7 @@ class UserControllerTest : BaseControllerTest() {
         mockMvc.get("$baseUrl/$lineageId/persons/${person.id}") {
             accept = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isUnauthorized() }
                 header {
@@ -140,7 +147,7 @@ class UserControllerTest : BaseControllerTest() {
         register(newUser)
 
         val newEntity = userRepository.findByEmail("admin@koldyr.com").get()
-        newEntity.role = roleRepository.findByIdOrNull(0)
+        newEntity.role = roleRepository.findById(0).get()
         userRepository.save(newEntity)
         
         val credentials = Credentials().apply {
@@ -156,7 +163,7 @@ class UserControllerTest : BaseControllerTest() {
             content = mapper.writeValueAsString(lineage)
             contentType = APPLICATION_JSON
         }
-            .andDo { print() }
+//            .andDo { print() }
             .andExpect {
                 status { isForbidden() }
                 header {

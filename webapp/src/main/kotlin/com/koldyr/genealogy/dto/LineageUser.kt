@@ -6,16 +6,16 @@ import org.springframework.security.core.userdetails.UserDetails
 import com.koldyr.genealogy.model.User
 
 /**
- * Description of the LibraryUser class
+ * Description of the LineageUser class
  *
  * @author d.halitski@gmail.com
  * @created 2022-06-17
  */
-class LibraryUser(private val user: User) : UserDetails {
+class LineageUser(private val user: User) : UserDetails {
 
     var token: String = ""
 
-    override fun getAuthorities(): List<GrantedAuthority> = listOf(SimpleGrantedAuthority(user.role?.name))
+    override fun getAuthorities(): List<GrantedAuthority> = listOf(SimpleGrantedAuthority(user.role.name))
 
     override fun getPassword(): String = user.password
 
@@ -32,6 +32,4 @@ class LibraryUser(private val user: User) : UserDetails {
     override fun toString(): String = "${user.name} ${user.surName}"
 
     fun userId(): Long = user.id!!
-
-    fun getUser(): User = user
 }
