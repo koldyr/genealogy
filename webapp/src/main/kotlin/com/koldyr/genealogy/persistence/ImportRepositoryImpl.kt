@@ -2,11 +2,14 @@ package com.koldyr.genealogy.persistence
 
 import java.sql.Date
 import java.sql.PreparedStatement
-import java.sql.Types.*
+import java.sql.Types.BIGINT
+import java.sql.Types.DATE
+import java.sql.Types.VARCHAR
 import java.time.LocalDate
 import org.springframework.jdbc.core.BatchPreparedStatementSetter
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.jdbc.core.ResultSetExtractor
+import org.springframework.stereotype.Repository
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.LifeEvent
 import com.koldyr.genealogy.model.Person
@@ -17,6 +20,7 @@ import com.koldyr.genealogy.model.Person
  * @author d.halitski@gmail.com
  * @created: 2022-06-25
  */
+@Repository
 class ImportRepositoryImpl(private val jdbc: JdbcTemplate) : ImportRepository {
 
     private val insertPerson = "insert into T_PERSON (PERSON_ID, PLACE, OCCUPATION, NOTE, GENDER, FIRST_NAME, MIDDLE_NAME, LAST_NAME, MAIDEN_NAME, USER_ID, LINEAGE_ID) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"

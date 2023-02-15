@@ -1,12 +1,15 @@
 package com.koldyr.genealogy
 
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy
-import org.springframework.http.HttpHeaders.*
-import org.springframework.http.HttpMethod.*
-import org.springframework.jdbc.core.JdbcTemplate
+import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.HttpMethod.DELETE
+import org.springframework.http.HttpMethod.GET
+import org.springframework.http.HttpMethod.HEAD
+import org.springframework.http.HttpMethod.PATCH
+import org.springframework.http.HttpMethod.POST
+import org.springframework.http.HttpMethod.PUT
 import org.springframework.web.servlet.HandlerExceptionResolver
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
@@ -18,21 +21,9 @@ import com.koldyr.genealogy.mapper.PersonConverter
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.persistence.FamilyEventRepository
-import com.koldyr.genealogy.persistence.FamilyRepository
-import com.koldyr.genealogy.persistence.ImportRepository
-import com.koldyr.genealogy.persistence.ImportRepositoryImpl
-import com.koldyr.genealogy.persistence.LineageRepository
-import com.koldyr.genealogy.persistence.PersonEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import com.koldyr.genealogy.persistence.UserRepository
 import com.koldyr.genealogy.services.AuthenticationUserDetailsService
-import com.koldyr.genealogy.services.FamilyService
-import com.koldyr.genealogy.services.FamilyServiceImpl
-import com.koldyr.genealogy.services.LineageService
-import com.koldyr.genealogy.services.LineageServiceImpl
-import com.koldyr.genealogy.services.PersonService
-import com.koldyr.genealogy.services.PersonServiceImpl
-import com.koldyr.genealogy.services.UserService
 import com.koldyr.genealogy.util.InternalExceptionResolver
 
 /**
@@ -45,49 +36,11 @@ import com.koldyr.genealogy.util.InternalExceptionResolver
 @EnableAspectJAutoProxy
 class GenealogyConfig {
 
-    @Autowired
-    lateinit var personRepository: PersonRepository
-
-    @Autowired
-    lateinit var familyRepository: FamilyRepository
-
-    @Autowired
-    lateinit var familyEventRepository: FamilyEventRepository
-
-    @Autowired
-    lateinit var userRepository: UserRepository
+    @Bean
+    fun authenticationUserDetailsService(userRepository: UserRepository): AuthenticationUserDetailsService = AuthenticationUserDetailsService(userRepository)
 
     @Bean
-    fun personService(mapper: MapperFacade, userService: UserService, personEventRepository: PersonEventRepository): PersonService {
-        return PersonServiceImpl(personRepository, personEventRepository, familyRepository, mapper, userService)
-    }
-
-    @Bean
-    fun familyService(mapper: MapperFacade, userService: UserService): FamilyService {
-        return FamilyServiceImpl(familyRepository, personRepository, familyEventRepository, mapper, userService)
-    }
-
-    @Bean
-    fun lineageService(
-        mapper: MapperFacade, userService: UserService,
-        importRepository: ImportRepository,
-        lineageRepository: LineageRepository
-    ): LineageService {
-        return LineageServiceImpl(lineageRepository, importRepository, personRepository, userService)
-    }
-
-    @Bean
-    fun importRepository(jdbcTemplate: JdbcTemplate): ImportRepository {
-        return ImportRepositoryImpl(jdbcTemplate)
-    }
-    
-    @Bean
-    fun authenticationUserDetailsService(): AuthenticationUserDetailsService {
-        return AuthenticationUserDetailsService(userRepository)
-    }
-
-    @Bean
-    fun mapper(): MapperFacade {
+    fun mapper(personRepository: PersonRepository, familyEventRepository: FamilyEventRepository): MapperFacade {
         val mapperFactory = DefaultMapperFactory.Builder().build()
 
         mapperFactory.classMap(Family::class.java, FamilyDTO::class.java)

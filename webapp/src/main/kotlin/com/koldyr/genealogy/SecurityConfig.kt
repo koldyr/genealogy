@@ -1,7 +1,6 @@
 package com.koldyr.genealogy
 
 import javax.security.auth.kerberos.EncryptionKey
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -29,20 +28,17 @@ import org.springframework.security.web.SecurityFilterChain
  * @author d.halitski@gmail.com
  * @created: 2021-11-04
  */
-@EnableWebSecurity
 @Configuration
+@EnableWebSecurity
 @EnableMethodSecurity(prePostEnabled = true)
 class SecurityConfig {
-
-    @Autowired
-    lateinit var authenticationConfiguration: AuthenticationConfiguration
 
     @Bean
     fun passwordEncoder(): PasswordEncoder = BCryptPasswordEncoder()
 
     @Bean
     @Throws(java.lang.Exception::class)
-    fun authenticationManager(): AuthenticationManager = authenticationConfiguration.authenticationManager
+    fun authenticationManager(authenticationConfiguration: AuthenticationConfiguration): AuthenticationManager = authenticationConfiguration.authenticationManager
 
     @Bean
     fun grantedAuthorityDefaults(): GrantedAuthorityDefaults = GrantedAuthorityDefaults("")
@@ -51,19 +47,17 @@ class SecurityConfig {
     fun jwtDecoder(
         @Value("\${spring.security.secret}") secret: String,
         @Value("\${spring.security.oauth2.resourceserver.jwt.jws-algorithms}") algorithm: String
-    ): JwtDecoder {
-        return NimbusJwtDecoder
-            .withSecretKey(EncryptionKey(secret.toByteArray(), 1))
-            .macAlgorithm(MacAlgorithm.from(algorithm))
-            .build()
-    }
+    ): JwtDecoder = NimbusJwtDecoder
+        .withSecretKey(EncryptionKey(secret.toByteArray(), 1))
+        .macAlgorithm(MacAlgorithm.from(algorithm))
+        .build()
 
     @Bean
     fun authenticationConverter(): JwtAuthenticationConverter = JwtAuthenticationConverter()
         .also {
-            val grantedAuthoritiesConverter = JwtGrantedAuthoritiesConverter()
-            grantedAuthoritiesConverter.setAuthorityPrefix("")
-            it.setJwtGrantedAuthoritiesConverter(grantedAuthoritiesConverter)
+            it.setJwtGrantedAuthoritiesConverter(
+                JwtGrantedAuthoritiesConverter().also { it.setAuthorityPrefix("") }
+            )
         }
 
     @Bean

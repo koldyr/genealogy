@@ -16,10 +16,8 @@ class AuthenticationUserDetailsService(
     private val userRepository: UserRepository
 ) : UserDetailsService {
 
-    override fun loadUserByUsername(email: String): UserDetails {
-        val user = userRepository
-            .findByEmail(email)
-            .orElseThrow { UsernameNotFoundException("Wrong username: $email") }
-        return LibraryUser(user)
-    }
+    override fun loadUserByUsername(email: String): UserDetails = userRepository
+        .findByEmail(email)
+        .map { LibraryUser(it) }
+        .orElseThrow { UsernameNotFoundException("Wrong username: $email") }
 }
