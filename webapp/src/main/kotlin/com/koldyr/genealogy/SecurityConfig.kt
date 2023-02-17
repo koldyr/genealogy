@@ -17,8 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm
 import org.springframework.security.oauth2.jwt.JwtDecoder
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter
-import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
 import org.springframework.security.web.SecurityFilterChain
 
 
@@ -41,7 +39,7 @@ class SecurityConfig {
     fun authenticationManager(authenticationConfiguration: AuthenticationConfiguration): AuthenticationManager = authenticationConfiguration.authenticationManager
 
     @Bean
-    fun grantedAuthorityDefaults(): GrantedAuthorityDefaults = GrantedAuthorityDefaults("")
+    fun grantedAuthorityDefaults(): GrantedAuthorityDefaults = GrantedAuthorityDefaults("SCOPE_")
 
     @Bean
     fun jwtDecoder(
@@ -53,30 +51,18 @@ class SecurityConfig {
         .build()
 
     @Bean
-    fun authenticationConverter(): JwtAuthenticationConverter = JwtAuthenticationConverter()
-        .also {
-            it.setJwtGrantedAuthoritiesConverter(
-                JwtGrantedAuthoritiesConverter().also { it.setAuthorityPrefix("") }
-            )
-        }
-
-    @Bean
     @Throws(Exception::class)
     fun filterChain(http: HttpSecurity): SecurityFilterChain {
-        http
-            .cors()
-            .and()
-            .csrf().disable()
-            .headers().disable()
-            .anonymous()
-            .and()
-            .authorizeHttpRequests()
-            .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**", "/error/**", "/favicon.ico").permitAll()
-            .requestMatchers(POST, "/api/user/**").permitAll()
-            .requestMatchers("/api/**").authenticated()
-            .and()
-            .oauth2ResourceServer().jwt()
-
-        return http.build()
+        return http
+            .cors {}
+            .csrf { it.disable() }
+            .headers { it.disable() }
+            .authorizeHttpRequests {
+                it.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**", "/error/**", "/favicon.ico").permitAll()
+                    .requestMatchers(POST, "/api/user/**").permitAll()
+                    .requestMatchers("/api/**").authenticated()
+            }
+            .oauth2ResourceServer { it.jwt() }
+            .build()
     }
 }

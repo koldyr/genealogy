@@ -155,11 +155,11 @@ class UserControllerTest : BaseControllerTest() {
             password = newUser.password
         }
         
-        val token = login(credentials)
+        val adminToken = login(credentials)
 
         val lineage = LineageDTO("Koldyrs", "Test lineage")
         mockMvc.post("/api/lineage") {
-            header(AUTHORIZATION, token)
+            header(AUTHORIZATION, adminToken)
             content = mapper.writeValueAsString(lineage)
             contentType = APPLICATION_JSON
         }
@@ -170,7 +170,5 @@ class UserControllerTest : BaseControllerTest() {
                     string(WWW_AUTHENTICATE, containsString("insufficient_scope"))
                 }
             }
-
-
     }
 }

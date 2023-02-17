@@ -1,14 +1,12 @@
 <configuration>
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <layout class="ch.qos.logback.classic.PatternLayout">
-            <Pattern>
-                %d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n
-            </Pattern>
-        </layout>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%blue(%date{HH:mm:ss.SSS}) %green([%-15.15thread{15}]) %cyan([%-40.40logger{40}]) %red(%.-1level): %msg%n</pattern>
+        </encoder>
     </appender>
 
     <root level="info">
-        <appender-ref ref="CONSOLE"/>
+        <appender-ref ref="STDOUT"/>
     </root>
 
     <logger name="org.springframework.boot.test" level="warn"/>
