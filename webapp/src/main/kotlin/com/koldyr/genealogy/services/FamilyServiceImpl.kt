@@ -169,7 +169,7 @@ class FamilyServiceImpl(
     @Transactional(readOnly = true)
     override fun findEvents(familyId: Long): Collection<FamilyEvent> {
         find(familyId)
-        return familyRepository.findEvents(familyId)
+        return familyEventRepository.findAllByFamilyId(familyId)
     }
 
     override fun createChild(familyId: Long, child: Person): Long {

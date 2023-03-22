@@ -9,4 +9,6 @@ import com.koldyr.genealogy.model.FamilyEvent
  * @created: 2021-10-08
  */
 @Repository("familyEventRepository")
-interface FamilyEventRepository: JpaRepository<FamilyEvent, Long>
+interface FamilyEventRepository: JpaRepository<FamilyEvent, Long> {
+    fun findAllByFamilyId(id: Long): Collection<FamilyEvent>
+}

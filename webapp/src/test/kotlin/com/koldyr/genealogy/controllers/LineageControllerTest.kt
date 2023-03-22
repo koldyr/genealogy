@@ -1,17 +1,20 @@
 package com.koldyr.genealogy.controllers
 
 import org.hamcrest.Matchers
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertTrue
 import org.junit.Test
-import org.springframework.http.HttpHeaders.*
-import org.springframework.http.MediaType.*
+import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.HttpHeaders.LOCATION
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.web.servlet.delete
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.put
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.koldyr.genealogy.dto.LineageDTO
-import com.koldyr.genealogy.model.EventType.*
+import com.koldyr.genealogy.model.EventType.Marriage
 import com.koldyr.genealogy.model.Family
 import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.Lineage
@@ -139,7 +142,7 @@ class LineageControllerTest : BaseControllerTest() {
             }
 
         //check children is deleted
-        mockMvc.get("$baseUrl/$lineageId/persons/${family.children!!.toList()[0]}") {
+        mockMvc.get("$baseUrl/$lineageId/persons/${family.children!!.first()}") {
             header(AUTHORIZATION, getBearerToken())
             accept = APPLICATION_JSON
         }

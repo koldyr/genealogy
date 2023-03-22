@@ -47,7 +47,7 @@ class PersonServiceImpl(
 
         val page = criteria.page?.index ?: 0
         val size = criteria.page?.size ?: 100
-        val direction = if (criteria.sort == null) Sort.Direction.ASC else Sort.Direction.fromString(criteria.sort!!.order)
+        val direction = criteria.sort?.let { Sort.Direction.fromString(it.order) } ?: Sort.Direction.ASC
         val property = criteria.sort?.name ?: "id"
         val pageSelector = PageRequest.of(page, size, direction, property)
 
@@ -111,7 +111,7 @@ class PersonServiceImpl(
     @Transactional(readOnly = true)
     override fun findEvents(personId: Long): Collection<PersonEvent> {
         findPerson(personId)
-        return personRepository.findEvents(personId)
+        return personEventRepository.findAllByPersonId(personId)
     }
 
     override fun deleteEvent(personId: Long, eventId: Long) {

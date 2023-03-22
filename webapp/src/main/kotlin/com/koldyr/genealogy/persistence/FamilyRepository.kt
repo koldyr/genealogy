@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import com.koldyr.genealogy.model.Family
-import com.koldyr.genealogy.model.FamilyEvent
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.User
 
@@ -18,9 +17,6 @@ import com.koldyr.genealogy.model.User
  */
 @Repository("familyRepository")
 interface FamilyRepository : JpaRepository<Family, Long> {
-    @Query("select f.events from Family as f where f.id = :familyId")
-    fun findEvents(@Param("familyId") familyId: Long): Collection<FamilyEvent>
-
     @Query("select f from Family f join f.children c where c.id = :childId")
     fun findChildFamily(@Param("childId") childId: Long): Optional<Family>
 

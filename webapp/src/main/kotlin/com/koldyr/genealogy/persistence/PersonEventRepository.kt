@@ -11,4 +11,6 @@ import com.koldyr.genealogy.model.PersonEvent
  * @created: 2021-10-08
  */
 @Repository("personEventRepository")
-interface PersonEventRepository: JpaRepository<PersonEvent, Long>
+interface PersonEventRepository: JpaRepository<PersonEvent, Long> {
+    fun findAllByPersonId(id: Long): Collection<PersonEvent>
+}

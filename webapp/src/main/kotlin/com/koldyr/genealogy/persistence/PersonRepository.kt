@@ -2,11 +2,8 @@ package com.koldyr.genealogy.persistence
 
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor
-import org.springframework.data.jpa.repository.Query
-import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
 import com.koldyr.genealogy.model.Person
-import com.koldyr.genealogy.model.PersonEvent
 import com.koldyr.genealogy.model.User
 
 /**
@@ -17,8 +14,5 @@ import com.koldyr.genealogy.model.User
  */
 @Repository("personRepository")
 interface PersonRepository : JpaRepository<Person, Long>, JpaSpecificationExecutor<Person> {
-    @Query("select p.events from Person as p where p.id = :personId")
-    fun findEvents(@Param("personId") personId: Long): Collection<PersonEvent>
-
     fun findAllByUserAndLineageId(user: User, lineageId: Long): List<Person>
 }
