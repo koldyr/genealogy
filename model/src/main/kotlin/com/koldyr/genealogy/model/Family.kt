@@ -14,6 +14,7 @@ import jakarta.persistence.OneToMany
 import jakarta.persistence.OneToOne
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
+import jakarta.validation.constraints.Size
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
@@ -69,6 +70,7 @@ class Family() {
     @ManyToOne @JoinColumn(name = "USER_ID", nullable = false) @JsonIgnore
     lateinit var user: User
 
+    @Size(max = 256)
     var note: String? = null
 
     constructor(id: Long) : this() {

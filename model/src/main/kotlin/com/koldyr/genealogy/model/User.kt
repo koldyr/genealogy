@@ -9,6 +9,7 @@ import jakarta.persistence.JoinColumn
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
+import jakarta.validation.constraints.Size
 import com.fasterxml.jackson.annotation.JsonIgnore
 
 /**
@@ -28,15 +29,19 @@ class User {
     var id: Long? = null
 
     @Column(name = "EMAIL", nullable = false, unique = true)
+    @Size(max = 100)
     var email: String = ""
 
     @Column(name = "PASSWORD", nullable = false)
+    @Size(max = 256)
     var password: String = ""
 
     @Column(name = "NAME", nullable = false)
+    @Size(max = 32)
     var name: String = ""
 
     @Column(name = "SURNAME", nullable = false)
+    @Size(max = 32)
     var surName: String = ""
 
     @ManyToOne(optional = false) @JoinColumn(name = "ROLE_ID") @JsonIgnore

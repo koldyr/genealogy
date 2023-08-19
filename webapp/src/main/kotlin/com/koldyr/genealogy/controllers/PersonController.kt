@@ -1,13 +1,28 @@
 package com.koldyr.genealogy.controllers
 
 import java.net.URI
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.headers.Header
+import io.swagger.v3.oas.annotations.media.ArraySchema
+import io.swagger.v3.oas.annotations.media.Content
+import io.swagger.v3.oas.annotations.media.Schema
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
+import io.swagger.v3.oas.annotations.tags.Tags
+import jakarta.validation.Valid
 import org.springframework.core.io.InputStreamResource
 import org.springframework.core.io.Resource
-import org.springframework.http.HttpHeaders.*
-import org.springframework.http.HttpStatus.*
-import org.springframework.http.MediaType.*
+import org.springframework.http.HttpHeaders.CONTENT_DISPOSITION
+import org.springframework.http.HttpHeaders.CONTENT_TYPE
+import org.springframework.http.HttpHeaders.LOCATION
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
+import org.springframework.http.MediaType.IMAGE_JPEG_VALUE
+import org.springframework.http.MediaType.IMAGE_PNG_VALUE
 import org.springframework.http.ResponseEntity
-import org.springframework.http.ResponseEntity.*
+import org.springframework.http.ResponseEntity.created
+import org.springframework.http.ResponseEntity.noContent
+import org.springframework.http.ResponseEntity.ok
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -19,15 +34,6 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.ResponseBody
 import org.springframework.web.bind.annotation.RestController
 import org.springframework.web.server.ResponseStatusException
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.headers.Header
-import io.swagger.v3.oas.annotations.media.ArraySchema
-import io.swagger.v3.oas.annotations.media.Content
-import io.swagger.v3.oas.annotations.media.Schema
-import io.swagger.v3.oas.annotations.responses.ApiResponse
-import io.swagger.v3.oas.annotations.tags.Tag
-import io.swagger.v3.oas.annotations.tags.Tags
-import com.koldyr.genealogy.dto.ErrorResponse
 import com.koldyr.genealogy.dto.PageResultDTO
 import com.koldyr.genealogy.dto.SearchDTO
 import com.koldyr.genealogy.model.Person
@@ -45,34 +51,26 @@ const val IMAGE_JPG_VALUE = "image/jpg"
 @RestController
 @RequestMapping("/api/lineage")
 @Tags(value = [Tag(name = "PersonController")])
-@ApiResponse(
-    description = "Internal server error",
-    responseCode = "500",
-    content = [Content(mediaType = APPLICATION_JSON_VALUE, schema = Schema(implementation = ErrorResponse::class))]
-)
-class PersonController(private val personService: PersonService) {
+class PersonController(
+    private val personService: PersonService
+) : BaseController() {
 
     @Operation(
         description = "Search person in lineage by criteria",
         responses = [
-            ApiResponse(
-                description = "List of persons", responseCode = "200", content = [
-                    Content(mediaType = APPLICATION_JSON_VALUE, schema = Schema(implementation = PageResultDTO::class))
-                ]
-            )
+            ApiResponse(description = "List of persons", responseCode = "200", content = [
+                    Content(mediaType = APPLICATION_JSON_VALUE, schema = Schema(implementation = PageResultDTO::class))])
         ]
     )
     @PostMapping("/{lineageId}/persons/search", consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])
-    fun search(@PathVariable("lineageId") lineageId: Long, @RequestBody criteria: SearchDTO): PageResultDTO<Person> = personService.search(lineageId, criteria)
+    fun search(@PathVariable("lineageId") lineageId: Long, @RequestBody criteria: SearchDTO): PageResultDTO<Person> =
+        personService.search(lineageId, criteria)
 
     @Operation(
         description = "Fetches list of all persons in lineage",
         responses = [
-            ApiResponse(
-                description = "List of persons", responseCode = "200", content = [
-                    Content(mediaType = APPLICATION_JSON_VALUE, array = ArraySchema(schema = Schema(implementation = Person::class)))
-                ]
-            )
+            ApiResponse(description = "List of persons", responseCode = "200", content = [
+                    Content(mediaType = APPLICATION_JSON_VALUE, array = ArraySchema(schema = Schema(implementation = Person::class)))])
         ]
     )
     @GetMapping("/{lineageId}/persons", produces = [APPLICATION_JSON_VALUE])
@@ -88,7 +86,7 @@ class PersonController(private val personService: PersonService) {
         )]
     )
     @PostMapping("/{lineageId}/persons", consumes = [APPLICATION_JSON_VALUE])
-    fun create(@PathVariable("lineageId") lineageId: Long, @RequestBody person: Person): ResponseEntity<Unit> {
+    fun create(@PathVariable("lineageId") lineageId: Long, @RequestBody @Valid person: Person): ResponseEntity<Unit> {
         person.lineageId = lineageId
         val personId = personService.create(person)
 
@@ -101,7 +99,9 @@ class PersonController(private val personService: PersonService) {
         responses = [ApiResponse(description = "Person is updated", responseCode = "200", content = [Content()])]
     )
     @PutMapping("/{lineageId}/persons/{personId}")
-    fun update(@PathVariable("lineageId") lineageId: Long, @PathVariable("personId") personId: Long, @RequestBody person: Person): ResponseEntity<Unit> {
+    fun update(@PathVariable("lineageId") lineageId: Long,
+               @PathVariable("personId") personId: Long,
+               @RequestBody @Valid person: Person): ResponseEntity<Unit> {
         personService.update(personId, person)
 
         return ok().build()
@@ -110,11 +110,8 @@ class PersonController(private val personService: PersonService) {
     @Operation(
         description = "Get person by id",
         responses = [
-            ApiResponse(
-                description = "Person data", responseCode = "200", content = [
-                    Content(mediaType = APPLICATION_JSON_VALUE, schema = Schema(implementation = Person::class))
-                ]
-            )
+            ApiResponse(description = "Person data", responseCode = "200", content = [
+                    Content(mediaType = APPLICATION_JSON_VALUE, schema = Schema(implementation = Person::class))])
         ]
     )
     @GetMapping("/{lineageId}/persons/{personId}", produces = [APPLICATION_JSON_VALUE])
@@ -141,7 +138,9 @@ class PersonController(private val personService: PersonService) {
         )]
     )
     @PostMapping("/{lineageId}/persons/{personId}/events", consumes = [APPLICATION_JSON_VALUE])
-    fun createEvent(@PathVariable("lineageId") lineageId: Long, @PathVariable("personId") personId: Long, @RequestBody event: PersonEvent): ResponseEntity<Unit> {
+    fun createEvent(@PathVariable("lineageId") lineageId: Long,
+                    @PathVariable("personId") personId: Long,
+                    @RequestBody @Valid event: PersonEvent): ResponseEntity<Unit> {
         val eventId = personService.createEvent(personId, event)
 
         val uri = URI.create("/api/lineage/$lineageId/persons/$personId/events/$eventId")
@@ -151,11 +150,8 @@ class PersonController(private val personService: PersonService) {
     @Operation(
         description = "Fetches list of all events for person",
         responses = [
-            ApiResponse(
-                description = "List of persons", responseCode = "200", content = [
-                    Content(mediaType = APPLICATION_JSON_VALUE, array = ArraySchema(schema = Schema(implementation = PersonEvent::class)))
-                ]
-            )
+            ApiResponse(description = "List of persons", responseCode = "200", content = [
+                    Content(mediaType = APPLICATION_JSON_VALUE, array = ArraySchema(schema = Schema(implementation = PersonEvent::class)))])
         ]
     )
     @GetMapping("/{lineageId}/persons/{personId}/events", produces = [APPLICATION_JSON_VALUE])
@@ -166,7 +162,9 @@ class PersonController(private val personService: PersonService) {
         responses = [ApiResponse(description = "Event is deleted", responseCode = "204", content = [Content()])]
     )
     @DeleteMapping("/{lineageId}/persons/{personId}/events/{eventId}")
-    fun deleteEvent(@PathVariable("lineageId") lineageId: Long, @PathVariable("personId") personId: Long, @PathVariable("eventId") eventId: Long): ResponseEntity<Unit> {
+    fun deleteEvent(@PathVariable("lineageId") lineageId: Long,
+                    @PathVariable("personId") personId: Long,
+                    @PathVariable("eventId") eventId: Long): ResponseEntity<Unit> {
         personService.deleteEvent(personId, eventId)
 
         return noContent().build()

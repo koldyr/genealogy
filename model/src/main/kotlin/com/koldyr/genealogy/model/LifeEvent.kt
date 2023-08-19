@@ -10,6 +10,7 @@ import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.MappedSuperclass
 import jakarta.persistence.SequenceGenerator
+import jakarta.validation.constraints.Size
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize
 import com.fasterxml.jackson.databind.annotation.JsonSerialize
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateDeserializer
@@ -52,8 +53,10 @@ open class LifeEvent() : Comparable<LifeEvent?>, Cloneable {
     @JsonDeserialize(using = LocalDateDeserializer::class)
     open var date: LocalDate? = null
 
+    @Size(max = 256)
     open var place: String? = null
 
+    @Size(max = 256)
     open var note: String? = null
 
     constructor(type: EventType) : this() {

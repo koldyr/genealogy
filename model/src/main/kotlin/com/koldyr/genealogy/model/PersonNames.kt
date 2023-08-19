@@ -1,8 +1,9 @@
 package com.koldyr.genealogy.model
 
-import java.util.StringJoiner
+import java.util.*
 import java.util.function.Predicate
 import jakarta.persistence.Embeddable
+import jakarta.validation.constraints.Size
 
 /**
  * Description of class PersonNames
@@ -12,9 +13,16 @@ import jakarta.persistence.Embeddable
  */
 @Embeddable
 class PersonNames() : Cloneable {
+    @Size(max = 256)
     var first: String? = null
+
+    @Size(max = 256)
     var middle: String? = null
+
+    @Size(max = 256)
     var last: String? = null
+
+    @Size(max = 256)
     var maiden: String? = null
 
     constructor(first: String) : this() {

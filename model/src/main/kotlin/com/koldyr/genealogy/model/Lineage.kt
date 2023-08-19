@@ -12,6 +12,7 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
+import jakarta.validation.constraints.Size
 import com.fasterxml.jackson.annotation.JsonIgnore
 
 /**
@@ -31,8 +32,10 @@ class Lineage() {
     var id: Long? = null
 
     @Column(name = "LINEAGE_NAME", nullable = false)
+    @Size(max = 256)
     var name: String = ""
 
+    @Size(max = 256)
     var note: String? = null
 
     @OneToMany(fetch = LAZY, cascade = [CascadeType.REMOVE], orphanRemoval = true)

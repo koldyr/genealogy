@@ -62,7 +62,7 @@ class SecurityConfig {
                     .requestMatchers(POST, "/api/user/**").permitAll()
                     .requestMatchers("/api/**").authenticated()
             }
-            .oauth2ResourceServer { it.jwt() }
+            .oauth2ResourceServer { it.jwt { } }
             .build()
     }
 }

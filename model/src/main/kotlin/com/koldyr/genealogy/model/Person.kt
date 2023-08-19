@@ -19,6 +19,7 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import jakarta.persistence.SequenceGenerator
 import jakarta.persistence.Table
+import jakarta.validation.constraints.Size
 import com.fasterxml.jackson.annotation.JsonIgnore
 import com.fasterxml.jackson.annotation.JsonPropertyOrder
 import com.koldyr.genealogy.model.converter.GenderConverter
@@ -52,10 +53,13 @@ class Person() : Cloneable {
     @OneToMany(mappedBy = "person", cascade = [CascadeType.ALL], fetch = FetchType.EAGER, orphanRemoval = true)
     var events: MutableSet<PersonEvent> = mutableSetOf()
 
+    @Size(max = 256)
     var place: String? = null
 
+    @Size(max = 256)
     var occupation: String? = null
 
+    @Size(max = 256)
     var note: String? = null
 
     @Basic(optional = false)
@@ -69,6 +73,7 @@ class Person() : Cloneable {
     var familyId: Long? = null
 
     @Column(name = "PHOTO_URL", nullable = true)
+    @Size(max = 1024)
     var photoUrl: String? = null
 
     @Lob @Basic(fetch = FetchType.LAZY)
