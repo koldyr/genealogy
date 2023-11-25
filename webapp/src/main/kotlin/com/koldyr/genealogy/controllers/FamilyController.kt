@@ -37,7 +37,7 @@ import com.koldyr.genealogy.services.FamilyService
  * @created: 2021-09-25
  */
 @RestController
-@RequestMapping("/api/lineage")
+@RequestMapping("/api/v1/lineage")
 @Tags(value = [Tag(name = "FamilyController")])
 class FamilyController(
     private val familyService: FamilyService
@@ -66,7 +66,7 @@ class FamilyController(
     fun create(@PathVariable("lineageId") lineageId: Long, @RequestBody family: FamilyDTO): ResponseEntity<Unit> {
         val familyId = familyService.create(lineageId, family)
 
-        val uri = URI.create("/api/lineage/$lineageId/families/${familyId}")
+        val uri = URI.create("/api/v1/lineage/$lineageId/families/${familyId}")
         return created(uri).build()
     }
 
@@ -120,7 +120,7 @@ class FamilyController(
                     @RequestBody @Valid event: FamilyEvent): ResponseEntity<Unit> {
         val eventId = familyService.createEvent(familyId, event)
 
-        val uri = URI.create("/api/lineage/$lineageId/families/$familyId/events/$eventId")
+        val uri = URI.create("/api/v1/lineage/$lineageId/families/$familyId/events/$eventId")
         return created(uri).build()
     }
 
@@ -163,7 +163,7 @@ class FamilyController(
                     @RequestBody @Valid child: Person): ResponseEntity<Unit> {
         val childId = familyService.createChild(familyId, child)
 
-        val uri = URI.create("/api/lineage/$lineageId/persons/$childId")
+        val uri = URI.create("/api/v1/lineage/$lineageId/persons/$childId")
         return created(uri).build()
     }
 
@@ -182,7 +182,7 @@ class FamilyController(
                  @PathVariable("childId") childId: Long): ResponseEntity<Unit> {
         familyService.addChild(familyId, childId)
 
-        val uri = URI.create("/api/lineage/$lineageId/persons/$childId")
+        val uri = URI.create("/api/v1/lineage/$lineageId/persons/$childId")
         return created(uri).build()
     }
 

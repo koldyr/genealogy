@@ -49,7 +49,7 @@ const val IMAGE_JPG_VALUE = "image/jpg"
  * @created: 2021-09-25
  */
 @RestController
-@RequestMapping("/api/lineage")
+@RequestMapping("/api/v1/lineage")
 @Tags(value = [Tag(name = "PersonController")])
 class PersonController(
     private val personService: PersonService
@@ -90,7 +90,7 @@ class PersonController(
         person.lineageId = lineageId
         val personId = personService.create(person)
 
-        val uri = URI.create("/api/lineage/$lineageId/persons/$personId")
+        val uri = URI.create("/api/v1/lineage/$lineageId/persons/$personId")
         return created(uri).build()
     }
 
@@ -143,7 +143,7 @@ class PersonController(
                     @RequestBody @Valid event: PersonEvent): ResponseEntity<Unit> {
         val eventId = personService.createEvent(personId, event)
 
-        val uri = URI.create("/api/lineage/$lineageId/persons/$personId/events/$eventId")
+        val uri = URI.create("/api/v1/lineage/$lineageId/persons/$personId/events/$eventId")
         return created(uri).build()
     }
 

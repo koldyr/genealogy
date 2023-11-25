@@ -40,7 +40,7 @@ const val TEXT_GED = "text/ged"
  * @created 2022-06-23
  */
 @RestController
-@RequestMapping("/api/lineage")
+@RequestMapping("/api/v1/lineage")
 @Tags(value = [Tag(name = "LineageController")])
 class LineageController(
     private val lineageService: LineageService
@@ -69,7 +69,7 @@ class LineageController(
     fun create(@RequestBody @Valid lineage: LineageDTO): ResponseEntity<Unit> {
         val lineageId = lineageService.create(lineage)
 
-        val uri = URI.create("/api/lineage/${lineageId}")
+        val uri = URI.create("/api/v1/lineage/${lineageId}")
         return created(uri).build()
     }
 
@@ -123,7 +123,7 @@ class LineageController(
     ): ResponseEntity<Unit> {
         val lineageId = lineageService.importLineage(dataType, lineage, name, note)
 
-        val uri = URI.create("/api/lineage/${lineageId}")
+        val uri = URI.create("/api/v1/lineage/${lineageId}")
         return created(uri).build()
     }
 

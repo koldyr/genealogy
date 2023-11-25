@@ -1,9 +1,10 @@
 package com.koldyr.genealogy.controllers
 
-import java.lang.Long.*
+import java.lang.Long.parseLong
 import java.time.LocalDate
-import org.apache.commons.lang3.RandomStringUtils.*
-import org.hamcrest.Matchers.*
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
+import org.hamcrest.Matchers.matchesRegex
 import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
@@ -11,19 +12,20 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.http.HttpHeaders.*
-import org.springframework.http.MediaType.*
+import org.springframework.http.HttpHeaders.AUTHORIZATION
+import org.springframework.http.HttpHeaders.LOCATION
+import org.springframework.http.MediaType.APPLICATION_JSON
 import org.springframework.test.annotation.IfProfileValue
 import org.springframework.test.context.junit4.SpringRunner
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.post
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.koldyr.genealogy.Genealogy
 import com.koldyr.genealogy.dto.Credentials
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.dto.LineageDTO
 import com.koldyr.genealogy.model.EventType
-import com.koldyr.genealogy.model.EventType.*
+import com.koldyr.genealogy.model.EventType.Birth
+import com.koldyr.genealogy.model.EventType.Marriage
 import com.koldyr.genealogy.model.FamilyEvent
 import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.Person
@@ -71,7 +73,7 @@ abstract class BaseControllerTest {
     @Value("\${spring.test.username}") lateinit var testUser: String
     @Value("\${spring.test.password}") lateinit var testPassword: String
 
-    protected val baseUrl = "/api/lineage"
+    protected val baseUrl = "/api/v1/lineage"
 
     protected fun createPersonModel(gender: Gender): Person {
         val person = Person()
@@ -126,14 +128,14 @@ abstract class BaseControllerTest {
     }
 
     protected fun register(user: User) {
-        mockMvc.post("/api/user/registration") {
+        mockMvc.post("/api/v1/user/registration") {
             content = mapper.writeValueAsString(user)
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
         }
             .andExpect {
                 status { isCreated() }
-                header { string(LOCATION, matchesRegex("/api/user/login")) }
+                header { string(LOCATION, matchesRegex("/api/v1/user/login")) }
             }
     }
 
@@ -157,7 +159,7 @@ abstract class BaseControllerTest {
     }
 
     protected fun login(credentials: Credentials): String {
-        return mockMvc.post("/api/user/login") {
+        return mockMvc.post("/api/v1/user/login") {
             content = mapper.writeValueAsString(credentials)
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
@@ -234,14 +236,14 @@ abstract class BaseControllerTest {
 
     protected fun createLineAge(): Long {
         val lineage = LineageDTO("Koldyrs", "Test lineage")
-        val location = mockMvc.post("/api/lineage") {
+        val location = mockMvc.post("/api/v1/lineage") {
             header(AUTHORIZATION, getBearerToken())
             content = mapper.writeValueAsString(lineage)
             contentType = APPLICATION_JSON
         }
             .andExpect {
                 status { isCreated() }
-                header { string(LOCATION, matchesRegex("/api/lineage/\\d+$")) }
+                header { string(LOCATION, matchesRegex("/api/v1/lineage/\\d+$")) }
             }
             .andReturn().response.getHeader(LOCATION)
         return getLastIdFromLocation(location)
