@@ -13,9 +13,9 @@ jobs:
       - name: Set up JDK 21
         uses: actions/setup-java@v2
         with:
-              java-version: '21'          s
-              distribution: 'zulu'
-              cache: 'maven'
+          java-version: '21'
+          distribution: 'zulu'
+          cache: 'maven'
       - name: Build All
         run: mvn -B package -DskipTests --file pom.xml
       - name: Test All
