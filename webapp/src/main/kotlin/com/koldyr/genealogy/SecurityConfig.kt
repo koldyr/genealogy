@@ -59,8 +59,8 @@ class SecurityConfig {
             .headers { it.disable() }
             .authorizeHttpRequests {
                 it.requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs", "/v3/api-docs/**", "/error/**", "/favicon.ico").permitAll()
-                    .requestMatchers(POST, "/api/v1/user/**").permitAll()
-                    .requestMatchers("/api/v1/**").authenticated()
+                    .requestMatchers(POST, "/api/user/v1/**").permitAll()
+                    .requestMatchers("/api/lineage/v1/**").authenticated()
             }
             .oauth2ResourceServer { it.jwt { } }
             .build()

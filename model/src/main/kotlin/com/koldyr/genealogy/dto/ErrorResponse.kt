@@ -16,3 +16,9 @@ data class ErrorResponse(
     var exception: String? = null,
     var trace: String? = null
 )
+
+
+data class ErrorDetails(
+    var pointer: String? = null,
+    var error: String? = null,
+)

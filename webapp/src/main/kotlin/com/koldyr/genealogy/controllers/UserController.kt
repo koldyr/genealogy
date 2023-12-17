@@ -18,7 +18,7 @@ import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.services.UserService
 
 @RestController
-@RequestMapping("/api/v1/user")
+@RequestMapping("/api/user/v1")
 @Tags(value = [Tag(name = "UserController")])
 class UserController(
     private val userService: UserService
@@ -28,7 +28,7 @@ class UserController(
     fun create(@RequestBody @Valid user: User): ResponseEntity<Unit> {
         userService.create(user)
 
-        val uri = URI.create("/api/v1/user/login")
+        val uri = URI.create("/api/user/v1/login")
         return created(uri).build()
     }
 

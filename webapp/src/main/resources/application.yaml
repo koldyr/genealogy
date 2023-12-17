@@ -4,6 +4,9 @@ server:
     include-message: always
     include-stacktrace: on_param
 spring:
+  threads:
+    virtual:
+      enabled: true
   datasource:
     url: jdbc:postgresql://localhost:5432/genealogy
     username: xxx

@@ -121,8 +121,8 @@ class FamilyControllerTest : BaseControllerTest() {
     @Test
     fun deleteFamily() {
         val children = listOf(
-                createPerson(Gender.FEMALE).id!!,
-                createPerson(Gender.FEMALE).id!!
+            createPerson(Gender.FEMALE).id!!,
+            createPerson(Gender.FEMALE).id!!
         )
 
         val familyDto = createFamily(children)

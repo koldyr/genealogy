@@ -1,5 +1,7 @@
 package com.koldyr.genealogy
 
+import ma.glasnost.orika.MapperFacade
+import ma.glasnost.orika.impl.DefaultMapperFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.EnableAspectJAutoProxy
@@ -10,11 +12,8 @@ import org.springframework.http.HttpMethod.HEAD
 import org.springframework.http.HttpMethod.PATCH
 import org.springframework.http.HttpMethod.POST
 import org.springframework.http.HttpMethod.PUT
-import org.springframework.web.servlet.HandlerExceptionResolver
 import org.springframework.web.servlet.config.annotation.CorsRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
-import ma.glasnost.orika.MapperFacade
-import ma.glasnost.orika.impl.DefaultMapperFactory
 import com.koldyr.genealogy.dto.FamilyDTO
 import com.koldyr.genealogy.mapper.FamilyEventConverter
 import com.koldyr.genealogy.mapper.PersonConverter
@@ -24,7 +23,6 @@ import com.koldyr.genealogy.persistence.FamilyEventRepository
 import com.koldyr.genealogy.persistence.PersonRepository
 import com.koldyr.genealogy.persistence.UserRepository
 import com.koldyr.genealogy.services.AuthenticationUserDetailsService
-import com.koldyr.genealogy.util.InternalExceptionResolver
 
 /**
  * Description of class GenealogyConfig
@@ -61,10 +59,6 @@ class GenealogyConfig {
     @Bean
     fun corsConfigurer(): WebMvcConfigurer {
         return object : WebMvcConfigurer {
-
-            override fun extendHandlerExceptionResolvers(resolvers: MutableList<HandlerExceptionResolver>) {
-                resolvers.add(InternalExceptionResolver())
-            }
 
             override fun addCorsMappings(registry: CorsRegistry) {
                 registry.addMapping("/**")
