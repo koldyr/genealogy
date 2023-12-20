@@ -73,7 +73,7 @@ abstract class BaseControllerTest {
     @Value("\${spring.test.username}") lateinit var testUser: String
     @Value("\${spring.test.password}") lateinit var testPassword: String
 
-    protected val baseUrl = "/api/lineage/v1"
+    protected val baseUrl = "/api/v1/lineage"
 
     protected fun createPersonModel(gender: Gender): Person {
         val person = Person()
@@ -128,14 +128,14 @@ abstract class BaseControllerTest {
     }
 
     protected fun register(user: User) {
-        mockMvc.post("/api/user/v1/registration") {
+        mockMvc.post("/api/v1/user/registration") {
             content = mapper.writeValueAsString(user)
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
         }
             .andExpect {
                 status { isCreated() }
-                header { string(LOCATION, matchesRegex("/api/user/v1/login")) }
+                header { string(LOCATION, matchesRegex("/api/v1/user/login")) }
             }
     }
 
@@ -159,7 +159,7 @@ abstract class BaseControllerTest {
     }
 
     protected fun login(credentials: Credentials): String {
-        return mockMvc.post("/api/user/v1/login") {
+        return mockMvc.post("/api/v1/user/login") {
             content = mapper.writeValueAsString(credentials)
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
@@ -236,14 +236,14 @@ abstract class BaseControllerTest {
 
     protected fun createLineAge(): Long {
         val lineage = LineageDTO("Koldyrs", "Test lineage")
-        val location = mockMvc.post("/api/lineage/v1") {
+        val location = mockMvc.post("/api/v1/lineage") {
             header(AUTHORIZATION, getBearerToken())
             content = mapper.writeValueAsString(lineage)
             contentType = APPLICATION_JSON
         }
             .andExpect {
                 status { isCreated() }
-                header { string(LOCATION, matchesRegex("/api/lineage/v1/\\d+$")) }
+                header { string(LOCATION, matchesRegex("/api/v1/lineage/\\d+$")) }
             }
             .andReturn().response.getHeader(LOCATION)
         return getLastIdFromLocation(location)

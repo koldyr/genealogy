@@ -21,7 +21,7 @@ class UserControllerTest : BaseControllerTest() {
 
     @Test
     fun registerExistingUser() {
-        mockMvc.post("/api/user/v1/registration") {
+        mockMvc.post("/api/v1/user/registration") {
             content = mapper.writeValueAsString(createUser())
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
@@ -40,7 +40,7 @@ class UserControllerTest : BaseControllerTest() {
         val credentials = Credentials().apply {
             username = "lemming@koldyr.com"
         }
-        mockMvc.post("/api/user/v1/registration") {
+        mockMvc.post("/api/v1/user/registration") {
             content = mapper.writeValueAsString(credentials)
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
@@ -61,7 +61,7 @@ class UserControllerTest : BaseControllerTest() {
             password = "1112"
         }
 
-        mockMvc.post("/api/user/v1/login") {
+        mockMvc.post("/api/v1/user/login") {
             content = mapper.writeValueAsString(credentials)
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
@@ -82,7 +82,7 @@ class UserControllerTest : BaseControllerTest() {
             password = "koldyr"
         }
 
-        mockMvc.post("/api/user/v1/login") {
+        mockMvc.post("/api/v1/user/login") {
             content = mapper.writeValueAsString(credentials)
             contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
@@ -158,7 +158,7 @@ class UserControllerTest : BaseControllerTest() {
         val adminToken = login(credentials)
 
         val lineage = LineageDTO("Koldyrs", "Test lineage")
-        mockMvc.post("/api/lineage/v1") {
+        mockMvc.post("/api/v1/lineage") {
             header(AUTHORIZATION, adminToken)
             content = mapper.writeValueAsString(lineage)
             contentType = APPLICATION_JSON

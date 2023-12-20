@@ -1,5 +1,5 @@
 ### User login
-POST http://{{server}}/api/user/v1/login
+POST http://{{server}}/api/v1/user/login
 Content-Type: application/json
 
 {
@@ -8,7 +8,7 @@ Content-Type: application/json
 }
 
 ### Import Lineage
-POST http://{{server}}/api/lineage/v1/import
+POST http://{{server}}/api/v1/lineage/import
 Authorization: Bearer {{authToken}}
 Content-Type: text/ged
 Lineage-Name: Test Lineage GED
@@ -16,17 +16,17 @@ Lineage-Name: Test Lineage GED
 < ../test-lineage.ged
 
 ### Get all Lineages
-GET http://{{server}}/api/lineage/v1
+GET http://{{server}}/api/v1/lineage
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Get Lineage
-GET http://{{server}}/api/lineage/v1/2
+GET http://{{server}}/api/v1/lineage/2
 Authorization: Bearer {{authToken}}
 Accept: application/json
 
 ### Create new Lineage
-POST http://{{server}}/api/lineage/v1
+POST http://{{server}}/api/v1/lineage
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 Accept: application/json
@@ -37,11 +37,11 @@ Accept: application/json
 }
 
 ### Delete Lineage
-DELETE http://{{server}}/api/lineage/v1/4
+DELETE http://{{server}}/api/v1/lineage/4
 Authorization: Bearer {{authToken}}
 
 ### Update Lineage
-PUT http://{{server}}/api/lineage/v1/import
+PUT http://{{server}}/api/v1/lineage/import
 Authorization: Bearer {{authToken}}
 Content-Type: application/json
 
@@ -51,6 +51,6 @@ Content-Type: application/json
 }
 
 ### Export Lineage
-GET http://{{server}}/api/lineage/v1/2/export
+GET http://{{server}}/api/v1/lineage/2/export
 Authorization: Bearer {{authToken}}
 Accept: text/ged
