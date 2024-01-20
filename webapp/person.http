@@ -10,13 +10,15 @@ Content-Type: application/json
 }
 
 ### User login
+< {%
+    const pwd = request.environment.get("testUserPwd")
+    const userPwd = 'me@koldyr.com:' + pwd;
+    const basicAuthValue = crypto.md5().updateWithText(userPwd).digest().toBase64()
+    request.variables.set("basicAuthValue", basicAuthValue)
+%}
 POST http://{{server}}/api/v1/user/login
-Content-Type: application/json
-
-{
-  "username": "me@koldyr.com",
-  "password": "{{testUserPwd}}"
-}
+Accept: application/json
+Authorization: Basic {{basicAuthValue}}
 
 ### Get All Persons
 GET http://{{server}}/api/v1/lineage/1/persons

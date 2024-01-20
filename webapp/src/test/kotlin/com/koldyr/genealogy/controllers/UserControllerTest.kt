@@ -1,5 +1,6 @@
 package com.koldyr.genealogy.controllers
 
+import org.apache.commons.lang3.RandomStringUtils
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.Matchers.containsString
 import org.junit.Test
@@ -56,15 +57,14 @@ class UserControllerTest : BaseControllerTest() {
 
     @Test
     fun wrongPassword() {
-        val credentials = Credentials().apply {
-            username = "me@koldyr.com"
-            password = "1112"
-        }
+        val username = "me@koldyr.com"
+        var password = "1112"
 
         mockMvc.post("/api/v1/user/login") {
-            content = mapper.writeValueAsString(credentials)
-            contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
+            headers {
+                setBasicAuth(username, password, Charsets.UTF_8)
+            }
         }
 //            .andDo { print() }
             .andExpect {
@@ -73,19 +73,34 @@ class UserControllerTest : BaseControllerTest() {
                     reason("username or password invalid")
                 }
             }
+
+        password = RandomStringUtils.randomAlphabetic(260)
+
+        mockMvc.post("/api/v1/user/login") {
+            accept = APPLICATION_JSON
+            headers {
+                setBasicAuth(username, password, Charsets.UTF_8)
+            }
+        }
+//            .andDo { print() }
+            .andExpect {
+                status {
+                    isBadRequest()
+                    reason("size must be between 0 and 256")
+                }
+            }
     }
 
     @Test
     fun wrongUser() {
-        val credentials = Credentials().apply {
-            username = "you@koldyr.com"
-            password = "koldyr"
-        }
+        val username = "you@koldyr.com"
+        val password = testPassword
 
         mockMvc.post("/api/v1/user/login") {
-            content = mapper.writeValueAsString(credentials)
-            contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
+            headers {
+                setBasicAuth(username, password, Charsets.UTF_8)
+            }
         }
 //            .andDo { print() }
             .andExpect {

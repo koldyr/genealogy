@@ -3,9 +3,17 @@ package com.koldyr.genealogy.services
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.*
+import kotlin.text.Charsets.UTF_8
+import com.nimbusds.jose.JWSAlgorithm
+import com.nimbusds.jose.JWSHeader
+import com.nimbusds.jose.crypto.MACSigner
+import com.nimbusds.jwt.JWTClaimsSet
+import com.nimbusds.jwt.SignedJWT
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.BAD_REQUEST
+import org.springframework.http.HttpStatus.FORBIDDEN
+import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken.unauthenticated
 import org.springframework.security.core.Authentication
@@ -15,12 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.server.ResponseStatusException
-import com.nimbusds.jose.JWSAlgorithm
-import com.nimbusds.jose.JWSHeader
-import com.nimbusds.jose.crypto.MACSigner
-import com.nimbusds.jwt.JWTClaimsSet
-import com.nimbusds.jwt.SignedJWT
-import com.koldyr.genealogy.dto.Credentials
 import com.koldyr.genealogy.dto.LineageUser
 import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.persistence.RoleRepository
@@ -71,18 +73,32 @@ class UserServiceImpl(
     }
 
     @Transactional(readOnly = true)
-    override fun login(credentials: Credentials): LineageUser {
+    override fun login(credentials: String): LineageUser {
         try {
-            val usernamePassword = unauthenticated(credentials.username, credentials.password)
-            val authentication = authenticationManager.authenticate(usernamePassword)
+            val (userName, password) = getCredentials(credentials)
+            val unauthenticatedToken = unauthenticated(userName, password)
+            val authentication = authenticationManager.authenticate(unauthenticatedToken)
 
             val user = authentication.principal as LineageUser
             user.token = "Bearer " + generateToken(authentication)
             
             return user
+        } catch (e: IllegalArgumentException) {
+            throw ResponseStatusException(BAD_REQUEST, e.message)
         } catch (e: AuthenticationException) {
             throw ResponseStatusException(FORBIDDEN, "username or password invalid")
         }
+    }
+
+    private fun getCredentials(credentials: String): Pair<String, String> {
+        if (!credentials.contains("Basic")) {
+            throw IllegalArgumentException("Wrong authentication schema")
+        }
+        var userNamePassword = credentials.substringAfter("Basic ")
+        userNamePassword = String(Base64.getDecoder().decode(userNamePassword), UTF_8)
+        val userName = userNamePassword.substringBefore(":")
+        val password = userNamePassword.substringAfter(":")
+        return Pair(userName, password)
     }
 
     private fun generateToken(authentication: Authentication): String {

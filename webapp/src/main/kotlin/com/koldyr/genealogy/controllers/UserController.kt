@@ -4,15 +4,16 @@ import java.net.URI
 import io.swagger.v3.oas.annotations.tags.Tag
 import io.swagger.v3.oas.annotations.tags.Tags
 import jakarta.validation.Valid
+import jakarta.validation.constraints.Size
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.http.ResponseEntity
 import org.springframework.http.ResponseEntity.created
 import org.springframework.http.ResponseEntity.ok
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import com.koldyr.genealogy.dto.Credentials
 import com.koldyr.genealogy.dto.UserDTO
 import com.koldyr.genealogy.model.User
 import com.koldyr.genealogy.services.UserService
@@ -33,7 +34,7 @@ class UserController(
     }
 
     @PostMapping("/login")
-    fun login(@RequestBody @Valid credentials: Credentials): ResponseEntity<UserDTO> {
+    fun login(@RequestHeader(AUTHORIZATION) @Size(max = 256) credentials: String): ResponseEntity<UserDTO> {
         val user = userService.login(credentials)
 
         return ok()

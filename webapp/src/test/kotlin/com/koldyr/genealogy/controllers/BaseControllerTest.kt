@@ -2,6 +2,7 @@ package com.koldyr.genealogy.controllers
 
 import java.lang.Long.parseLong
 import java.time.LocalDate
+import kotlin.text.Charsets.UTF_8
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.apache.commons.lang3.RandomStringUtils.randomAlphabetic
 import org.hamcrest.Matchers.matchesRegex
@@ -160,9 +161,10 @@ abstract class BaseControllerTest {
 
     protected fun login(credentials: Credentials): String {
         return mockMvc.post("/api/v1/user/login") {
-            content = mapper.writeValueAsString(credentials)
-            contentType = APPLICATION_JSON
             accept = APPLICATION_JSON
+            headers {
+                setBasicAuth(credentials.username, credentials.password, UTF_8)
+            }
         }
             .andExpect {
                 status { isOk() }

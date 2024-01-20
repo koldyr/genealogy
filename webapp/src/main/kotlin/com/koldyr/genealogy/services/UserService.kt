@@ -1,6 +1,5 @@
 package com.koldyr.genealogy.services
 
-import com.koldyr.genealogy.dto.Credentials
 import com.koldyr.genealogy.dto.LineageUser
 import com.koldyr.genealogy.model.User
 
@@ -13,5 +12,5 @@ import com.koldyr.genealogy.model.User
 interface UserService {
     fun create(user: User)
     fun currentUser(): User
-    fun login(credentials: Credentials): LineageUser
+    fun login(credentials: String): LineageUser
 }
