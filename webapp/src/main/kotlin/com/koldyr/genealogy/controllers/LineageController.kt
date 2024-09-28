@@ -32,6 +32,7 @@ import com.koldyr.genealogy.services.LineageService
 
 const val TEXT_CSV = "text/csv"
 const val TEXT_GED = "text/ged"
+const val TEXT_PLANTUML = "text/plantuml"
 
 /**
  * Description of the LineageController class
@@ -131,7 +132,7 @@ class LineageController(
         description = "Export lineage to client",
         responses = [ApiResponse(description = "Lineage data", responseCode = "200")]
     )
-    @GetMapping("/{lineageId}/export", produces = [APPLICATION_JSON_VALUE, TEXT_CSV, TEXT_GED])
+    @GetMapping("/{lineageId}/export", produces = [APPLICATION_JSON_VALUE, TEXT_CSV, TEXT_GED, TEXT_PLANTUML])
     fun exportLineage(
         @PathVariable("lineageId") lineageId: Long,
         @RequestHeader(ACCEPT, required = false) dataType: String?,

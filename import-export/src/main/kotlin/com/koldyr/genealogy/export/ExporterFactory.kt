@@ -13,6 +13,7 @@ object ExporterFactory {
             type == null || type.contains("ged") -> GEDExporter()
             type.contains("json") -> JSONExporter()
             type.contains("csv") -> CSVExporter()
+            type.contains("plantuml") -> PlantUMLExporter()
             else -> throw UnsupportedExportFormatException("Unsupported format $type")
         }
     }

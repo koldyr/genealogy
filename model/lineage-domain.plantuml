@@ -77,16 +77,16 @@ class Role {
    name:  String
 }
 
-Lineage::families   "0..1"  --->    "0..*" Family
-Lineage             "0..*"  -->     "0..1" User
-Family::events      "1"     <--->   "0..*" FamilyEvent
-Family              "0..1"  -->     "0..*" Person
-Family              "0..*"  -->     "0..1" User
-FamilyEvent                 --^            LifeEvent
-Person              "0..*"  -->     "0..1" User
-PersonNames                 -*             Person
-PersonEvent                 --^            LifeEvent
-Person::events      "1"     <-->    "0..*" PersonEvent
-Role                "0..*"  ->      "1"    User::roles
-LifeEvent::type             ->             EventType
+Lineage         "0..1"  -->     "0..*" Family
+Lineage         "0..*"  -->     "0..1" User
+Family          "1"     <--->   "0..*" FamilyEvent
+Family          "0..1"  -->     "0..*" Person
+Family          "0..*"  -->     "0..1" User
+FamilyEvent             --^            LifeEvent
+Person          "0..*"  -->     "0..1" User
+PersonNames             -*             Person
+PersonEvent             --^            LifeEvent
+Person          "1"     <-->    "0..*" PersonEvent
+User           "1"     -->      "0..*" Role
+LifeEvent               ->             EventType
 @enduml

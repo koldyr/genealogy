@@ -1,10 +1,11 @@
 package com.koldyr.genealogy.services
 
 import java.io.ByteArrayOutputStream
-import java.util.UUID
+import java.util.*
 import org.slf4j.LoggerFactory
 import org.springframework.dao.DataAccessException
-import org.springframework.http.HttpStatus.*
+import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -120,10 +121,10 @@ class LineageServiceImpl(
     override fun exportLineage(lineageId: Long, dataType: String?): ByteArray {
         try {
             val lineage = findAndCheck(lineageId)
-            val importer = ExporterFactory.create(dataType)
+            val exporter = ExporterFactory.create(dataType)
 
             val output = ByteArrayOutputStream()
-            importer.export(lineage, output)
+            exporter.export(lineage, output)
 
             return output.toByteArray()
         } catch (e: DataAccessException) {

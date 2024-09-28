@@ -1,11 +1,6 @@
 ### User login
 POST http://{{server}}/api/v1/user/login
-Content-Type: application/json
-
-{
-  "username": "me@koldyr.com",
-  "password": "{{testUserPwd}}"
-}
+Authorization: Basic {{basicAuthValue}}
 
 ### Import Lineage
 POST http://{{server}}/api/v1/lineage/import
@@ -51,6 +46,6 @@ Content-Type: application/json
 }
 
 ### Export Lineage
-GET http://{{server}}/api/v1/lineage/2/export
+GET http://{{server}}/api/v1/lineage/9/export
 Authorization: Bearer {{authToken}}
-Accept: text/ged
+Accept: text/plantuml;charset=UTF-8
