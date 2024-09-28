@@ -5,6 +5,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import org.apache.commons.lang3.StringUtils.EMPTY
 import com.koldyr.genealogy.model.Family
+import com.koldyr.genealogy.model.Gender
 import com.koldyr.genealogy.model.Lineage
 import com.koldyr.genealogy.model.Person
 import com.koldyr.genealogy.model.PersonNames
@@ -30,6 +31,7 @@ class PlantUMLExporter : Exporter {
                 writer.write(person(person))
                 writer.newLine()
             }
+            writer.newLine()
             lineage.families.forEach { family ->
                 writer.write(family(family))
                 writer.newLine()
@@ -40,7 +42,7 @@ class PlantUMLExporter : Exporter {
     }
 
     private fun person(it: Person): String {
-        return "actor \"${personNames(it.name)}\" as p${it.id}"
+        return "actor \"${personNames(it.name)}\" as p${it.id} #${if (it.gender == Gender.MALE) "red" else "blue"}"
     }
 
     private fun family(it: Family): String {
