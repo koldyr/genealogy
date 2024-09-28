@@ -1,0 +1,92 @@
+@startuml
+
+'top to bottom direction
+'skinparam linetype ortho
+hide methods
+
+class Lineage {
+   id:  Long
+   name:  String
+   families: List<Family>
+   note:  String
+}
+
+class Family {
+   id:  Long 
+   wife: Person
+   husband: Person
+   children: List<Person>
+   events: List<FamilyEvent>
+   note:  String
+}
+
+class Person {
+   id:  Long
+   gender:  Gender
+   occupation:  String
+   place:  String
+   photo:  byte[]
+   events: List<PersonEvent>
+   note:  String
+}
+class PersonNames {
+   first:  String
+   last:  String
+   maiden:  String
+   middle:  String
+}
+
+class LifeEvent {
+   id:  Long
+   date:  LocalDate
+   place:  String
+   prefix:  EventPrefix
+   type:  EventType
+   note:  String
+}
+class FamilyEvent
+class PersonEvent
+
+enum EventType {
+    Birth
+    Death
+    Engagement
+    Marriage
+    Divorce
+    Adoption
+    Christening
+    Relocation
+    Education
+    Emigration
+    GetJob
+    Graduation
+    Retirement
+    Immigration
+}
+
+class User {
+   id:  Long 
+   email:  String 
+   name:  String 
+   password:  String 
+   surName:  String
+   roles: List<Role>
+}
+class Role {
+   id:  Integer
+   name:  String
+}
+
+Lineage::families   "0..1"  --->    "0..*" Family
+Lineage             "0..*"  -->     "0..1" User
+Family::events      "1"     <--->   "0..*" FamilyEvent
+Family              "0..1"  -->     "0..*" Person
+Family              "0..*"  -->     "0..1" User
+FamilyEvent                 --^            LifeEvent
+Person              "0..*"  -->     "0..1" User
+PersonNames                 -*             Person
+PersonEvent                 --^            LifeEvent
+Person::events      "1"     <-->    "0..*" PersonEvent
+Role                "0..*"  ->      "1"    User::roles
+LifeEvent::type             ->             EventType
+@enduml

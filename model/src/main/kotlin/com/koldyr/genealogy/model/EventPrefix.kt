@@ -14,7 +14,7 @@ enum class EventPrefix(
     companion object {
         fun parse(value: String?): EventPrefix? {
             if (value == null) return null
-            for (prefix in values()) {
+            for (prefix in entries) {
                 if (value.contains(prefix.code)) {
                     return prefix
                 }

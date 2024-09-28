@@ -83,8 +83,7 @@ class Person() : Cloneable {
     @ManyToOne @JoinColumn(name = "USER_ID", nullable = false) @JsonIgnore
     var user: User? = null
 
-    @Column(name = "LINEAGE_ID")
-    @JsonIgnore
+    @Column(name = "LINEAGE_ID") @JsonIgnore
     var lineageId: Long? = null
 
     constructor(id: Long) : this() {
