@@ -3,7 +3,7 @@ package com.koldyr.genealogy.importer
 import java.io.BufferedInputStream
 import java.io.InputStream
 import java.nio.charset.Charset
-import java.nio.file.Files.*
+import java.nio.file.Files.newInputStream
 import java.nio.file.Path
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -305,7 +305,7 @@ class GEDImporter : Importer {
     }
 
     private fun parseMonth(month: String): String {
-        return StringUtils.capitalize(month.toLowerCase())
+        return StringUtils.capitalize(month.lowercase())
     }
 
     private fun handleNote(line: String, event: LifeEvent?, person: Person?, family: Family?) {
